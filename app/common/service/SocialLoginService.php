@@ -42,7 +42,7 @@ class SocialLoginService
     {
         $defaults = [
             'enabled' => 0,
-            'connect_url' => 'https://v.910627.xyz/connect.php',
+            'connect_url' => '',
             'appid' => '',
             'appkey' => '',
             'types' => [

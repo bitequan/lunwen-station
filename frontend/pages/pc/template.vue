@@ -106,7 +106,7 @@
                 <li><strong>格式建议：</strong>建议使用标准页面设置，避免复杂排版和特殊字体</li>
                 <li>
                   <strong>封面模板：</strong>
-                  <a class="demo-link" href="https://adhelp-muban.oss-cn-beijing.aliyuncs.com/actions/mubanfengmain.docx" target="_blank" rel="noopener">
+                  <a class="demo-link" href="https://example.com/sample-cover.docx" target="_blank" rel="noopener">
                     下载参考封面
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

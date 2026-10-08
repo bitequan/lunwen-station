@@ -764,7 +764,7 @@ class Index extends BaseController
 
         $defaults = [
             'enabled' => 0,
-            'connect_url' => 'https://v.910627.xyz/connect.php',
+            'connect_url' => '',
             'appid' => '',
             'appkey' => '',
             'types' => [
@@ -1374,7 +1374,7 @@ class Index extends BaseController
             // 如果配置文件不存在，使用默认配置
             $configs = [
                 'agent_id_prefix' => AgentIdHelper::DEFAULT_PREFIX,
-                'api_url' => 'http://e.com/',
+                'api_url' => 'http://lwapi2.wangkedaan.com/',
                 'api_token' => 'your_api_token_here',
             ];
         }
@@ -1393,7 +1393,7 @@ class Index extends BaseController
             'api_url' => [
                 'id' => 1,
                 'config_key' => 'api_url',
-                'config_value' => $configs['api_url'] ?? 'http://e.com/',
+                'config_value' => $configs['api_url'] ?? 'http://lwapi2.wangkedaan.com/',
                 'config_desc' => '对接域名',
                 'config_type' => 'string',
                 'sort' => 1,
@@ -2589,9 +2589,6 @@ class Index extends BaseController
         }
 
         $connect = trim((string) ($data['connect_url'] ?? ''));
-        if ($connect === '') {
-            $connect = 'https://v.910627.xyz/connect.php';
-        }
 
         $existing = [];
         $raw = \app\model\SystemConfig::getValue(\app\common\service\SocialLoginService::CONFIG_KEY_AGGREGATE);

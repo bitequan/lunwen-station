@@ -556,8 +556,8 @@ $siteUrlOk = !empty($site_url_configured);
 
             <div class="form-group">
                 <label class="form-label" for="connect_url">聚合接口地址</label>
-                <input type="url" id="connect_url" name="connect_url" value="<?php echo htmlspecialchars((string)($cfg['connect_url'] ?? 'https://v.910627.xyz/connect.php')); ?>" placeholder="https://v.910627.xyz/connect.php">
-                <div class="form-hint">一般为 connect.php 完整 URL，保存时会自动拼接 act、appid、appkey 等参数。</div>
+                <input type="url" id="connect_url" name="connect_url" value="<?php echo htmlspecialchars((string)($cfg['connect_url'] ?? '')); ?>" placeholder="https://your-aggregate-login-domain/connect.php">
+                <div class="form-hint">为你自己的聚合登录服务地址（connect.php 完整 URL），保存时会自动拼接 act、appid、appkey 等参数。</div>
             </div>
 
             <div class="form-group">
