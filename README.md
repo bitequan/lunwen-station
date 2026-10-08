@@ -26,13 +26,13 @@
 
 **AI 率检测 · 多平台一键实测**
 
-<img src="docs/screenshots/pc-ai-check.png" width="560" alt="AI 率检测：PaperPass / 维普 / 大雅 / 格子达多平台，AI 率圆环与片段明细"/>
+<img src="docs/screenshots/pc-ai-check.jpg" width="560" alt="AI 率检测：PaperPass / 维普 / 大雅 / 格子达多平台，AI 率圆环与片段明细"/>
 
 <br/>
 
 **AIGC 降重 · 原文与降重结果对照**
 
-<img src="docs/screenshots/pc-aigc-reduce.png" width="560" alt="AIGC 降重：12 个中文平台 + 英文模式，降前降后对照"/>
+<img src="docs/screenshots/pc-aigc-reduce.jpg" width="560" alt="AIGC 降重：12 个中文平台 + 英文模式，降前降后对照"/>
 
 </div>
 
@@ -52,7 +52,7 @@
 
 **分步式下单 · AI 论文创建页**
 
-<img src="docs/screenshots/pc-home.png" width="560" alt="AI 论文创建页：填写标题与参数 → 选择模板 → 生成大纲"/>
+<img src="docs/screenshots/pc-home.jpg" width="560" alt="AI 论文创建页：填写标题与参数 → 选择模板 → 生成大纲"/>
 
 </div>
 
@@ -75,9 +75,9 @@
 | **AI 率降重（英文）** | Turnitin、ZeroGPT、知网、维普、格子达 |
 | **重复率降重** | PaperPass、PaperYY 等 |
 
-降AI效果经开放测试与平台官方判定比对：
+AI 率检测准确度 —— 开放测试期间与平台官方判定比对，系统检测结果与平台判定一致的比率：
 
-| 平台 | 比对样本 | 降后与人工判定一致率 |
+| 平台 | 比对样本 | 检测判定一致率 |
 | --- | --- | --- |
 | PaperPass | 803 段 | **97.14%** |
 | 大雅 | 746 段 | **94.91%** |
@@ -105,7 +105,7 @@
 
 **H5 移动端 · 底部 Tab 导航**
 
-<img src="docs/screenshots/h5-home.png" width="360" alt="H5 移动端首页"/>
+<img src="docs/screenshots/h5-home.jpg" width="320" alt="H5 移动端首页"/>
 
 </div>
 
