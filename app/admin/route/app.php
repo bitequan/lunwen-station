@@ -158,37 +158,7 @@ Route::group('/', function () {
         Route::get('migrateAdmin', 'database/migrateAdmin');
         Route::post('migrateAdmin', 'database/migrateAdmin');
     });
-    
-    // 版本更新
-    Route::get('versionCenter', 'version/index');
-    Route::group('version', function () {
-        // 获取当前版本
-        Route::get('current', 'version/current');
-        // 检查更新
-        Route::get('check', 'version/check');
-        // 在线检查更新
-        Route::get('checkOnline', 'version/checkOnline');
-        // 创建在线更新任务
-        Route::post('createTask', 'version/createTask');
-        // 启动在线更新任务
-        Route::post('startTask', 'version/startTask');
-        // 查询在线更新任务状态
-        Route::get('taskStatus', 'version/taskStatus');
-        // 查询在线更新任务日志
-        Route::get('taskLogs', 'version/taskLogs');
-        // 重试在线更新任务
-        Route::post('retryTask', 'version/retryTask');
-        // 手动回滚在线更新任务
-        Route::post('rollbackTask', 'version/rollbackTask');
-        // 上传更新包
-        Route::post('upload', 'version/upload');
-        // 应用更新
-        Route::post('apply', 'version/apply');
-        // 获取更新历史
-        Route::get('history', 'version/history');
-        // 设置版本号
-        Route::post('set', 'version/setVersion');
-    });
+
     })->middleware(\app\admin\middleware\AdminAuth::class);
 
     Route::post('testEmailConfig', 'index/testEmailConfig')
