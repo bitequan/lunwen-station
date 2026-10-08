@@ -1,0 +1,1 @@
+import e from"./CUJ35jXl.js";import{_ as t,u as r,c as a,d as s,b as o}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const c={class:"m-rewrite-wrap"},_={__name:"rewrite",setup(i){return r({title:"段落改写"}),(p,d)=>(o(),a("div",c,[s(e)]))}},l=t(_,[["__scopeId","data-v-45d0a08f"]]);export{l as default};

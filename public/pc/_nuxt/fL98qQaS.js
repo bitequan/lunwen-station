@@ -1,0 +1,1 @@
+import t from"./Dn6vS0wK.js";import{_ as a,u as e,c as s,d as o,b as r}from"./BkmVlzPN.js";import"./BGUsDQsT.js";import"./CnGO2uq1.js";import"./BlRpTDXp.js";import"./BzJVkfZx.js";const c={class:"m-task-wrap"},_={__name:"task",setup(p){return e({title:"任务书"}),(m,i)=>(r(),s("div",c,[o(t)]))}},x=a(_,[["__scopeId","data-v-7c73b712"]]);export{x as default};

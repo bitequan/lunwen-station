@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大纲模板管理</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 20px 20px 48px; box-sizing: border-box; min-height: 100vh; background: #f5f7fb; }
+        .card { background: #fff; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,.08); padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .title { margin: 0; font-size: 20px; color: #222; }
+        .btn { border: 0; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+        .btn-primary { background: #1677ff; color: #fff; }
+        .btn-danger { background: #ff4d4f; color: #fff; }
+        .btn-default { background: #f0f0f0; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; text-align: left; vertical-align: top; }
+        th { background: #fafafa; color: #555; font-weight: 600; }
+        .actions { display: flex; gap: 8px; }
+        .preview { max-width: 600px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: #666; }
+        .muted { color: #999; }
+        .tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; display: inline-block; }
+        .tag-on { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+        .tag-off { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; }
+        .modal { width: 760px; max-width: 92vw; background: #fff; border-radius: 10px; overflow: hidden; }
+        .modal-header { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 16px; }
+        .form-item { margin-bottom: 12px; }
+        .form-item label { display: block; margin-bottom: 6px; color: #444; }
+        .input, .textarea { width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; padding: 8px 10px; }
+        .textarea { min-height: 220px; resize: vertical; line-height: 1.6; }
+        .modal-footer { padding: 12px 16px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+        .pager {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 14px 18px;
+            color: #475569;
+            font-size: 13px;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+        }
+        .pager > div:first-child {
+            font-weight: 500;
+            color: #334155;
+            letter-spacing: 0.02em;
+        }
+        .pager-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .pager .btn {
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+        }
+        .pager .btn:not(:disabled):active { transform: translateY(1px); }
+        .pager .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+        .pager .select {
+            min-width: 100px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #334155;
+            font-size: 13px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+        @media (max-width: 768px) {
+            body { padding: 12px 12px 56px; background: #f3f6fc; }
+            .card { padding: 14px; border-radius: 14px; }
+            .header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 12px; }
+            /* 新建模板等头部按钮：不占满整行，右对齐更易点且视觉更紧凑 */
+            .header .btn { width: auto; max-width: 100%; align-self: flex-end; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; box-sizing: border-box; }
+            thead { display: none; }
+            table { border-collapse: separate; border-spacing: 0 10px; }
+            tbody tr {
+                margin-bottom: 10px;
+                background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+                border: 1px solid #e8eef8;
+                border-radius: 14px;
+                box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+                padding: 10px 12px;
+            }
+            tbody td {
+                border: 0;
+                padding: 7px 0;
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 10px;
+                font-size: 14px;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                color: #6b7280;
+                font-size: 12px;
+                line-height: 1.6;
+                flex: 0 0 74px;
+            }
+            .preview {
+                max-width: none;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: unset;
+                color: #4b5563;
+            }
+            .actions {
+                width: 100%;
+                flex-wrap: nowrap;
+                justify-content: flex-end;
+                gap: 6px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .actions .btn {
+                flex: 0 0 auto;
+                min-width: 66px;
+                padding: 5px 9px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .pager {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                margin-top: 16px;
+                padding: 14px 14px 16px;
+                border-radius: 14px;
+            }
+            .pager-actions { justify-content: stretch; gap: 8px; flex-wrap: nowrap; }
+            .pager .select { flex: 0 1 auto; min-width: 100px; max-width: 42%; }
+            .pager .btn { flex: 1; min-width: 72px; }
+            .modal { width: calc(100vw - 20px); max-width: calc(100vw - 20px); border-radius: 12px; }
+            .modal-body { padding: 12px; }
+            .textarea { min-height: 180px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h2 class="title">大纲模板管理</h2>
+        <button class="btn btn-primary" onclick="openEditor()">新建模板</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 220px;">模板名称</th>
+                <th>模板内容</th>
+                <th style="width: 120px;">是否分享</th>
+                <th style="width: 180px;">更新时间</th>
+                <th style="width: 240px;">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="5" class="muted" data-label="">加载中...</td></tr>
+        </tbody>
+    </table>
+    <div class="pager">
+        <div id="pagerInfo">第 1 / 1 页，共 0 条</div>
+        <div class="pager-actions">
+            <select id="pageSize" class="select" onchange="changePageSize()">
+                <option value="10">10条/页</option>
+                <option value="20" selected>20条/页</option>
+                <option value="30">30条/页</option>
+                <option value="50">50条/页</option>
+            </select>
+            <button id="prevBtn" class="btn btn-default" onclick="changePage(-1)">上一页</button>
+            <button id="nextBtn" class="btn btn-default" onclick="changePage(1)">下一页</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-mask" id="editorMask">
+    <div class="modal">
+        <div class="modal-header">
+            <strong id="editorTitle">新建模板</strong>
+            <button class="btn btn-default" onclick="closeEditor()">关闭</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="templateId">
+            <div class="form-item">
+                <label>模板名称</label>
+                <input id="templateName" class="input" placeholder="请输入模板名称">
+            </div>
+            <div class="form-item">
+                <label>模板内容</label>
+                <textarea id="templateContent" class="textarea" placeholder="请输入模板内容"></textarea>
+            </div>
+            <div class="form-item">
+                <label>是否分享</label>
+                <select id="templateShare" class="input">
+                    <option value="0" selected>不分享</option>
+                    <option value="1">分享</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" onclick="closeEditor()">取消</button>
+            <button class="btn btn-primary" onclick="saveTemplate()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+var pager = {
+    page: 1,
+    pageSize: 20,
+    total: 0,
+    totalPage: 1
+};
+
+function esc(str) {
+    return String(str || '').replace(/[&<>"']/g, function (m) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+    });
+}
+
+function fmtTime(v) {
+    if (!v) return '-';
+    if (typeof v === 'string' && v.indexOf('-') > -1) return v;
+    var n = Number(v);
+    if (!n) return String(v);
+    var d = new Date(n * 1000);
+    if (isNaN(d.getTime())) return String(v);
+    var p = function (x) { return String(x).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function toInt(v, dft) {
+    var n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : dft;
+}
+
+function applyPager(data, listLen) {
+    var total = toInt(data && (data.total || data.count || data.total_count), 0);
+    var page = toInt(data && (data.page || data.current_page), pager.page);
+    var pageSize = toInt(data && (data.page_size || data.per_page), pager.pageSize);
+    if (!total) {
+        total = toInt(data && (data.total_page || data.last_page), 0) * pageSize;
+    }
+    if (!total) {
+        total = listLen;
+    }
+    var totalPage = toInt(data && (data.total_page || data.last_page), Math.ceil(total / pageSize) || 1);
+    pager.page = Math.min(page, totalPage);
+    pager.pageSize = pageSize;
+    pager.total = total;
+    pager.totalPage = Math.max(1, totalPage);
+}
+
+function renderPager() {
+    document.getElementById('pagerInfo').textContent = '第 ' + pager.page + ' / ' + pager.totalPage + ' 页，共 ' + pager.total + ' 条';
+    document.getElementById('prevBtn').disabled = pager.page <= 1;
+    document.getElementById('nextBtn').disabled = pager.page >= pager.totalPage;
+    document.getElementById('pageSize').value = String(pager.pageSize);
+}
+
+function changePage(step) {
+    var next = pager.page + Number(step || 0);
+    if (next < 1 || next > pager.totalPage) return;
+    pager.page = next;
+    loadList();
+}
+
+function changePageSize() {
+    pager.pageSize = toInt(document.getElementById('pageSize').value, 20);
+    pager.page = 1;
+    loadList();
+}
+
+async function loadList() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '<tr><td colspan="5" class="muted" data-label="">加载中...</td></tr>';
+    try {
+        const url = '/admin/getOutlineTemplates?page=' + encodeURIComponent(String(pager.page))
+            + '&page_size=' + encodeURIComponent(String(pager.pageSize));
+        const res = await fetch(url);
+        const json = await res.json();
+        const data = (json && json.code === 1 && json.data) ? json.data : {};
+        const list = Array.isArray(data.list) ? data.list : (Array.isArray(data) ? data : []);
+        applyPager(data, list.length);
+        renderPager();
+        if (!list.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="muted" data-label="">暂无数据</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(item => {
+            const id = Number(item.id || 0);
+            const content = item.template_content || '';
+            const preview = content.length > 80 ? content.slice(0, 80) + '...' : content;
+            const isShare = Number(item.enable_subordinate || 0) === 1;
+            const shareTag = isShare
+                ? '<span class="tag tag-on">已分享</span>'
+                : '<span class="tag tag-off">未分享</span>';
+            const shareBtn = isShare
+                ? '<button class="btn btn-default" onclick="updateShare(' + id + ',0)">取消分享</button>'
+                : '<button class="btn btn-primary" onclick="updateShare(' + id + ',1)">设为分享</button>';
+            return '<tr>'
+                + '<td data-label="模板名">' + esc(item.template_name || '-') + '</td>'
+                + '<td data-label="模板内容"><div class="preview" title="' + esc(content) + '">' + esc(preview) + '</div></td>'
+                + '<td data-label="分享">' + shareTag + '</td>'
+                + '<td data-label="更新时间">' + esc(fmtTime(item.update_time || item.create_time)) + '</td>'
+                + '<td data-label="操作"><div class="actions">'
+                + shareBtn
+                + '<button class="btn btn-default" onclick="editTemplate(' + id + ')">编辑</button>'
+                + '<button class="btn btn-danger" onclick="removeTemplate(' + id + ')">删除</button>'
+                + '</div></td>'
+                + '</tr>';
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5" class="muted" data-label="">加载失败</td></tr>';
+        renderPager();
+    }
+}
+
+function openEditor() {
+    document.getElementById('editorTitle').textContent = '新建模板';
+    document.getElementById('templateId').value = '';
+    document.getElementById('templateName').value = '';
+    document.getElementById('templateContent').value = '';
+    document.getElementById('templateShare').value = '0';
+    document.getElementById('editorMask').style.display = 'flex';
+}
+
+function closeEditor() {
+    document.getElementById('editorMask').style.display = 'none';
+}
+
+async function editTemplate(id) {
+    if (!id) return;
+    const res = await fetch('/admin/getOutlineTemplateDetail?id=' + id);
+    const json = await res.json();
+    if (!json || json.code !== 1 || !json.data) {
+        alert(json && json.msg ? json.msg : '获取详情失败');
+        return;
+    }
+    const item = json.data;
+    document.getElementById('editorTitle').textContent = '编辑模板';
+    document.getElementById('templateId').value = item.id || id;
+    document.getElementById('templateName').value = item.template_name || '';
+    document.getElementById('templateContent').value = item.template_content || '';
+    document.getElementById('templateShare').value = String(Number(item.enable_subordinate || 0) === 1 ? 1 : 0);
+    document.getElementById('editorMask').style.display = 'flex';
+}
+
+async function saveTemplate() {
+    const id = document.getElementById('templateId').value;
+    const template_name = document.getElementById('templateName').value.trim();
+    const template_content = document.getElementById('templateContent').value.trim();
+    const enable_subordinate = Number(document.getElementById('templateShare').value) === 1 ? 1 : 0;
+    if (!template_name || !template_content) {
+        alert('请填写完整信息');
+        return;
+    }
+    const payload = { template_name, template_content, enable_subordinate };
+    if (id) payload.id = Number(id);
+    const res = await fetch('/admin/saveOutlineTemplate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json && json.code === 1) {
+        closeEditor();
+        loadList();
+        return;
+    }
+    alert(json && json.msg ? json.msg : '保存失败');
+}
+
+async function updateShare(id, enableSubordinate) {
+    if (!id) return;
+    if (Number(enableSubordinate) === 1 && !confirm('分享将向本系统用户共享此模板使用，确定继续吗？')) {
+        return;
+    }
+    const res = await fetch('/admin/updateOutlineTemplateShare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: Number(id), enable_subordinate: Number(enableSubordinate) === 1 ? 1 : 0 })
+    });
+    const json = await res.json();
+    if (json && json.code === 1) {
+        loadList();
+        return;
+    }
+    alert(json && json.msg ? json.msg : '更新分享设置失败');
+}
+
+async function removeTemplate(id) {
+    if (!id) return;
+    if (!confirm('确定删除该模板？')) return;
+    const res = await fetch('/admin/deleteOutlineTemplate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: Number(id) })
+    });
+    const json = await res.json();
+    if (json && json.code === 1) {
+        loadList();
+        return;
+    }
+    alert(json && json.msg ? json.msg : '删除失败');
+}
+
+document.addEventListener('DOMContentLoaded', loadList);
+</script>
+</body>
+</html>

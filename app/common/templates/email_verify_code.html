@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{$typeText}验证码</title>
+    <style>
+        /* 基础样式 */
+        body { 
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        /* 容器优化 - 适配H5 */
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 10px; /* 减少左右间距 */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* 移动端适配 */
+        @media screen and (max-width: 640px) {
+            .container {
+                padding: 8px; /* 移动端更小的间距 */
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 25px 20px !important; /* 移动端减少内边距 */
+            }
+            
+            .code {
+                font-size: 28px !important; /* 移动端减小字体 */
+                padding: 15px 25px !important;
+                letter-spacing: 8px !important;
+            }
+            
+            .header {
+                padding: 20px 15px !important;
+            }
+            
+            .header h1 {
+                font-size: 20px !important;
+            }
+        }
+        
+        /* 超小屏幕适配 */
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .content {
+                padding: 20px 15px !important;
+            }
+            
+            .code {
+                font-size: 24px !important;
+                padding: 12px 20px !important;
+                letter-spacing: 6px !important;
+            }
+        }
+        
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 20px; 
+            text-align: center; 
+            border-radius: 10px 10px 0 0;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        .content { 
+            background: #fff; 
+            padding: 40px; 
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .code-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code { 
+            display: inline-block;
+            font-size: 36px; 
+            font-weight: bold; 
+            color: #1890ff; 
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 10px;
+            letter-spacing: 10px;
+            border: 2px dashed #1890ff;
+            box-shadow: 0 4px 15px rgba(24, 144, 255, 0.1);
+            word-break: break-all;
+        }
+        .tips {
+            background: #f8f9fa;
+            border-left: 4px solid #1890ff;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .tips h3 {
+            margin-top: 0;
+            color: #1890ff;
+            font-size: 16px;
+        }
+        .tips ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .tips li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .footer { 
+            margin-top: 40px; 
+            padding-top: 20px; 
+            border-top: 1px solid #e8e8e8; 
+            color: #999; 
+            font-size: 12px; 
+            text-align: center; 
+        }
+        .btn {
+            display: inline-block;
+            background: #1890ff;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #40a9ff;
+        }
+        .expire-notice {
+            color: #ff4d4f;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        
+        /* 内容区域字体优化 */
+        h2 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 15px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{$siteName}</h1>
+        </div>
+        <div class="content">
+            <h2>亲爱的用户：</h2>
+            <p>感谢您使用{$siteName}！</p>
+            <p>您正在进行{$typeText}操作，验证码为：</p>
+            
+            <div class="code-container">
+                <div class="code">{$verifyCode}</div>
+            </div>
+            
+            <div class="expire-notice">
+                ⏰ 请在{$expireMinutes}分钟内完成验证
+            </div>
+            
+            <div class="tips">
+                <h3>🔒 安全提示：</h3>
+                <ul>
+                    <li>请勿将验证码告知他人，包括{$siteName}客服</li>
+                    <li>验证码仅限本次操作使用，有效期为{$expireMinutes}分钟</li>
+                    <li>如非本人操作，请立即修改账户密码</li>
+                    <li>请妥善保管您的账户信息</li>
+                </ul>
+            </div>
+            
+            <p>如果这不是您的操作，请忽略此邮件。</p>
+            <p>如有任何问题，请联系我们的客服。</p>
+            
+            <p style="margin-top: 30px;">祝您使用愉快！</p>
+            <p><strong>{$siteName}团队</strong></p>
+        </div>
+        <div class="footer">
+            <p>此邮件由系统自动发送，请勿直接回复</p>
+            <p>© {$currentYear} {$siteName} 版权所有</p>
+            <p style="font-size: 11px; color: #ccc;">为了保障您的账户安全，请勿泄露此邮件内容</p>
+        </div>
+    </div>
+</body>
+</html>

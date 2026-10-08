@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .config-panel {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            animation: fadeInUp 0.3s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 32px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.02em;
+        }
+        
+        .panel-title::before {
+            content: '';
+            width: 5px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 商品分类区域 */
+        .product-section {
+            margin-bottom: 24px;
+            padding: 20px 20px 18px;
+            background: #fafcff;
+            border: 1px solid #e6eefb;
+            border-radius: 12px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            animation: fadeInUp 0.4s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .product-section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .product-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .product-section + .product-section {
+            margin-top: 18px;
+        }
+        
+        .product-card {
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.15s; }
+        .product-card:nth-child(3) { animation-delay: 0.2s; }
+        .product-card:nth-child(4) { animation-delay: 0.25s; }
+        .product-card:nth-child(5) { animation-delay: 0.3s; }
+        .product-card:nth-child(6) { animation-delay: 0.35s; }
+        .product-card:nth-child(7) { animation-delay: 0.4s; }
+        .product-card:nth-child(8) { animation-delay: 0.45s; }
+        .product-card:nth-child(9) { animation-delay: 0.5s; }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 14px;
+            padding: 0 0 12px 0;
+            border-bottom: 2px dashed #d6e4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+        }
+
+        #mainProductsGrid,
+        #reduceProductsGrid,
+        #aigcBundleGrid,
+        #toolsProductsGrid {
+            padding-top: 4px;
+        }
+
+        /* AIGC 降重：两入口共用对接价 */
+        .aigc-unified-section {
+            background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
+            border: 1px solid #c7d2fe;
+        }
+        .aigc-unified-head {
+            margin-bottom: 14px;
+        }
+        .aigc-unified-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e1b4b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .aigc-unified-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+            border-radius: 2px;
+        }
+        #aigcBundleGrid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        @media (max-width: 900px) {
+            #aigcBundleGrid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* 九宫格布局 */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        .product-card {
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .product-card:hover {
+            border-color: #d4d4d4;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+        
+        .product-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* 未启用商品的样式 */
+        .product-card.disabled-product {
+            opacity: 0.85;
+            border-color: #d9d9d9;
+            background: #fafafa;
+        }
+        
+        .product-card.disabled-product::before {
+            background: linear-gradient(90deg, #c0c4cc 0%, #a8adb4 100%);
+        }
+        
+        .product-card.disabled-product .product-name {
+            color: #8c8c8c;
+            font-weight: 600;
+        }
+        
+        .product-card.disabled-product .product-switch-wrapper:first-child .product-switch-label {
+            color: #8c8c8c;
+            font-weight: 600;
+        }
+        
+        .product-card.disabled-product .product-icon {
+            background: #f0f0f0;
+        }
+        
+        .product-card.disabled-product .product-icon svg {
+            color: #a8adb4;
+        }
+        
+        /* 卡片价格条 */
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            background: #f6f8ff;
+            border: 1px solid #eef0f8;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .product-price .pp-cost { color: #4263eb; font-weight: 600; }
+        .product-price .pp-plus { color: #8a8f98; }
+        .product-price .pp-eq { color: #0ca678; font-weight: 600; }
+        /* 阶梯/双版本价格条 */
+        .product-price .pp-tag {
+            font-size: 11px;
+            color: #4263eb;
+            background: #edf2ff;
+            border: 1px solid #bac8ff;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .product-price .pp-line { font-size: 12px; color: #495057; white-space: nowrap; }
+        .product-price .pp-line b { color: #0ca678; font-weight: 600; }
+
+        .product-card.disabled-product .product-price {
+            background: #f5f5f5;
+            border-color: #eee;
+        }
+        .product-card.disabled-product .product-price .pp-cost { color: #868e96; }
+        .product-card.disabled-product .product-price .pp-eq { color: #868e96; }
+        .product-card.disabled-product .product-price .pp-tag {
+            color: #868e96;
+            background: #f1f3f5;
+            border-color: #dee2e6;
+        }
+        .product-card.disabled-product .product-price .pp-line { color: #868e96; }
+        .product-card.disabled-product .product-price .pp-line b { color: #868e96; }
+        
+        .product-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .product-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .product-card:hover .product-icon {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        .product-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 不同商品的图标背景色 */
+        .product-icon.kaiti {
+            background: #f0f4ff;
+        }
+        .product-icon.kaiti svg {
+            color: #667eea;
+        }
+        
+        .product-icon.rws {
+            background: #fef0f5;
+        }
+        .product-icon.rws svg {
+            color: #f5576c;
+        }
+        
+        .product-icon.sx {
+            background: #e6f7ff;
+        }
+        .product-icon.sx svg {
+            color: #1890ff;
+        }
+        
+        .product-icon.sxrz {
+            background: #f0fdf4;
+        }
+        .product-icon.sxrz svg {
+            color: #52c41a;
+        }
+        
+        .product-icon.gjlw {
+            background: #fff7e6;
+        }
+        .product-icon.gjlw svg {
+            color: #fa8c16;
+        }
+        
+        .product-icon.ppt {
+            background: #e6f4ff;
+        }
+        .product-icon.ppt svg {
+            color: #096dd9;
+        }
+        
+        .product-icon.reduce {
+            background: #f6ffed;
+        }
+        .product-icon.reduce svg {
+            color: #73d13d;
+        }
+        
+        .product-icon.tools_wxlist {
+            background: #f0f4ff;
+        }
+        .product-icon.tools_wxlist svg {
+            color: #667eea;
+        }
+        
+        .product-icon.tools_rewrite {
+            background: #fff7e6;
+        }
+        .product-icon.tools_rewrite svg {
+            color: #fa8c16;
+        }
+        
+        .product-icon.tools_illustration {
+            background: #e6f7ff;
+        }
+        .product-icon.tools_illustration svg {
+            color: #1890ff;
+        }
+        
+        .product-icon.tools_chart {
+            background: #f0f4ff;
+        }
+        .product-icon.tools_chart svg {
+            color: #667eea;
+        }
+        
+        .product-icon.tools_createtitle {
+            background: #fff7e6;
+        }
+        .product-icon.tools_createtitle svg {
+            color: #fa8c16;
+        }
+        
+        .product-icon.tools_createoutline {
+            background: #f0fdf4;
+        }
+        .product-icon.tools_createoutline svg {
+            color: #52c41a;
+        }
+
+        .product-icon.file_aigcreduceweight {
+            background: #fff7e6;
+        }
+        .product-icon.file_aigcreduceweight svg {
+            color: #fa8c16;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            flex: 1;
+            letter-spacing: -0.01em;
+        }
+        
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .product-actions-section {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .product-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        
+        .product-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+        
+        .product-switch-wrapper:hover {
+            border-color: #d4d4d4;
+            background: #fafafa;
+        }
+        
+        .product-switches {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .product-switch-wrapper:last-child {
+            border-color: #e6f7ff;
+            background: #f0f9ff;
+        }
+        
+        .product-switch-wrapper:last-child .product-switch-label {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .product-switch-wrapper:last-child input:checked + .switch-slider {
+            background-color: #1890ff;
+        }
+        
+        .product-switch-wrapper:last-child:hover {
+            border-color: #91d5ff;
+            background: #e6f7ff;
+        }
+        
+        .product-sort-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .product-sort-label {
+            font-size: 12px;
+            color: #595959;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .product-sort-hint {
+            display: none;
+        }
+        
+        .product-sort-input {
+            width: 70px;
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+        
+        .product-sort-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+            background: #ffffff;
+        }
+        
+        .product-sort-input:read-only {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .product-sort-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+        }
+        
+        .product-sort-btn:hover {
+            background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+            box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .product-sort-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+        }
+        
+        .product-sort-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .product-switch-label {
+            font-size: 12px;
+            color: #595959;
+            font-weight: 500;
+        }
+        
+        /* 开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d9d9d9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 24px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .switch:hover .switch-slider {
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        
+        .switch input:checked + .switch-slider {
+            background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+            box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
+        }
+        
+        .switch input:checked + .switch-slider:before {
+            transform: translateX(18px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .switch input:disabled + .switch-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #262626;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e8e8e8;
+        }
+        
+        .btn:hover {
+            background: #fafafa;
+            border-color: #d4d4d4;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 关键：让表单成为 flex 容器，从而约束 modal-body 可滚动 */
+        #configForm {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        /* 底部按钮区不参与滚动 */
+        #configForm .form-actions {
+            flex-shrink: 0;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-shrink: 0;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 20px;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0; /* 关键：让 flex 子容器真正可滚动 */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 7px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #262626;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+        
+        .form-input:read-only {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+            flex-shrink: 0;
+        }
+        
+        /* Toast 提示框 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            min-width: 320px;
+            max-width: 420px;
+            padding: 14px 16px;
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            animation: toastSlideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        .toast.hiding {
+            animation: toastSlideOut 0.3s ease-out forwards;
+        }
+        
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #262626;
+        }
+        
+        .toast-close {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: #8c8c8c;
+            transition: color 0.2s ease;
+        }
+        
+        .toast-close:hover {
+            color: #262626;
+        }
+        
+        .toast-close svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .toast.success {
+            border-left-color: #52c41a;
+        }
+        
+        .toast.success .toast-icon {
+            color: #52c41a;
+        }
+        
+        .toast.error {
+            border-left-color: #ff4d4f;
+        }
+        
+        .toast.error .toast-icon {
+            color: #ff4d4f;
+        }
+        
+        .toast.warning {
+            border-left-color: #faad14;
+        }
+        
+        .toast.warning .toast-icon {
+            color: #faad14;
+        }
+        
+        .toast.info {
+            border-left-color: #1890ff;
+        }
+        
+        .toast.info .toast-icon {
+            color: #1890ff;
+        }
+        
+        @media (max-width: 1200px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+                background: #f5f7fa;
+            }
+            
+            .config-panel {
+                padding: 24px 20px;
+                border-radius: 12px;
+            }
+            
+            .panel-title {
+                font-size: 20px;
+                margin-bottom: 24px;
+            }
+            
+            .section-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .product-card {
+                padding: 20px;
+                border-radius: 10px;
+            }
+
+            .product-section {
+                padding: 14px;
+                border-radius: 10px;
+                margin-bottom: 16px;
+            }
+            
+            .product-header {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+            
+            .product-icon {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .product-icon svg {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .product-name {
+                font-size: 15px;
+            }
+            
+            .product-actions {
+                gap: 12px;
+            }
+            
+            .product-actions-section {
+                padding: 10px;
+            }
+            
+            .product-sort-wrapper {
+                padding: 12px;
+            }
+            
+            .product-sort-input {
+                width: 80px;
+                padding: 6px 10px;
+            }
+            
+            .product-sort-btn {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+            
+            .btn {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+                max-height: 95vh;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .modal-body {
+                padding: 12px;
+            }
+            
+            .form-group {
+                margin-bottom: 8px;
+            }
+            
+            .form-label {
+                margin-bottom: 4px;
+                font-size: 12px;
+            }
+            
+            .form-input {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .modal-header {
+                padding: 12px 16px;
+            }
+            
+            .form-actions {
+                padding: 10px 16px;
+            }
+            
+            .form-group div[style*="font-size: 11px"] {
+                margin-top: 2px !important;
+                font-size: 10px !important;
+            }
+            
+            .modal-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <div class="config-panel">
+            <h2 class="panel-title">商品管理</h2>
+            
+            <!-- 主要商品区域 -->
+            <div class="product-section">
+                <h3 class="section-title">主要商品</h3>
+                <div class="products-grid" id="mainProductsGrid">
+                    <!-- 主要商品卡片将通过JavaScript动态加载 -->
+                </div>
+            </div>
+
+            <!-- 查重降重区域 -->
+            <div class="product-section">
+                <h3 class="section-title">查重降重</h3>
+                <div class="products-grid" id="reduceProductsGrid">
+                    <!-- 查重降重商品卡片将通过JavaScript动态加载 -->
+                </div>
+            </div>
+
+            <!-- AIGC 降重：文档与工具共用对接计价（从上下两区抽出单独展示） -->
+            <div class="product-section aigc-unified-section" id="aigcBundleSection" style="display: none;">
+                <div class="aigc-unified-head">
+                    <div class="aigc-unified-title">AIGC 降重 · 统一对接计价</div>
+                </div>
+                <div class="products-grid" id="aigcBundleGrid"></div>
+            </div>
+            
+            <!-- 套餐商城区域（降重/AI检测时长包，本站加价载体） -->
+            <div class="product-section">
+                <h3 class="section-title">套餐商城</h3>
+                <div class="products-grid" id="packageProductsGrid">
+                    <!-- 套餐商品卡片将通过JavaScript动态加载 -->
+                </div>
+            </div>
+
+            <!-- 工具类商品区域 -->
+            <div class="product-section">
+                <h3 class="section-title">工具类商品</h3>
+                <div class="products-grid" id="toolsProductsGrid">
+                    <!-- 工具类商品卡片将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 设置模态框 -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">商品设置</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="configForm">
+                <input type="hidden" name="id" id="product_id">
+                <input type="hidden" name="code" id="product_code">
+                <input type="hidden" name="sort_order" id="product_sort_order">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">商品名称</label>
+                            <input type="text" name="name" id="product_name" class="form-input" placeholder="请输入商品名称" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">图标路径</label>
+                            <input type="text" name="icon" id="icon" class="form-input" placeholder="如：/assets/icons/menu_lw_order.svg">
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 3px;">商品图标文件路径</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" id="cost_price_label">对接成本价（元）</label>
+                            <input type="number" name="cost_price" id="cost_price" class="form-input" 
+                                   step="0.01" min="0" placeholder="自动从API获取" readonly>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 3px;" id="cost_price_hint">自动获取对接返回的底价</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" id="markup_label">加价金额（元）</label>
+                            <input type="number" name="markup" id="markup" class="form-input" 
+                                   step="0.01" min="0" placeholder="请输入加价金额" required>
+                        </div>
+                    </div>
+                    <div class="form-row" id="aigcBillingHourRow" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">对接单价（元/小时）</label>
+                            <input type="text" id="billing_price_per_hour_display" class="form-input" readonly
+                                   style="background: #f8fafc; color: #334155;" value="" tabindex="-1">
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 3px;">只读</div>
+                        </div>
+                        <div class="form-group"></div>
+                    </div>
+                    <div class="form-group full-width" id="priceDetailBox" style="display: none;">
+                        <div id="priceDetailContent"></div>
+                    </div>
+                    <div class="form-group full-width" id="reducePriceHintBox" style="display:none;">
+                        <div style="font-size: 12px; color: #d46b08; background: #fff7e6; border: 1px solid #ffd591; border-radius: 6px; padding: 8px 10px;">
+                            价格说明：当前设置价格为每千字单价，不足千字按照千字计算，实际按用户提交的字符数进行计费。
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                                <span>跟价开关</span>
+                                <label class="switch" style="margin: 0;">
+                                    <input type="checkbox" name="follow_price" id="follow_price" value="1">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </label>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 3px;">开启后在成本价基础上自动加价</div>
+                        </div>
+                        <div class="form-group">
+                            <!-- 占位，保持布局平衡 -->
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">商品滚动条通知</label>
+                        <textarea name="notice_text" id="notice_text" class="form-input" 
+                                  rows="2" placeholder="请输入商品通知内容（将在客户端商品页展示）"></textarea>
+                        <div style="font-size: 11px; color: #8c8c8c; margin-top: 3px;">此内容将在客户端对应的商品页面以滚动条形式展示</div>
+                    </div>
+                    
+                    <div class="form-group full-width" id="guideSettingsBox" style="display:none;">
+                        <label class="form-label" style="display:flex;align-items:center;gap:10px;">
+                            <span>下单引导图设置</span>
+                            <span style="font-size: 11px; color:#8c8c8c; font-weight:500;">适用于：AI论文、PPT、开题/任务书/实习报告/实习日志；查重入口下的论文降重助手；以及小工具中心内各独立工具页（code 以 tools_ 开头，不含 tools_center 聚合页）</span>
+                        </label>
+                        
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                            <label class="switch" style="margin: 0;">
+                                <input type="checkbox" name="guide_enabled" id="guide_enabled" value="1" disabled>
+                                <span class="switch-slider"></span>
+                            </label>
+                            <span class="product-switch-label" style="font-size:12px;color:#595959;font-weight:500;">开启显示</span>
+                        </div>
+                        
+                        <!-- 上传后将返回的 URL 写入隐藏字段 guide_image -->
+                        <input type="hidden" name="guide_image" id="guide_image" disabled>
+
+                        <div style="border:1px dashed #d9d9d9;border-radius:12px;padding:16px 14px;background:#fafafa;">
+                            <input type="file" id="guide_image_file" accept="image/*" disabled style="display:none;">
+                            <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+                                <!-- 上传占位：复用你截图中的“添加”虚线卡片风格 -->
+                                <div id="guide_image_pick_btn"
+                                     role="button"
+                                     tabindex="0"
+                                     aria-label="添加引导图"
+                                     style="width:190px;height:140px;border:1px dashed #d9d9d9;border-radius:14px;background:#ffffff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.02);"
+                                >
+                                    <i class="fas fa-plus" style="font-size:26px;color:#9ca3af;"></i>
+                                    <div style="font-size:14px;color:#9ca3af;line-height:1;">添加</div>
+                                </div>
+                                
+                                <div id="guide_image_preview_wrap" style="display:none;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+                                    <img id="guide_image_preview" alt="引导图缩略图"
+                                         style="width:140px;max-height:90px;object-fit:contain;border-radius:10px;border:1px solid #e8e8e8;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                                    
+                                    <div id="guide_image_view_large_icon"
+                                         role="button"
+                                         tabindex="0"
+                                         aria-label="查看大图"
+                                         title="查看大图"
+                                         class="btn">
+                                        查看大图
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                                <div style="font-size:11px;color:#8c8c8c;">只展示缩略图，点击“查看大图”可放大预览</div>
+                                <span id="guide_image_upload_status" style="font-size:11px;color:#8c8c8c;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 下单引导图大图预览模态框 -->
+    <div class="modal" id="guideImageBigModal" style="z-index:2500;">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-header">
+                <h2 class="modal-title">引导图预览</h2>
+                <button class="modal-close" onclick="closeGuideImageBigModal()">×</button>
+            </div>
+            <div class="modal-body" style="padding:20px;">
+                <img id="guideImageBigPreview"
+                     src=""
+                     alt="引导图大图预览"
+                     style="width:100%;height:auto;max-height:70vh;object-fit:contain;border-radius:12px;border:1px solid #e8e8e8;background:#fff;">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 加载商品列表
+        async function loadProducts() {
+            try {
+                const response = await fetch('/admin/getProducts');
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    renderProducts(result.data);
+                    // 后台拉取 AI 论文阶梯价 / PPT 双版本价，仅局部刷新对应卡片
+                    refreshPriceDetail();
+                } else {
+                    showAlert('加载商品列表失败：' + result.msg, 'error');
+                }
+            } catch (error) {
+                console.error('加载商品列表失败:', error);
+                showAlert('加载商品列表失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 图标映射 - 使用 Feather Icons 风格
+        const iconMap = {
+            'kaiti': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>',
+            'rws': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            'sx': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>',
+            'sxrz': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+            'gjlw': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>',
+            'ppt': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line></svg>',
+            'reduce': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
+            'tools_wxlist': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>',
+            'tools_rewrite': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
+            'tools_illustration': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
+            'tools_chart': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
+            'tools_createtitle': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+            'tools_createoutline': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>',
+            'file_aigcreduceweight': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 13l2 2 4-4"></path></svg>',
+            'tools_aigcreduceweight': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h14"></path><path d="M17 9l2 2 4-4"></path></svg>',
+            'aicheck': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>',
+            'jc_package': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+            'aicheck_package': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="12 8 12 12 15 13"></polyline></svg>',
+            'autodoc': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M8 17h4"></path><path d="M9 11V7l3 2-3 2z"></path></svg>'
+        };
+        
+        // 判断是否为工具类商品
+        function isToolsProduct(product) {
+            // 优先使用 product_type 字段，如果没有则回退到检查 code
+            if (product.product_type !== undefined && product.product_type !== null) {
+                return product.product_type == 2; // 2表示工具类商品
+            }
+            // 兼容旧数据：通过 code 判断
+            return product.code && product.code.startsWith('tools_');
+        }
+        
+        // 判断是否为查重降重
+        function isReduceProduct(product) {
+            // 优先使用 product_type 字段
+            if (product.product_type !== undefined && product.product_type !== null) {
+                return product.product_type == 4; // 4表示查重降重
+            }
+            // 兼容旧数据：通过 code 判断
+            const reduceCodes = ['file_aigcreduceweight'];
+            return reduceCodes.includes(product.code);
+        }
+        
+        // 判断是否为套餐商品（时长包加价载体）
+        function isPackageProduct(product) {
+            // 优先使用 product_type 字段
+            if (product.product_type !== undefined && product.product_type !== null) {
+                return product.product_type == 5; // 5表示套餐商城
+            }
+            // 兼容旧数据：通过 code 判断
+            return !!product.code && product.code.endsWith('_package');
+        }
+
+        // 根据商品代码判断是否为工具类商品（简化版本）
+        function isToolsProductByCode(code) {
+            return code && code.startsWith('tools_');
+        }
+
+        const AIGC_PRODUCT_DOC = 'file_aigcreduceweight';
+        const AIGC_PRODUCT_TOOL = 'tools_aigcreduceweight';
+
+        // ---- 模块状态与公共工具 ----
+        let productsData = [];                       // 当前商品列表快照（避免联网重渲染闪烁）
+        let gridMap = { main: [], value: [], reduce: [], tools: [], package: [] };
+        let aigcList = [];
+
+        async function postJson(url, payload) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            let result;
+            try { result = await response.json(); }
+            catch (e) { throw new Error('响应格式错误'); }
+            return result;
+        }
+
+        function fmtPrice(v) {
+            const n = parseFloat(v);
+            return (isNaN(n) ? 0 : n).toFixed(2);
+        }
+
+        // 阶梯/双版本价格明细缓存（gjlw/ppt 由 /admin/fetchProductPrice 后台填充，卡片局部刷新）
+        const priceDetailCache = {};
+
+        function escHtml(s) {
+            return String(s == null ? '' : s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // 档位进价（元）：cost>0 取 cost，否则兜底 base（与后端实扣口径一致）
+        function tierInPrice(t) {
+            const c = parseFloat(t.cost_price);
+            if (!isNaN(c) && c > 0) return c;
+            return parseFloat(t.base_price) || 0;
+        }
+
+        // 商品加价金额（ad_products.markup）
+        function markupFor(code) {
+            const p = (typeof productsData !== 'undefined' ? productsData : []).find(x => x.code === code);
+            return p ? (Number(p.markup) || 0) : 0;
+        }
+
+        // 模型阶梯区间（用户支付口径）：每档 = 进价 + 加价，¥min 或 ¥min~max
+        function modelTierRange(m, markup) {
+            const prices = (m.tiers || []).map(t => tierInPrice(t) + (Number(markup) || 0)).filter(n => n > 0);
+            if (!prices.length) return '';
+            const min = Math.min(...prices), max = Math.max(...prices);
+            return min === max ? `¥${fmtPrice(min)}` : `¥${fmtPrice(min)}~${fmtPrice(max)}`;
+        }
+
+        // AI 论文卡片价格条：阶梯计价，每档用户支付 = 对接进价 + 商品加价
+        function tieredPriceBarHtml(models, markup) {
+            const lines = (models || []).map(m => {
+                const range = modelTierRange(m, markup);
+                if (!range) return '';
+                return `<span class="pp-line">${escHtml(m.name || m.code)} <b>${range}</b></span>`;
+            }).filter(Boolean).join('');
+            if (!lines) return '';
+            return `<div class="product-price"><span class="pp-tag">阶梯计价</span>${lines}</div>`;
+        }
+
+        // PPT 卡片价格条：双版本（标准版/高级版，用户支付 = 对接成本 + 加价，括号内展示主站对接成本）
+        function versionPriceBarHtml(versions, markup) {
+            const lines = (versions || []).map(v => {
+                const inP = tierInPrice(v);
+                if (inP <= 0) return '';
+                const userP = inP + (Number(markup) || 0);
+                return `<span class="pp-line">${escHtml(v.name || '')} <b>¥${fmtPrice(userP)}</b><i style="font-style:normal;font-size:11px;color:#8c8c8c;">（成本¥${fmtPrice(inP)}）</i></span>`;
+            }).filter(Boolean).join('');
+            if (!lines) return '';
+            return `<div class="product-price"><span class="pp-tag">双版本</span>${lines}</div>`;
+        }
+
+        // 页面加载后后台拉取 gjlw/ppt 的阶梯/双版本价格，仅局部重渲染对应卡片
+        async function refreshPriceDetail() {
+            await Promise.all(['gjlw', 'ppt'].map(async (code) => {
+                try {
+                    const response = await fetch('/admin/fetchProductPrice?code=' + encodeURIComponent(code));
+                    const result = await response.json();
+                    if (result.code === 1 && result.data && result.data.price_mode) {
+                        priceDetailCache[code] = result.data;
+                    } else {
+                        delete priceDetailCache[code];
+                    }
+                } catch (e) {
+                    delete priceDetailCache[code];
+                }
+                replaceCardByCode(code);
+            }));
+        }
+
+        function gridIdFor(code) {
+            if (code === AIGC_PRODUCT_DOC || code === AIGC_PRODUCT_TOOL) return 'aigcBundleGrid';
+            const p = productsData.find(x => x.code === code);
+            if (!p) return 'mainProductsGrid';
+            if (isPackageProduct(p)) return 'packageProductsGrid';
+            if (isReduceProduct(p)) return 'reduceProductsGrid';
+            if (isToolsProduct(p)) return 'toolsProductsGrid';
+            return 'mainProductsGrid';
+        }
+
+        function listFor(gridId) {
+            if (gridId === 'aigcBundleGrid') return aigcList;
+            if (gridId === 'packageProductsGrid') return gridMap.package;
+            if (gridId === 'reduceProductsGrid') return gridMap.reduce;
+            if (gridId === 'toolsProductsGrid') return gridMap.tools;
+            return gridMap.main;
+        }
+
+        function sortByOrder(arr) {
+            arr.sort((a, b) => {
+                const sa = parseInt(a.sort_order || 0), sb = parseInt(b.sort_order || 0);
+                if (sa !== sb) return sa - sb;
+                return (a.id || 0) - (b.id || 0);
+            });
+        }
+
+        function loadGridProducts() {
+            gridMap = { main: [], reduce: [], tools: [], package: [] };
+            aigcList = [];
+            (productsData || []).forEach(p => {
+                if (isReduceProduct(p)) gridMap.reduce.push(p);
+                else if (isPackageProduct(p)) gridMap.package.push(p);
+                else if (isToolsProduct(p)) gridMap.tools.push(p);
+                else gridMap.main.push(p);
+            });
+            // 抽出 AIGC 两入口，单独成区
+            const docIdx = gridMap.reduce.findIndex(p => p.code === AIGC_PRODUCT_DOC);
+            if (docIdx >= 0) { aigcList.push(gridMap.reduce[docIdx]); gridMap.reduce.splice(docIdx, 1); }
+            const toolIdx = gridMap.tools.findIndex(p => p.code === AIGC_PRODUCT_TOOL);
+            if (toolIdx >= 0) { aigcList.push(gridMap.tools[toolIdx]); gridMap.tools.splice(toolIdx, 1); }
+            sortByOrder(gridMap.main);
+            sortByOrder(gridMap.reduce);
+            sortByOrder(gridMap.tools);
+            sortByOrder(gridMap.package);
+            sortByOrder(aigcList);
+        }
+
+        function renderIntoGrid(gridId, list) {
+            const g = document.getElementById(gridId);
+            if (!g) return;
+            g.innerHTML = '';
+            list.forEach(p => g.appendChild(renderProductCard(p)));
+        }
+
+        function renderAllGrids() {
+            renderIntoGrid('mainProductsGrid', gridMap.main);
+            renderIntoGrid('reduceProductsGrid', gridMap.reduce);
+            renderIntoGrid('toolsProductsGrid', gridMap.tools);
+            renderIntoGrid('packageProductsGrid', gridMap.package);
+            const aigcSection = document.getElementById('aigcBundleSection');
+            if (aigcSection) aigcSection.style.display = aigcList.length ? '' : 'none';
+            renderIntoGrid('aigcBundleGrid', aigcList);
+        }
+
+        // 仅局部重渲染某张卡片（开关/默认等无排序变化的场景，避免整页闪烁）
+        function replaceCardByCode(code) {
+            const gridId = gridIdFor(code);
+            const g = document.getElementById(gridId);
+            if (!g) return;
+            const p = productsData.find(x => x.code === code);
+            if (!p) return;
+            const old = g.querySelector('.product-card[data-code="' + code + '"]');
+            const node = renderProductCard(p);
+            if (old && old.parentNode) old.replaceWith(node);
+            else g.appendChild(node);
+        }
+
+        // 渲染单个商品卡片
+        function renderProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            // 为未启用的商品添加特殊样式
+            if (product.enabled != 1) {
+                card.classList.add('disabled-product');
+            }
+            const iconHtml = iconMap[product.code] || '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>';
+            // 查重/降重商品不支持价格等设置，不显示“设置”按钮
+            const showConfigButton = product.code !== 'reduce';
+            card.setAttribute('data-code', product.code);
+            card.setAttribute('data-id', product.id);
+
+            // 价格条：gjlw/ppt 用阶梯/双版本明细（priceDetailCache，每档用户支付 = 进价 + 加价；明细未返回前不显示），其余成本 + 加价 = 售价（reduce 助手无价格配置，不展示）
+            const hasPrice = product.code !== 'reduce';
+            const isStructuredPrice = product.code === 'gjlw' || product.code === 'ppt';
+            const isPackageCard = isPackageProduct(product);
+            const baseP = Number(product.cost_price) || 0;
+            const markP = Number(product.markup) || 0;
+            let priceBar = '';
+            if (product.code === 'gjlw' && priceDetailCache.gjlw && Array.isArray(priceDetailCache.gjlw.models) && priceDetailCache.gjlw.models.length) {
+                priceBar = tieredPriceBarHtml(priceDetailCache.gjlw.models, product.markup);
+            } else if (product.code === 'ppt' && priceDetailCache.ppt && Array.isArray(priceDetailCache.ppt.versions) && priceDetailCache.ppt.versions.length) {
+                priceBar = versionPriceBarHtml(priceDetailCache.ppt.versions, product.markup);
+            } else if (isPackageCard) {
+                // 套餐商品：底价随主站动态变化，仅展示加价口径，避免「成本0+加价」误导
+                priceBar = `<div class="product-price">
+                     <span class="pp-plus">＋加价 ¥${fmtPrice(markP)}</span>
+                     <span style="font-size:11px;color:#8c8c8c;">叠加于主站套餐原价</span>
+                   </div>`;
+            } else if (!isStructuredPrice && hasPrice) {
+                priceBar = `<div class="product-price">
+                     <span class="pp-cost">成本 ¥${fmtPrice(baseP)}</span>
+                     <span class="pp-plus">＋加价 ¥${fmtPrice(markP)}</span>
+                     <span class="pp-eq">＝售价 ¥${fmtPrice(baseP + markP)}</span>
+                   </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="product-header">
+                    <div class="product-icon ${product.code}">
+                        ${iconHtml}
+                    </div>
+                    <div class="product-name">${(product.name || '').replace(/</g, '&lt;')}</div>
+                </div>
+                ${priceBar}
+                <div class="product-actions">
+                    <div class="product-actions-section">
+                        <div class="product-switches">
+                            <div class="product-switch-wrapper">
+                                <span class="product-switch-label">${product.enabled == 1 ? '已启用' : '已禁用'}</span>
+                                <label class="switch">
+                                    <input type="checkbox" class="js-enable-toggle" ${product.enabled == 1 ? 'checked' : ''}>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="product-switch-wrapper">
+                                <span class="product-switch-label">${(product.is_default || 0) == 1 ? '首页默认' : '设为默认'}</span>
+                                <label class="switch">
+                                    <input type="checkbox" class="js-default-toggle" ${(product.is_default || 0) == 1 ? 'checked' : ''}>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-sort-wrapper">
+                        <span class="product-sort-label">排序</span>
+                        <input type="number" class="product-sort-input" value="${product.sort_order || 0}" min="0" placeholder="0">
+                        <button class="product-sort-btn">保存</button>
+                        ${showConfigButton ? `<button class="btn btn-primary btn-open-config" data-id="${product.id}" style="margin-left: auto;">设置</button>` : ''}
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+        
+        // 渲染商品列表
+        function renderProducts(products) {
+            productsData = products || [];
+            loadGridProducts();
+            renderAllGrids();
+        }
+        
+        // 保存商品排序
+        async function saveProductSort(id, code, buttonElement) {
+            const card = buttonElement.closest('.product-card');
+            const sortInput = card.querySelector('.product-sort-input');
+            const sortOrder = parseInt(sortInput.value) || 0;
+            
+            // 禁用按钮，显示保存中状态
+            const originalText = buttonElement.textContent;
+            buttonElement.disabled = true;
+            buttonElement.textContent = '保存中...';
+            
+            try {
+                const result = await postJson('/admin/updateProductSort', { id, code, sort_order: sortOrder });
+
+                if (result.code == 1) {
+                    const p = productsData.find(x => x.code === code);
+                    if (p) p.sort_order = sortOrder;
+                    // 仅局部重排所属分区，避免整页重新联网渲染闪烁
+                    loadGridProducts();
+                    renderIntoGrid(gridIdFor(code), listFor(gridIdFor(code)));
+                    showAlert('排序已保存', 'success');
+                } else {
+                    showAlert('保存失败：' + (result.msg || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('保存排序失败:', error);
+                showAlert('保存失败，请稍后再试', 'error');
+            } finally {
+                // 恢复按钮状态
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalText;
+            }
+        }
+        
+        // 切换首页默认项
+        async function toggleDefaultProduct(id, code, enabled, element) {
+            const checkbox = element || (window.event ? window.event.target : null);
+            const card = checkbox ? checkbox.closest('.product-card') : null;
+            
+            try {
+                const result = await postJson('/admin/updateProductDefault', {
+                    id: id,
+                    code: code,
+                    is_default: enabled ? 1 : 0
+                });
+
+                if (result.code == 1) {
+                    // 更新本地数据：点击项设为默认，其余取消
+                    productsData.forEach(p => { p.is_default = (p.code === code && enabled) ? 1 : 0; });
+                    // 局部刷新所有卡片的首页默认开关（不整页重排，避免闪烁）
+                    document.querySelectorAll('.product-card').forEach(cardEl => {
+                        const p = productsData.find(x => x.code === cardEl.dataset.code);
+                        const defInput = cardEl.querySelector('.js-default-toggle');
+                        const defLabel = cardEl.querySelector('.product-switch-wrapper:last-child .product-switch-label');
+                        if (p && defInput && defLabel) {
+                            const isDef = (p.is_default || 0) == 1;
+                            defInput.checked = isDef;
+                            defLabel.textContent = isDef ? '首页默认' : '设为默认';
+                        }
+                    });
+                    showAlert(enabled ? '已设为首页默认项' : '已取消首页默认项', 'success');
+                } else {
+                    // 操作失败，恢复开关状态并显示错误
+                    if (checkbox) {
+                        checkbox.checked = !enabled;
+                    }
+                    showAlert('操作失败：' + (result.msg || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('切换首页默认项失败:', error);
+                // 恢复开关状态
+                if (checkbox) {
+                    checkbox.checked = !enabled;
+                }
+                showAlert('操作失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 切换商品启用状态
+        async function toggleProduct(id, code, enabled, element) {
+            // 获取当前开关元素，用于恢复状态
+            const checkbox = element || (window.event ? window.event.target : null);
+            const card = checkbox ? checkbox.closest('.product-card') : null;
+            
+            try {
+                const result = await postJson('/admin/updateProductStatus', {
+                    id: id,
+                    code: code,
+                    enabled: enabled ? 1 : 0
+                });
+
+                // 检查返回码（支持数字1和字符串'1'）
+                if (result.code == 1) {
+                    // 更新本地数据并局部重渲染该卡片（含启用态样式，整页不动避免闪烁）
+                    const p = productsData.find(x => x.code === code);
+                    if (p) p.enabled = enabled ? 1 : 0;
+                    replaceCardByCode(code);
+                    showAlert(enabled ? '已启用' : '已禁用', 'success');
+                    return; // 成功时直接返回，不执行后续代码
+                } else {
+                    // 操作失败，恢复开关状态并显示错误
+                    if (checkbox) {
+                        checkbox.checked = !enabled;
+                    }
+                    showAlert('操作失败：' + (result.msg || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('切换状态失败:', error);
+                // 恢复开关状态
+                if (checkbox) {
+                    checkbox.checked = !enabled;
+                }
+                showAlert('操作失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 打开设置模态框
+        async function openConfigModal(id) {
+            try {
+                const response = await fetch('/admin/getProduct?id=' + id);
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    const product = result.data;
+                    document.getElementById('product_id').value = product.id;
+                    document.getElementById('product_code').value = product.code;
+                    document.getElementById('product_name').value = product.name;
+                    document.getElementById('icon').value = product.icon || '';
+                    document.getElementById('cost_price').value = product.cost_price || '0.00';
+                    document.getElementById('markup').value = product.markup || '0.00';
+                    document.getElementById('follow_price').checked = product.follow_price == 1;
+                    document.getElementById('notice_text').value = product.notice_text || '';
+                    document.getElementById('product_sort_order').value = product.sort_order || 0;
+
+                    // 下单引导图设置：扩展支持除 gjlw 外的其它商品
+                    const guideSettingsBox = document.getElementById('guideSettingsBox');
+                    const guideEnabledEl = document.getElementById('guide_enabled');
+                    const guideImageEl = document.getElementById('guide_image');
+                    const guideImagePreviewEl = document.getElementById('guide_image_preview');
+                    const guideImagePreviewWrapEl = document.getElementById('guide_image_preview_wrap');
+                    const guideImageViewLargeIconEl = document.getElementById('guide_image_view_large_icon');
+                    const guideImageFileEl = document.getElementById('guide_image_file');
+                    const guideImagePickBtnEl = document.getElementById('guide_image_pick_btn');
+                    const reducePriceHintBoxEl = document.getElementById('reducePriceHintBox');
+                    const costPriceLabelEl = document.getElementById('cost_price_label');
+                    const markupLabelEl = document.getElementById('markup_label');
+                    const costPriceHintEl = document.getElementById('cost_price_hint');
+                    const guideSupportedCodes = ['gjlw', 'ppt', 'kaiti', 'rws', 'sx', 'sxrz', 'weightreduction'];
+                    const isGuideSupported = guideSupportedCodes.includes(product.code)
+                        || (isToolsProductByCode(product.code) && product.code !== 'tools_center');
+                    const reduceCodes = ['file_aigcreduceweight', 'tools_aigcreduceweight'];
+                    const isReduceTypeProduct = (product.product_type == 4) || reduceCodes.includes(product.code);
+                    const isAigcPair = (product.code === AIGC_PRODUCT_DOC || product.code === AIGC_PRODUCT_TOOL);
+                    if (reducePriceHintBoxEl) {
+                        reducePriceHintBoxEl.style.display = isReduceTypeProduct ? 'block' : 'none';
+                    }
+                    const aigcHourRowEl = document.getElementById('aigcBillingHourRow');
+                    const aigcHourInputEl = document.getElementById('billing_price_per_hour_display');
+                    if (costPriceLabelEl && markupLabelEl && costPriceHintEl) {
+                        if (isAigcPair) {
+                            costPriceLabelEl.textContent = '对接单价（元/千字）';
+                            markupLabelEl.textContent = '加价金额（元/千字）';
+                            costPriceHintEl.textContent = '自动获取对接返回的底价';
+                            if (aigcHourRowEl) aigcHourRowEl.style.display = '';
+                            if (aigcHourInputEl) aigcHourInputEl.value = '';
+                        } else {
+                            costPriceLabelEl.textContent = '对接成本价（元）';
+                            markupLabelEl.textContent = '加价金额（元）';
+                            costPriceHintEl.textContent = '自动获取对接返回的底价';
+                            if (aigcHourRowEl) aigcHourRowEl.style.display = 'none';
+                            if (aigcHourInputEl) aigcHourInputEl.value = '';
+                        }
+                    }
+                    // AI论文/PPT 有阶梯/双版本明细表，不再单独展示「对接成本价」输入区；
+                    // 套餐商品底价随主站动态变化（多个套餐不同价），同样隐藏并跳过底价获取
+                    const costPriceGroupEl = costPriceLabelEl ? costPriceLabelEl.closest('.form-group') : null;
+                    const isStructuredPrice = (product.code === 'gjlw' || product.code === 'ppt');
+                    const isPackageTypeProduct = isPackageProduct(product);
+                    if (costPriceGroupEl) {
+                        costPriceGroupEl.style.display = (isStructuredPrice || isPackageTypeProduct) ? 'none' : '';
+                    }
+                    if (guideSettingsBox && guideEnabledEl && guideImageEl && guideImagePreviewEl && guideImagePreviewWrapEl && guideImageFileEl && guideImagePickBtnEl && guideImageViewLargeIconEl) {
+                        guideSettingsBox.style.display = isGuideSupported ? 'block' : 'none';
+                        guideEnabledEl.disabled = !isGuideSupported;
+                        guideImageEl.disabled = !isGuideSupported;
+                        guideImageFileEl.disabled = !isGuideSupported;
+                        guideImagePickBtnEl.style.pointerEvents = isGuideSupported ? 'auto' : 'none';
+                        guideImagePickBtnEl.style.opacity = isGuideSupported ? '1' : '0.55';
+                        guideEnabledEl.checked = (product.guide_enabled || 0) == 1;
+                        guideImageEl.value = product.guide_image || '';
+                        
+                        if (guideImageEl.value) {
+                            guideImagePreviewEl.src = guideImageEl.value;
+                            guideImagePreviewWrapEl.style.display = 'flex';
+                            guideImagePickBtnEl.style.display = 'none';
+                            guideImageViewLargeIconEl.style.pointerEvents = isGuideSupported ? 'auto' : 'none';
+                            guideImageViewLargeIconEl.style.opacity = '1';
+                        } else {
+                            guideImagePreviewEl.src = '';
+                            guideImagePreviewWrapEl.style.display = 'none';
+                            guideImagePickBtnEl.style.display = 'flex';
+                            guideImageViewLargeIconEl.style.pointerEvents = 'none';
+                            guideImageViewLargeIconEl.style.opacity = '0.55';
+                        }
+                    }
+
+                    document.getElementById('modalTitle').textContent = product.name + ' - 设置';
+                    document.getElementById('configModal').classList.add('show');
+                    
+                    // 自动加载成本价（套餐商品价格随主站动态变化，不获取底价）
+                    if (!isPackageTypeProduct) fetchCostPrice();
+                } else {
+                    showAlert('获取商品信息失败：' + result.msg, 'error');
+                }
+            } catch (error) {
+                console.error('获取商品信息失败:', error);
+                showAlert('获取商品信息失败，请稍后再试', 'error');
+            }
+        }
+
+        // 上传引导图（替代手动填写图片路径）
+        const guideImageFileEl = document.getElementById('guide_image_file');
+        const guideImageEl = document.getElementById('guide_image');
+        const guideImagePreviewEl = document.getElementById('guide_image_preview');
+        const guideImagePickBtnEl = document.getElementById('guide_image_pick_btn');
+        const guideImageUploadStatusEl = document.getElementById('guide_image_upload_status');
+        const guideImageBigModalEl = document.getElementById('guideImageBigModal');
+        const guideImageBigPreviewEl = document.getElementById('guideImageBigPreview');
+
+        // 关闭“大图预览”弹窗
+        function closeGuideImageBigModal() {
+            if (guideImageBigModalEl) {
+                guideImageBigModalEl.classList.remove('show');
+            }
+            if (guideImageBigPreviewEl) {
+                guideImageBigPreviewEl.src = '';
+            }
+        }
+
+        if (guideImagePickBtnEl && guideImageFileEl) {
+            guideImagePickBtnEl.addEventListener('click', () => {
+                if (guideImageFileEl.disabled) return;
+                guideImageFileEl.click();
+            });
+        }
+
+        const guideImageViewLargeIconEl = document.getElementById('guide_image_view_large_icon');
+
+        // 1) 缩略图点击：重新选择图片（打开文件选择框）
+        if (guideImagePreviewEl && guideImageFileEl && guideImagePickBtnEl) {
+            guideImagePreviewEl.addEventListener('click', () => {
+                if (guideImageFileEl.disabled) return;
+                guideImageFileEl.click();
+            });
+            guideImagePreviewEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (guideImageFileEl.disabled) return;
+                    guideImageFileEl.click();
+                }
+            });
+        }
+
+        // 2) “查看大图”图标点击：打开大图弹窗
+        if (guideImageViewLargeIconEl && guideImageBigModalEl && guideImageBigPreviewEl && guideImageEl) {
+            const openBig = () => {
+                const url = guideImageEl.value;
+                if (!url) return;
+                guideImageBigPreviewEl.src = url;
+                guideImageBigModalEl.classList.add('show');
+            };
+
+            guideImageViewLargeIconEl.addEventListener('click', openBig);
+            guideImageViewLargeIconEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openBig();
+                }
+            });
+
+            guideImageBigModalEl.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeGuideImageBigModal();
+                }
+            });
+        }
+
+        if (guideImageFileEl && guideImageEl && guideImagePreviewEl && guideImageUploadStatusEl) {
+            guideImageFileEl.addEventListener('change', async function() {
+                const file = this.files && this.files[0];
+                if (!file) return;
+                if (this.disabled) return;
+
+                const prevDisabled = this.disabled;
+                this.disabled = true;
+                guideImageUploadStatusEl.textContent = '上传中...';
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('type', 'guide');
+
+                try {
+                    const response = await fetch('/admin/uploadImage', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result && result.code === 1 && result.data) {
+                        const url = result.data.url || '';
+                        if (!url) {
+                            throw new Error('上传成功但未返回 url');
+                        }
+
+                        guideImageEl.value = url;
+                        guideImagePreviewEl.src = url;
+                        const guideImagePreviewWrapEl = document.getElementById('guide_image_preview_wrap');
+                        const guideImagePickBtnEl = document.getElementById('guide_image_pick_btn');
+                        const guideImageViewLargeIconEl = document.getElementById('guide_image_view_large_icon');
+                        if (guideImagePreviewWrapEl) guideImagePreviewWrapEl.style.display = 'flex';
+                        if (guideImagePickBtnEl) guideImagePickBtnEl.style.display = 'none';
+                        if (guideImageViewLargeIconEl) {
+                            guideImageViewLargeIconEl.style.pointerEvents = 'auto';
+                            guideImageViewLargeIconEl.style.opacity = '1';
+                        }
+                        guideImageUploadStatusEl.textContent = '上传完成';
+                        showAlert('引导图上传成功', 'success');
+                    } else {
+                        const msg = (result && result.msg) ? result.msg : '上传失败';
+                        guideImageUploadStatusEl.textContent = '';
+                        showAlert(msg, 'error');
+                    }
+                } catch (error) {
+                    console.error('引导图上传失败:', error);
+                    guideImageUploadStatusEl.textContent = '';
+                    showAlert('图片上传失败，请重试', 'error');
+                } finally {
+                    this.disabled = prevDisabled;
+                    setTimeout(() => {
+                        guideImageUploadStatusEl.textContent = '';
+                    }, 1500);
+                }
+            });
+        }
+        
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('configModal').classList.remove('show');
+            document.getElementById('configForm').reset();
+            const aigcHourRowEl = document.getElementById('aigcBillingHourRow');
+            const aigcHourInputEl = document.getElementById('billing_price_per_hour_display');
+            if (aigcHourRowEl) aigcHourRowEl.style.display = 'none';
+            if (aigcHourInputEl) aigcHourInputEl.value = '';
+            const priceDetailBoxEl = document.getElementById('priceDetailBox');
+            const priceDetailContentEl = document.getElementById('priceDetailContent');
+            if (priceDetailBoxEl) priceDetailBoxEl.style.display = 'none';
+            if (priceDetailContentEl) priceDetailContentEl.innerHTML = '';
+        }
+        
+        // 从API获取成本价
+        async function fetchCostPrice() {
+            const code = document.getElementById('product_code').value;
+            const costPriceInput = document.getElementById('cost_price');
+            
+            if (!code) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/fetchProductPrice?code=' + encodeURIComponent(code));
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    // 使用接口返回的成本价（API 底价），不要用 final_price：开启跟价时 final_price = 底价 + 加价
+                    const apiCost = result.data.cost_price ?? result.data.price_per_1000 ?? result.data.price ?? result.data.final_price;
+                    costPriceInput.value = (apiCost != null && apiCost !== '') ? String(apiCost) : '0.00';
+
+                    // 阶梯/双版本价格明细（gjlw/ppt）
+                    renderPriceDetailBox(code, result.data || {});
+
+                    const aigcHourInp = document.getElementById('billing_price_per_hour_display');
+                    if (code === AIGC_PRODUCT_DOC || code === AIGC_PRODUCT_TOOL) {
+                        if (aigcHourInp) {
+                            const ph = result.data.price_per_hour;
+                            aigcHourInp.value = (ph != null && ph !== '') ? String(ph) : '—';
+                        }
+                    } else if (aigcHourInp) {
+                        aigcHourInp.value = '';
+                    }
+                    
+                    // 如果返回了提示信息（如"暂不支持价格获取"），显示提示
+                    if (result.msg && result.msg.trim() && result.msg !== 'success') {
+                        // 检查是否是"暂不支持"类型的提示
+                        if (result.msg.includes('暂不支持') || result.msg.includes('不支持')) {
+                            showAlert(result.msg, 'warning');
+                        } else {
+                            // 其他提示信息也显示
+                            showAlert(result.msg, 'info');
+                        }
+                    }
+                } else {
+                    // 失败时才显示错误提示
+                    renderPriceDetailBox(code, null);
+                    showAlert('获取价格失败：' + (result.msg || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('获取价格失败:', error);
+                // 失败时才显示错误提示
+                renderPriceDetailBox(code, null);
+                showAlert('获取价格失败，请稍后再试', 'error');
+            }
+        }
+
+        // 弹窗内阶梯/双版本价格明细（gjlw：模型×字数档；ppt：标准版/高级版）
+        function renderPriceDetailBox(code, data) {
+            const box = document.getElementById('priceDetailBox');
+            const content = document.getElementById('priceDetailContent');
+            if (!box || !content) return;
+
+            let html = '';
+            if (code === 'gjlw' && data && data.price_mode === 'tiered' && Array.isArray(data.models) && data.models.length) {
+                const mk = markupFor(code);
+                const rows = [];
+                data.models.forEach(m => {
+                    const name = escHtml(m.name || m.code || '-');
+                    (m.tiers || []).forEach(t => {
+                        const maxW = parseInt(t.max_words) || 0;
+                        const tierTxt = (!maxW || maxW >= 999999) ? '不限字数' : '≤' + maxW + '字';
+                        const userPay = tierInPrice(t) + mk;
+                        rows.push(`<tr>
+                            <td style="padding:4px 10px;border:1px solid #e5e7eb;font-weight:600;white-space:nowrap;">${name}</td>
+                            <td style="padding:4px 10px;border:1px solid #e5e7eb;white-space:nowrap;">${tierTxt}</td>
+                            <td style="padding:4px 10px;border:1px solid #e5e7eb;color:#0ca678;font-weight:600;">¥${fmtPrice(userPay)}</td>
+                            <td style="padding:4px 10px;border:1px solid #e5e7eb;color:#4263eb;">¥${fmtPrice(t.cost_price)}</td>
+                        </tr>`);
+                    });
+                });
+                if (rows.length) {
+                    html = `<div style="font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;">
+                        <div style="font-weight:600;margin-bottom:6px;color:#1e293b;">AI论文阶梯价（按模型 × 字数档，档位价为整单价格）</div>
+                        <table style="border-collapse:collapse;font-size:12px;width:100%;">
+                            <thead><tr>
+                                <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">模型</th>
+                                <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">字数档</th>
+                                <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">用户支付</th>
+                                <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">对接成本</th>
+                            </tr></thead>
+                            <tbody>${rows.join('')}</tbody>
+                        </table>
+                        <div style="margin-top:6px;color:#8c8c8c;">用户支付 = 对接成本 + 加价（成本为 0 时按标价计），实际按所选模型与字数档实时计价</div>
+                    </div>`;
+                }
+            } else if (code === 'ppt' && data && data.price_mode === 'versions' && Array.isArray(data.versions) && data.versions.length) {
+                const mk = markupFor(code);
+                const rows = data.versions.map(v => `<tr>
+                    <td style="padding:4px 10px;border:1px solid #e5e7eb;font-weight:600;white-space:nowrap;">${escHtml(v.name || '-')}</td>
+                    <td style="padding:4px 10px;border:1px solid #e5e7eb;color:#0ca678;font-weight:600;">¥${fmtPrice((parseFloat(v.cost_price) || 0) + mk)}</td>
+                    <td style="padding:4px 10px;border:1px solid #e5e7eb;color:#4263eb;">¥${fmtPrice(v.cost_price)}</td>
+                    <td style="padding:4px 10px;border:1px solid #e5e7eb;color:#8c8c8c;">${v.model_name ? escHtml(v.model_name) : '—'}</td>
+                </tr>`).join('');
+                html = `<div style="font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;">
+                    <div style="font-weight:600;margin-bottom:6px;color:#1e293b;">PPT 双版本价（用户支付 = 对接成本 + 加价）</div>
+                    <table style="border-collapse:collapse;font-size:12px;width:100%;">
+                        <thead><tr>
+                            <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">版本</th>
+                            <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">用户支付</th>
+                            <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">对接成本</th>
+                            <th style="padding:4px 10px;border:1px solid #e5e7eb;background:#eef2f7;text-align:left;">对接模型</th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <div style="margin-top:6px;color:#8c8c8c;">标准版 / 高级版独立计价；用户支付 = 对接成本 + 加价，实际按所选版本实时计价</div>
+                </div>`;
+            }
+
+            content.innerHTML = html;
+            box.style.display = html ? 'block' : 'none';
+        }
+        
+        // 保存配置
+        document.getElementById('configForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // 转换为数字
+            data.cost_price = parseFloat(data.cost_price) || 0;
+            data.markup = parseFloat(data.markup) || 0;
+            data.sort_order = parseInt(data.sort_order) || 0;
+            // 跟价开关
+            data.follow_price = document.getElementById('follow_price').checked ? 1 : 0;
+            // 商品滚动条通知
+            data.notice_text = document.getElementById('notice_text').value || '';
+            
+            // 下单引导图：仅当当前输入启用时才写入，避免覆盖其它商品
+            const guideEnabledEl = document.getElementById('guide_enabled');
+            const guideImageInput = document.getElementById('guide_image');
+            if (guideEnabledEl && !guideEnabledEl.disabled) {
+                data.guide_enabled = guideEnabledEl.checked ? 1 : 0;
+                if (guideImageInput && !guideImageInput.disabled) {
+                    data.guide_image = guideImageInput.value || '';
+                }
+            }
+            
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '保存中...';
+            }
+            
+            try {
+                const response = await fetch('/admin/saveProduct', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('保存成功', 'success');
+                    closeModal();
+                    loadProducts();
+                } else {
+                    showAlert('保存失败：' + result.msg, 'error');
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                showAlert('保存失败，请稍后再试', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '保存';
+                }
+            }
+        });
+        
+        // 事件委托：替代内联 onchange/onclick，避免 id/code 字符串拼接注入风险
+        document.addEventListener('change', function (e) {
+            const t = e.target;
+            if (!t) return;
+            const card = t.closest('.product-card');
+            if (!card) return;
+            const id = parseInt(card.dataset.id), code = card.dataset.code;
+            if (t.classList.contains('js-enable-toggle')) {
+                toggleProduct(id, code, t.checked, t);
+            } else if (t.classList.contains('js-default-toggle')) {
+                toggleDefaultProduct(id, code, t.checked, t);
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            const sortBtn = e.target.closest('.product-sort-btn');
+            if (sortBtn) {
+                const card = sortBtn.closest('.product-card');
+                if (card) saveProductSort(parseInt(card.dataset.id), card.dataset.code, sortBtn);
+                e.preventDefault();
+                return;
+            }
+            const setBtn = e.target.closest('.btn-open-config');
+            if (setBtn) {
+                openConfigModal(parseInt(setBtn.dataset.id));
+                return;
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('product-sort-input')) {
+                const card = e.target.closest('.product-card');
+                const btn = card ? card.querySelector('.product-sort-btn') : null;
+                if (card && btn) saveProductSort(parseInt(card.dataset.id), card.dataset.code, btn);
+                e.preventDefault();
+            }
+        });
+
+        // 显示 Toast 提示
+        function showAlert(message, type) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            } else if (type === 'warning') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+            } else if (type === 'info') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+            }
+            
+            const closeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${iconSvg}</div>
+                <div class="toast-content">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">${closeSvg}</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // 点击模态框背景关闭
+        document.getElementById('configModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // 页面加载时加载商品列表
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+    </script>
+</body>
+</html>
+

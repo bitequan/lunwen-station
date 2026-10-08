@@ -1,0 +1,602 @@
+[
+  {
+    "id": 3,
+    "name": "七台河职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%83%E5%8F%B0%E6%B2%B3%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 4,
+    "name": "三亚中瑞酒店管理职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E4%BA%9A%E4%B8%AD%E7%91%9E%E9%85%92%E5%BA%97%E7%AE%A1%E7%90%86%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 5,
+    "name": "三亚城市职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E4%BA%9A%E5%9F%8E%E5%B8%82%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 6,
+    "name": "三亚学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E4%BA%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 27,
+    "name": "三亚理工职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E4%BA%9A%E7%90%86%E5%B7%A5%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 28,
+    "name": "三亚航空旅游职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E4%BA%9A%E8%88%AA%E7%A9%BA%E6%97%85%E6%B8%B8%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 29,
+    "name": "三峡大学",
+    "logo": "?path=school-logo%2F%E4%B8%89%E5%B3%A1%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 37,
+    "name": "三峡大学科技学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E5%B3%A1%E5%A4%A7%E5%AD%A6%E7%A7%91%E6%8A%80%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 43,
+    "name": "三峡旅游职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E5%B3%A1%E6%97%85%E6%B8%B8%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 44,
+    "name": "三峡电力职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E5%B3%A1%E7%94%B5%E5%8A%9B%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 49,
+    "name": "三明医学科技职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E6%98%8E%E5%8C%BB%E5%AD%A6%E7%A7%91%E6%8A%80%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 50,
+    "name": "三明学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E6%98%8E%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 62,
+    "name": "三明学院成人高等教育",
+    "logo": "?path=school-logo%2F%E4%B8%89%E6%98%8E%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 64,
+    "name": "三江学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E6%B1%9F%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 81,
+    "name": "三门峡社会管理职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E9%97%A8%E5%B3%A1%E7%A4%BE%E4%BC%9A%E7%AE%A1%E7%90%86%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 82,
+    "name": "三门峡职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%89%E9%97%A8%E5%B3%A1%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 87,
+    "name": "上海东海职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E4%B8%9C%E6%B5%B7%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 89,
+    "name": "上海中医药大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E4%B8%AD%E5%8C%BB%E8%8D%AF%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 92,
+    "name": "上海中医药大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E4%B8%AD%E5%8C%BB%E8%8D%AF%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 93,
+    "name": "上海交通大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E4%BA%A4%E9%80%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 102,
+    "name": "上海交通大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E4%BA%A4%E9%80%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 115,
+    "name": "上海交通职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E4%BA%A4%E9%80%9A%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 125,
+    "name": "上海健康医学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%81%A5%E5%BA%B7%E5%8C%BB%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 135,
+    "name": "上海农林职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%86%9C%E6%9E%97%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 138,
+    "name": "上海商学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%95%86%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 156,
+    "name": "上海国家会计学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%9B%BD%E5%AE%B6%E4%BC%9A%E8%AE%A1%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 157,
+    "name": "上海城建职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%9F%8E%E5%BB%BA%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 164,
+    "name": "上海外国语大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%A4%96%E5%9B%BD%E8%AF%AD%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 169,
+    "name": "上海外国语大学贤达经济人文学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%A4%96%E5%9B%BD%E8%AF%AD%E5%A4%A7%E5%AD%A6%E8%B4%A4%E8%BE%BE%E7%BB%8F%E6%B5%8E%E4%BA%BA%E6%96%87%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 179,
+    "name": "上海大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 191,
+    "name": "上海大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 194,
+    "name": "上海对外经贸大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%AF%B9%E5%A4%96%E7%BB%8F%E8%B4%B8%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 197,
+    "name": "上海工商外国语职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%B7%A5%E5%95%86%E5%A4%96%E5%9B%BD%E8%AF%AD%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 198,
+    "name": "上海工商职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%B7%A5%E5%95%86%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 199,
+    "name": "上海工程技术大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%B7%A5%E7%A8%8B%E6%8A%80%E6%9C%AF%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 201,
+    "name": "上海工艺美术职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%B7%A5%E8%89%BA%E7%BE%8E%E6%9C%AF%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 202,
+    "name": "上海师范大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%B8%88%E8%8C%83%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 206,
+    "name": "上海应用技术大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%BA%94%E7%94%A8%E6%8A%80%E6%9C%AF%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 210,
+    "name": "上海应用技术大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%BA%94%E7%94%A8%E6%8A%80%E6%9C%AF%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 215,
+    "name": "上海应用技术大学自学考试",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%BA%94%E7%94%A8%E6%8A%80%E6%9C%AF%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 220,
+    "name": "上海建桥学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%BB%BA%E6%A1%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 225,
+    "name": "上海开放大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E5%BC%80%E6%94%BE%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 233,
+    "name": "上海思博职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%80%9D%E5%8D%9A%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 234,
+    "name": "上海戏剧学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%88%8F%E5%89%A7%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 236,
+    "name": "上海政法学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%94%BF%E6%B3%95%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 238,
+    "name": "上海杉达学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%9D%89%E8%BE%BE%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 252,
+    "name": "上海民航职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B0%91%E8%88%AA%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 255,
+    "name": "上海民远职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B0%91%E8%BF%9C%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 256,
+    "name": "上海济光职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B5%8E%E5%85%89%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 257,
+    "name": "上海海事大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B5%B7%E4%BA%8B%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 266,
+    "name": "上海海事职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B5%B7%E4%BA%8B%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 267,
+    "name": "上海海关学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B5%B7%E5%85%B3%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 273,
+    "name": "上海海洋大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E6%B5%B7%E6%B4%8B%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 279,
+    "name": "上海理工大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 281,
+    "name": "上海电力大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%94%B5%E5%8A%9B%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 285,
+    "name": "上海电子信息职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%94%B5%E5%AD%90%E4%BF%A1%E6%81%AF%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 286,
+    "name": "上海电影艺术职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%94%B5%E5%BD%B1%E8%89%BA%E6%9C%AF%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 287,
+    "name": "上海电机学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%94%B5%E6%9C%BA%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 289,
+    "name": "上海电机学院继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%94%B5%E6%9C%BA%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 297,
+    "name": "上海科学技术职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%A7%91%E5%AD%A6%E6%8A%80%E6%9C%AF%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 300,
+    "name": "上海立信会计金融学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%AB%8B%E4%BF%A1%E4%BC%9A%E8%AE%A1%E9%87%91%E8%9E%8D%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 316,
+    "name": "上海立信会计金融学院自学考试",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%AB%8B%E4%BF%A1%E4%BC%9A%E8%AE%A1%E9%87%91%E8%9E%8D%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 318,
+    "name": "上海第二工业大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%AC%AC%E4%BA%8C%E5%B7%A5%E4%B8%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 320,
+    "name": "上海第二工业大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E7%AC%AC%E4%BA%8C%E5%B7%A5%E4%B8%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 322,
+    "name": "上海行健职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E8%A1%8C%E5%81%A5%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 325,
+    "name": "上海视觉艺术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E8%A7%86%E8%A7%89%E8%89%BA%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 327,
+    "name": "上海财经大学",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E8%B4%A2%E7%BB%8F%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 331,
+    "name": "上海财经大学浙江学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E8%B4%A2%E7%BB%8F%E5%A4%A7%E5%AD%A6%E6%B5%99%E6%B1%9F%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 335,
+    "name": "上海邦德职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E9%82%A6%E5%BE%B7%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 336,
+    "name": "上海震旦职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E9%9C%87%E6%97%A6%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 337,
+    "name": "上海音乐学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E6%B5%B7%E9%9F%B3%E4%B9%90%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 338,
+    "name": "上饶师范学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E9%A5%B6%E5%B8%88%E8%8C%83%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 354,
+    "name": "上饶职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%8A%E9%A5%B6%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 355,
+    "name": "东北农业大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E5%86%9C%E4%B8%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 379,
+    "name": "东北农业大学远程教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E5%86%9C%E4%B8%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 382,
+    "name": "东北大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 399,
+    "name": "东北大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 418,
+    "name": "东北大学远程教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 420,
+    "name": "东北师范大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E5%B8%88%E8%8C%83%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 424,
+    "name": "东北林业大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E6%9E%97%E4%B8%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 431,
+    "name": "东北林业大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E6%9E%97%E4%B8%9A%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 432,
+    "name": "东北电力大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E7%94%B5%E5%8A%9B%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 439,
+    "name": "东北石油大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E7%9F%B3%E6%B2%B9%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 454,
+    "name": "东北财经大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E8%B4%A2%E7%BB%8F%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 459,
+    "name": "东北财经大学远程教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8C%97%E8%B4%A2%E7%BB%8F%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 468,
+    "name": "东华大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%8E%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 471,
+    "name": "东华大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%8E%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 472,
+    "name": "东华理工大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%8E%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 501,
+    "name": "东华理工大学函授",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%8E%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 503,
+    "name": "东华理工大学长江学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%8E%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 505,
+    "name": "东南大学",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 508,
+    "name": "东南大学成贤学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E5%8D%97%E5%A4%A7%E5%AD%A6%E6%88%90%E8%B4%A4%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 521,
+    "name": "东莞理工学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E8%8E%9E%E7%90%86%E5%B7%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 530,
+    "name": "东莞理工学院城市学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E8%8E%9E%E7%90%86%E5%B7%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 558,
+    "name": "东莞理工学院继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E8%8E%9E%E7%90%86%E5%B7%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 560,
+    "name": "东莞职业技术学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E8%8E%9E%E8%81%8C%E4%B8%9A%E6%8A%80%E6%9C%AF%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 570,
+    "name": "东营科技职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E8%90%A5%E7%A7%91%E6%8A%80%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 573,
+    "name": "东营职业学院",
+    "logo": "?path=school-logo%2F%E4%B8%9C%E8%90%A5%E8%81%8C%E4%B8%9A%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 574,
+    "name": "中北大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8C%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 586,
+    "name": "中北大学信息商务学院",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8C%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 608,
+    "name": "中北大学函授",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8C%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 609,
+    "name": "中华女子学院",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%8E%E5%A5%B3%E5%AD%90%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 617,
+    "name": "中南大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 626,
+    "name": "中南大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 632,
+    "name": "中南大学远程教育",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 637,
+    "name": "中南林业科技大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E6%9E%97%E4%B8%9A%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 641,
+    "name": "中南林业科技大学涉外学院",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E6%9E%97%E4%B8%9A%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6%E6%B6%89%E5%A4%96%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 649,
+    "name": "中南林业科技大学继续教育",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E6%9E%97%E4%B8%9A%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 651,
+    "name": "中南民族大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E6%B0%91%E6%97%8F%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 673,
+    "name": "中南财经政法大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E8%B4%A2%E7%BB%8F%E6%94%BF%E6%B3%95%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 681,
+    "name": "中南财经政法大学自学考试",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8D%97%E8%B4%A2%E7%BB%8F%E6%94%BF%E6%B3%95%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 687,
+    "name": "中原工学院",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8E%9F%E5%B7%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 707,
+    "name": "中原工学院信息商务学院",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8E%9F%E5%B7%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 745,
+    "name": "中原工学院函授",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%8E%9F%E5%B7%A5%E5%AD%A6%E9%99%A2.png"
+  },
+  {
+    "id": 749,
+    "name": "中国人民公安大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%9B%BD%E4%BA%BA%E6%B0%91%E5%85%AC%E5%AE%89%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 760,
+    "name": "中国人民公安大学自学考试",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%9B%BD%E4%BA%BA%E6%B0%91%E5%85%AC%E5%AE%89%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 764,
+    "name": "中国人民大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%9B%BD%E4%BA%BA%E6%B0%91%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 769,
+    "name": "中国人民警察大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%9B%BD%E4%BA%BA%E6%B0%91%E8%AD%A6%E5%AF%9F%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 775,
+    "name": "中国传媒大学",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%9B%BD%E4%BC%A0%E5%AA%92%E5%A4%A7%E5%AD%A6.png"
+  },
+  {
+    "id": 778,
+    "name": "中国传媒大学南广学院",
+    "logo": "?path=school-logo%2F%E4%B8%AD%E5%9B%BD%E4%BC%A0%E5%AA%92%E5%A4%A7%E5%AD%A6.png"
+  }
+]

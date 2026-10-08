@@ -1,0 +1,1 @@
+import t from"./CYhwYPZ9.js";import{_ as e,u as r,c as a,d as s,b as c}from"./BkmVlzPN.js";import"./Cuncmrtt.js";const o={class:"m-writing-wrap"},i={__name:"writing",setup(_){return r({title:"写作中心"}),(n,p)=>(c(),a("div",o,[s(t)]))}},u=e(i,[["__scopeId","data-v-c3b44cae"]]);export{u as default};

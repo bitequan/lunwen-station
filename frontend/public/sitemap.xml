@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/</loc><changefreq>daily</changefreq><priority>1.00</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/create</loc><changefreq>weekly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/writing</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/tools/aigcreduceweight</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/tools/rewrite</loc><changefreq>weekly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/autodoc</loc><changefreq>weekly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/aippt</loc><changefreq>weekly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/tools</loc><changefreq>weekly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/tools/createchart</loc><changefreq>weekly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://YOUR_DOMAIN_HERE/pc/package-shop</loc><changefreq>weekly</changefreq><priority>0.60</priority></url>
+</urlset>

@@ -1,0 +1,1 @@
+import e from"./BjB3hJ9U.js";import{_ as t,u as a,c as p,d as s,b as c}from"./BkmVlzPN.js";const o={class:"m-aippt-wrap"},_={__name:"aippt",setup(r){return a({title:"AIPPT"}),(i,n)=>(c(),p("div",o,[s(e)]))}},f=t(_,[["__scopeId","data-v-7e71f0cc"]]);export{f as default};

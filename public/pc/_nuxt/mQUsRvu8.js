@@ -1,0 +1,1 @@
+import e from"./C0O3lOag.js";import{_ as t,u as s,c as a,d as r,b as o}from"./BkmVlzPN.js";import"./BGUsDQsT.js";import"./CnGO2uq1.js";const n={class:"m-internship-wrap"},p={__name:"internship",setup(c){return s({title:"实习报告"}),(i,_)=>(o(),a("div",n,[r(e)]))}},l=t(p,[["__scopeId","data-v-adab29f8"]]);export{l as default};

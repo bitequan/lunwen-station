@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API配置参数</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #262626;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .config-panel {
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 32px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 28px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title::before {
+            content: '|';
+            color: #1890ff;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .section {
+            padding: 20px 24px;
+            border-radius: 6px;
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #1890ff, #36cfc9);
+        }
+
+        .section + .section {
+            margin-top: 8px;
+        }
+
+        .section-description {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .section-warning {
+            font-size: 12px;
+            line-height: 1.65;
+            color: #ad4e00;
+            background: #fff7e6;
+            border: 1px solid #ffd591;
+            border-left: 4px solid #fa8c16;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-label .required {
+            color: #ff4d4f;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #262626;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .form-input:hover {
+            border-color: #40a9ff;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+        
+        .form-actions {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Toast 提示框 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            min-width: 320px;
+            max-width: 420px;
+            padding: 14px 16px;
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            animation: toastSlideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        .toast.hiding {
+            animation: toastSlideOut 0.3s ease-out forwards;
+        }
+        
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #262626;
+        }
+        
+        .toast-close {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: #8c8c8c;
+            transition: color 0.2s ease;
+        }
+        
+        .toast-close:hover {
+            color: #262626;
+        }
+        
+        .toast-close svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .toast.success {
+            border-left-color: #52c41a;
+        }
+        
+        .toast.success .toast-icon {
+            color: #52c41a;
+        }
+        
+        .toast.error {
+            border-left-color: #ff4d4f;
+        }
+        
+        .toast.error .toast-icon {
+            color: #ff4d4f;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .config-panel {
+                padding: 24px;
+            }
+            
+            .panel-title {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                text-align: center;
+                margin-top: 24px;
+                padding-top: 20px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 0;
+            }
+            
+            .toast-container {
+                top: 16px;
+                right: 16px;
+                left: 16px;
+            }
+            
+            .toast {
+                min-width: auto;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <div class="config-panel">
+            <h2 class="panel-title">API配置参数</h2>
+            <form id="apiConfigForm">
+                <div class="section">
+                    <div class="section-title">本站对接标识</div>
+                    <div class="section-warning">
+                        <strong>重要：</strong>前缀一经设置请尽量不要修改。若修改，新产生的订单将使用新前缀；后台按前缀拉取订单时，<strong>将无法再看到此前以旧前缀产生的对接记录</strong>（用户侧订单列表也可能与上游不一致）。仅在全新部署或明确需要切换渠道标识时再调整。
+                    </div>
+                    <div class="section-description">对接 TokenAPI 时使用的 agent_str 格式为「前缀 + 用户数字 ID」。默认前缀为 adweb_；可改为自定义英文/数字（可带下划线），若未以 _ 结尾会自动补全。</div>
+
+                    <div class="form-group">
+                        <label class="form-label">agent_str 前缀 <span class="required">*</span></label>
+                        <input type="text" name="agent_id_prefix" id="agent_id_prefix" class="form-input"
+                               placeholder="adweb_" maxlength="48"
+                               autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">爱点写作接口</div>
+                    <div class="section-description">用于对接爱点写作服务，请填写正式环境的域名和 Token。</div>
+
+                    <div class="form-group">
+                        <label class="form-label">对接域名 <span class="required">*</span></label>
+                        <input type="url" name="api_url" id="api_url" class="form-input" 
+                               placeholder="http://lwapi.wangkedaan.com" 
+                               value="<?php 
+                               $apiUrl = '';
+                               if (isset($list) && is_array($list)) {
+                                   foreach ($list as $item) {
+                                       if ($item['config_key'] === 'api_url' || $item['config_key'] === 'api_domain') {
+                                           $apiUrl = htmlspecialchars($item['config_value']);
+                                           break;
+                                       }
+                                   }
+                               }
+                               echo $apiUrl;
+                               ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">对接Token <span class="required">*</span></label>
+                        <input type="text" name="api_token" id="api_token" class="form-input" 
+                               placeholder="请输入对接Token" 
+                               value="<?php 
+                               $apiToken = '';
+                               if (isset($list) && is_array($list)) {
+                                   foreach ($list as $item) {
+                                       if ($item['config_key'] === 'api_token' || $item['config_key'] === 'token') {
+                                           $apiToken = htmlspecialchars($item['config_value']);
+                                           break;
+                                       }
+                                   }
+                               }
+                               echo $apiToken;
+                               ?>" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="resetForm()">重置</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 表单提交
+        document.getElementById('apiConfigForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const apiUrl = document.getElementById('api_url').value.trim();
+            const apiToken = document.getElementById('api_token').value.trim();
+            const agentIdPrefix = document.getElementById('agent_id_prefix').value.trim();
+            
+            // 验证写作
+            if (!apiUrl) {
+                showAlert('请输入爱点写作的对接域名', 'error');
+                return;
+            }
+            
+            if (!apiToken) {
+                showAlert('请输入爱点写作的对接Token', 'error');
+                return;
+            }
+            
+            // 验证 URL 格式（写作）
+            try {
+                new URL(apiUrl);
+            } catch (e) {
+                showAlert('请输入有效的爱点写作对接域名 URL', 'error');
+                return;
+            }
+            
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '保存中...';
+            }
+            
+            try {
+                // 保存爱点写作对接域名
+                let saveUrlResult = await saveApiConfig('api_url', apiUrl);
+                if (saveUrlResult.code !== 1) {
+                    showAlert('保存对接域名失败：' + saveUrlResult.msg, 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = '保存';
+                    }
+                    return;
+                }
+                
+                // 保存爱点写作对接Token
+                let saveTokenResult = await saveApiConfig('api_token', apiToken);
+                if (saveTokenResult.code !== 1) {
+                    showAlert('保存对接Token失败：' + saveTokenResult.msg, 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = '保存';
+                    }
+                    return;
+                }
+
+                let savePrefixResult = await saveApiConfig('agent_id_prefix', agentIdPrefix);
+                if (savePrefixResult.code !== 1) {
+                    showAlert('保存 agent_str 前缀失败：' + savePrefixResult.msg, 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = '保存';
+                    }
+                    return;
+                }
+
+                showAlert('保存成功', 'success');
+            } catch (error) {
+                console.error('保存失败:', error);
+                showAlert('保存失败，请稍后再试', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '保存';
+                }
+            }
+        });
+        
+        // 保存API配置
+        async function saveApiConfig(key, value) {
+            try {
+                // 先尝试获取现有配置
+                const response = await fetch('/admin/getApiConfig?key=' + encodeURIComponent(key));
+                const result = await response.json();
+                
+                let configData = {
+                    config_key: key,
+                    config_value: value,
+                    config_desc: key === 'api_url' ? '对接域名' : '对接Token',
+                    config_type: 'string',
+                    sort: key === 'api_url' ? 1 : 2,
+                    status: 1
+                };
+                
+                if (result.code === 1 && result.data) {
+                    // 更新现有配置
+                    configData.id = result.data.id;
+                }
+                
+                const saveResponse = await fetch('/admin/saveApiConfig', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(configData)
+                });
+                
+                return await saveResponse.json();
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                return { code: 0, msg: '保存失败：' + error.message };
+            }
+        }
+        
+        // 重置表单
+        function resetForm() {
+            document.getElementById('apiConfigForm').reset();
+        }
+        
+        // 显示 Toast 提示
+        function showAlert(message, type) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            }
+            
+            const closeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${iconSvg}</div>
+                <div class="toast-content">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">${closeSvg}</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // 页面加载时获取API配置数据
+        async function loadApiConfig() {
+            try {
+                // 获取爱点写作对接域名配置
+                const urlResponse = await fetch('/admin/getApiConfig?key=api_url');
+                const urlResult = await urlResponse.json();
+                
+                // 获取爱点写作对接Token配置
+                const tokenResponse = await fetch('/admin/getApiConfig?key=api_token');
+                const tokenResult = await tokenResponse.json();
+
+                const prefixResponse = await fetch('/admin/getApiConfig?key=agent_id_prefix');
+                const prefixResult = await prefixResponse.json();
+                
+                // 填充表单数据
+                if (urlResult.code === 1 && urlResult.data && urlResult.data.config_value) {
+                    document.getElementById('api_url').value = urlResult.data.config_value;
+                }
+                
+                if (tokenResult.code === 1 && tokenResult.data && tokenResult.data.config_value) {
+                    document.getElementById('api_token').value = tokenResult.data.config_value;
+                }
+
+                if (prefixResult.code === 1 && prefixResult.data && typeof prefixResult.data.config_value === 'string') {
+                    document.getElementById('agent_id_prefix').value = prefixResult.data.config_value;
+                }
+                
+            } catch (error) {
+                console.error('加载API配置失败:', error);
+                showAlert('加载配置数据失败，请刷新页面重试', 'error');
+            }
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApiConfig();
+        });
+    </script>
+</body>
+</html>

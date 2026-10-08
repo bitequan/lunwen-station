@@ -1,0 +1,1 @@
+import e from"./5sDh8Tw-.js";import{_ as a,u as c,c as t,d as o,b as s}from"./BkmVlzPN.js";import"./Cuncmrtt.js";import"./CnGO2uq1.js";const r={class:"m-aicheck-wrap"},_={__name:"ai-check",setup(i){return c({title:"AI检测"}),(p,m)=>(s(),t("div",r,[o(e)]))}},l=a(_,[["__scopeId","data-v-823bad8b"]]);export{l as default};

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>概述</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 40px;
+            color: #262626;
+            line-height: 1.8;
+        }
+        
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #1890ff;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+        }
+        
+        .section-content {
+            font-size: 15px;
+            color: #595959;
+            line-height: 1.8;
+        }
+        
+        .section-content p {
+            margin-bottom: 12px;
+        }
+        
+        .code-block {
+            background: #f5f5f5;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            background: #e6f7ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #1890ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <h1 class="page-title">API 概述</h1>
+        
+        <div class="section">
+            <h2 class="section-title">系统简介</h2>
+            <div class="section-content">
+                <p>TokenAPI 是一个功能完善的写作服务接口系统，提供多种写作类型和工具集合，支持开题报告、任务书、实习报告、高级论文、PPT生成等多种业务场景。</p>
+                <p>系统采用 RESTful API 设计，支持 JSON 格式的数据交互，提供完善的鉴权机制和错误处理。</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">主要功能模块</h2>
+            <div class="section-content">
+                <p><strong>1. 基础写作功能</strong></p>
+                <p>包括开题报告、任务书、实习报告、实习日志等基础写作类型的完整流程管理。</p>
+                
+                <p><strong>2. 高级论文功能</strong></p>
+                <p>提供论文表单配置、图表资源、文献资源、大纲生成、模板管理等高级功能。</p>
+                
+                <p><strong>3. PPT生成功能</strong></p>
+                <p>支持PPT价格查询、大纲生成、模板管理、订单处理、预览下载等功能。</p>
+                
+                <p><strong>4. 工具集合</strong></p>
+                <p>提供参考文献获取、段落改写、段落配图、AIGC降重、图表生成、题目生成、大纲生成等实用工具。</p>
+                
+                <p><strong>5. 模板管理</strong></p>
+                <p>支持大纲模板和论文模板的增删改查、状态管理等操作。</p>
+                
+                <p><strong>6. 支付功能</strong></p>
+                <p>提供价格查询、余额支付等支付相关接口。</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">接口特点</h2>
+            <div class="section-content">
+                <p>• <span class="highlight">统一响应格式</span>：所有接口采用统一的 JSON 响应格式，便于处理</p>
+                <p>• <span class="highlight">完善的错误处理</span>：提供详细的错误码和错误信息</p>
+                <p>• <span class="highlight">灵活的鉴权机制</span>：支持多种鉴权方式，保障接口安全</p>
+                <p>• <span class="highlight">丰富的功能模块</span>：覆盖写作服务的各个环节</p>
+                <p>• <span class="highlight">详细的文档说明</span>：每个接口都有详细的参数说明和示例</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">快速开始</h2>
+            <div class="section-content">
+                <p>1. 查看 <span class="highlight">鉴权方式</span> 了解如何获取和使用 Token</p>
+                <p>2. 查看 <span class="highlight">响应格式</span> 了解接口返回的数据结构</p>
+                <p>3. 根据业务需求选择相应的功能模块进行对接</p>
+                <p>4. 参考各模块的接口文档进行开发和测试</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

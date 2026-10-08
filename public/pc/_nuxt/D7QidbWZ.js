@@ -1,0 +1,1 @@
+import e from"./D89OHePQ.js";import{_ as a,u as t,c as r,d as s,b as o}from"./BkmVlzPN.js";import"./BGUsDQsT.js";import"./CnGO2uq1.js";const i={class:"m-diary-wrap"},c={__name:"internshipdiary",setup(n){return t({title:"实习日记"}),(p,_)=>(o(),r("div",i,[s(e)]))}},u=a(c,[["__scopeId","data-v-7a4df2a1"]]);export{u as default};

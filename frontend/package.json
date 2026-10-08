@@ -1,0 +1,22 @@
+{
+  "name": "ai-writing-system-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "clean": "node scripts/clean.mjs",
+    "build": "npm run clean && nuxt generate && node scripts/deploy.mjs",
+    "generate": "npm run clean && nuxt generate && node scripts/deploy.mjs",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "element-plus": "^2.14.4",
+    "qrcode": "^1.5.4",
+    "sortablejs": "^1.15.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "nuxt": "^3.21.9",
+    "vite": "^7.3.6"
+  }
+}

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* ============================================
+           控制台 · 轻盈精致版设计
+           白卡 + 淡彩图标芯片 + 克制的阴影与描边
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f6fa;
+            padding: 32px 36px 40px;
+            color: #1f2329;
+            line-height: 1.5;
+        }
+
+        .home-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ---------- 统计卡片区 ---------- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #edf0f5;
+            border-radius: 14px;
+            padding: 20px 22px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+
+        @media (hover: hover) {
+            .stat-card:hover {
+                transform: translateY(-3px);
+                border-color: #e3e7ef;
+                box-shadow: 0 12px 28px rgba(31, 45, 80, 0.08);
+            }
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card--indigo .stat-icon { background: rgba(79, 110, 242, 0.10); }
+        .stat-card--violet .stat-icon { background: rgba(124, 92, 240, 0.10); }
+        .stat-card--teal   .stat-icon { background: rgba(14, 159, 168, 0.10); }
+        .stat-card--green  .stat-icon { background: rgba(23, 162, 107, 0.10); }
+        .stat-card--amber  .stat-icon { background: rgba(224, 138, 0, 0.11); }
+
+        .stat-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 4px;
+        }
+
+        .stat-card--indigo .stat-value { color: #3d5ce0; }
+        .stat-card--violet .stat-value { color: #6a48e8; }
+        .stat-card--teal   .stat-value { color: #0b8a93; }
+        .stat-card--green  .stat-value { color: #118a58; }
+        .stat-card--amber  .stat-value { color: #c67a00; }
+
+        .stat-desc {
+            font-size: 12px;
+            color: #9aa3b2;
+        }
+
+        /* ---------- 主区布局：图表 + 运行环境 ---------- */
+        .charts-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(240px, 292px);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #edf0f5;
+            border-radius: 14px;
+            padding: 20px 22px;
+            transition: box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+
+        @media (hover: hover) {
+            .chart-card:hover {
+                border-color: #e3e7ef;
+                box-shadow: 0 12px 28px rgba(31, 45, 80, 0.08);
+            }
+        }
+
+        .chart-header {
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2329;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .chart-chip {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .chart-chip--indigo { background: rgba(79, 110, 242, 0.10); }
+        .chart-chip--violet { background: rgba(124, 92, 240, 0.10); }
+        .chart-chip--teal   { background: rgba(14, 159, 168, 0.10); }
+        .chart-chip--green  { background: rgba(23, 162, 107, 0.10); }
+        .chart-chip--amber  { background: rgba(224, 138, 0, 0.11); }
+        .chart-chip--rose   { background: rgba(232, 78, 116, 0.10); }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+        }
+
+        /* ---------- 运行环境侧栏 ---------- */
+        .sys-meta-panel {
+            background: #ffffff;
+            border: 1px solid #edf0f5;
+            border-radius: 14px;
+            padding: 20px 18px 16px;
+        }
+
+        .sys-meta-panel--aside {
+            position: sticky;
+            top: 20px;
+        }
+
+        .sys-meta-panel__head {
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f2f4f8;
+        }
+
+        .sys-meta-panel__heading {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2329;
+            letter-spacing: -0.01em;
+        }
+
+        .sys-meta-panel__sub {
+            font-size: 12px;
+            color: #9aa3b2;
+            margin-top: 2px;
+        }
+
+        .sys-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .sys-tile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 11px;
+            background: #f8f9fc;
+            border: 1px solid #f0f2f7;
+        }
+
+        .sys-tile__icon {
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(79, 110, 242, 0.10);
+        }
+
+        .sys-tile__body {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .sys-tile__label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #9aa3b2;
+            margin-bottom: 2px;
+            letter-spacing: 0.02em;
+        }
+
+        .sys-tile__value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2329;
+            word-break: break-word;
+        }
+
+        /* ---------- 响应式 ---------- */
+        @media (max-width: 1240px) and (min-width: 1025px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .charts-layout {
+                grid-template-columns: 1fr;
+            }
+            .sys-meta-panel--aside {
+                position: static;
+            }
+            .sys-meta-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        /* 平板设备适配 - 769px到1024px */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                padding: 24px 20px 32px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+            .charts-section {
+                gap: 16px;
+            }
+        }
+
+        /* 移动设备适配 - 小于等于768px */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 18px 14px 28px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 16px 16px 14px;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .chart-card {
+                padding: 18px 16px;
+            }
+            .chart-container {
+                height: 220px;
+            }
+            .sys-meta-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* 小屏幕手机适配 - 小于等于480px */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .sys-meta-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <div class="stats-grid">
+            <div class="stat-card stat-card--indigo">
+                <div class="stat-icon">👥</div>
+                <div class="stat-title">用户总数</div>
+                <div class="stat-value"><?php echo isset($data['user_count']) ? number_format($data['user_count']) : 0; ?></div>
+                <div class="stat-desc">累计注册用户</div>
+            </div>
+
+            <div class="stat-card stat-card--violet">
+                <div class="stat-icon">📦</div>
+                <div class="stat-title">订单总数</div>
+                <div class="stat-value"><?php echo isset($data['order_count']) ? number_format($data['order_count']) : 0; ?></div>
+                <div class="stat-desc">累计订单数量</div>
+            </div>
+
+            <div class="stat-card stat-card--teal">
+                <div class="stat-icon">📊</div>
+                <div class="stat-title">今日订单</div>
+                <div class="stat-value"><?php echo isset($data['today_order_count']) ? number_format($data['today_order_count']) : 0; ?></div>
+                <div class="stat-desc">今日新增订单</div>
+            </div>
+
+            <div class="stat-card stat-card--green">
+                <div class="stat-icon">📈</div>
+                <div class="stat-title">本月订单</div>
+                <div class="stat-value"><?php echo isset($data['month_order_count']) ? number_format($data['month_order_count']) : 0; ?></div>
+                <div class="stat-desc">本月累计订单</div>
+            </div>
+
+            <div class="stat-card stat-card--amber">
+                <div class="stat-icon">💳</div>
+                <div class="stat-title">爱点接口余额</div>
+                <div class="stat-value"><?php echo isset($data['api_balance']) ? number_format($data['api_balance'], 2) : 0; ?></div>
+                <div class="stat-desc">当前接口余额（元）</div>
+            </div>
+        </div>
+
+        <div class="charts-layout">
+        <div class="charts-section">
+            <!-- 1) 用户增长（放到第一个） -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-chip chart-chip--rose">👥</span>
+                        <span>用户增长</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2) 论文订单 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-chip chart-chip--indigo">📄</span>
+                        <span>论文订单</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="paperChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 3) 写作中心订单 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-chip chart-chip--violet">✍️</span>
+                        <span>写作中心订单</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="writingCenterChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 4) 查重订单 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-chip chart-chip--teal">🔎</span>
+                        <span>查重订单</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="checkChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 5) PPT订单 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-chip chart-chip--amber">📽</span>
+                        <span>PPT订单</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pptChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <aside class="sys-meta-panel sys-meta-panel--aside" aria-label="系统运行环境">
+            <header class="sys-meta-panel__head">
+                <h2 class="sys-meta-panel__heading">运行环境</h2>
+                <p class="sys-meta-panel__sub">版本 · 运行栈</p>
+            </header>
+            <div class="sys-meta-grid">
+                <div class="sys-tile">
+                    <div class="sys-tile__icon" aria-hidden="true">📌</div>
+                    <div class="sys-tile__body">
+                        <div class="sys-tile__label">系统版本</div>
+                        <div class="sys-tile__value"><?php echo htmlspecialchars((string)($data['system_version'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></div>
+                    </div>
+                </div>
+                <div class="sys-tile">
+                    <div class="sys-tile__icon" aria-hidden="true">🐘</div>
+                    <div class="sys-tile__body">
+                        <div class="sys-tile__label">PHP 版本</div>
+                        <div class="sys-tile__value"><?php echo htmlspecialchars((string)($data['php_version'] ?? PHP_VERSION), ENT_QUOTES, 'UTF-8'); ?></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        </div>
+    </div>
+
+    <!-- 以纯 JSON 形式输出 chart_data，避免在 JS 里直接嵌入 PHP 模板表达式导致 linter 报错 -->
+    <script type="application/json" id="homeChartData">
+        <?php echo json_encode($data['chart_data'] ?? [], JSON_UNESCAPED_UNICODE); ?>
+    </script>
+
+    <script>
+        // 图表数据
+        var chartData = JSON.parse(document.getElementById('homeChartData').textContent || '{}');
+        var chartLabels = chartData.labels || [];
+        var chartUsers = chartData.users || [];
+        var chartPaperOrders = chartData.paper_orders || [];
+        var chartWritingCenterOrders = chartData.writing_center_orders || [];
+        var chartCheckOrders = chartData.check_orders || [];
+        var chartPptOrders = chartData.ppt_orders || [];
+
+        // 通用图表配置
+        var commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 10,
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyFont: {
+                        size: 12
+                    },
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        },
+                        color: '#8c8c8c',
+                        padding: 8
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        },
+                        color: '#8c8c8c',
+                        maxRotation: 45,
+                        minRotation: 0,
+                        padding: 8
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        };
+
+        // 检测是否为移动端
+        var isMobile = window.innerWidth <= 768;
+
+        // 移动端图表配置
+        var mobileChartOptions = JSON.parse(JSON.stringify(commonChartOptions));
+        mobileChartOptions.scales.x.ticks.maxRotation = 0;
+        mobileChartOptions.scales.x.ticks.font.size = 10;
+        mobileChartOptions.scales.y.ticks.font.size = 10;
+        mobileChartOptions.plugins.tooltip.titleFont.size = 12;
+        mobileChartOptions.plugins.tooltip.bodyFont.size = 11;
+        mobileChartOptions.plugins.tooltip.padding = 8;
+        // 移动端优化点的大小
+        var mobilePointRadius = 2.5;
+        var mobilePointHoverRadius = 4;
+        var mobileBorderWidth = 1.5;
+
+        // 根据设备选择配置
+        var getChartOptions = function(baseOptions) {
+            return isMobile ? JSON.parse(JSON.stringify(mobileChartOptions)) : baseOptions;
+        };
+
+        // 创建折线图（统一样式）
+        function createLineChart(canvasId, data, label, borderColor, backgroundColor) {
+            var ctx = document.getElementById(canvasId).getContext('2d');
+            var options = getChartOptions(commonChartOptions);
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
+                        borderWidth: isMobile ? mobileBorderWidth : 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: isMobile ? mobilePointRadius : 3,
+                        pointHoverRadius: isMobile ? mobilePointHoverRadius : 5,
+                        pointBackgroundColor: borderColor,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: isMobile ? 1.5 : 2
+                    }]
+                },
+                options: options
+            });
+        }
+
+        // 1) 用户增长
+        createLineChart('userChart', chartUsers, '新增用户', 'rgb(245, 87, 108)', 'rgba(245, 87, 108, 0.1)');
+        // 2) 论文订单
+        createLineChart('paperChart', chartPaperOrders, '论文订单数量', 'rgb(102, 126, 234)', 'rgba(102, 126, 234, 0.1)');
+        // 3) 写作中心订单
+        createLineChart('writingCenterChart', chartWritingCenterOrders, '写作中心订单数量', 'rgb(250, 140, 20)', 'rgba(250, 140, 20, 0.1)');
+        // 4) 查重订单
+        createLineChart('checkChart', chartCheckOrders, '查重订单数量', 'rgb(79, 172, 254)', 'rgba(79, 172, 254, 0.1)');
+        // 5) PPT订单
+        createLineChart('pptChart', chartPptOrders, 'PPT订单数量', 'rgb(250, 112, 154)', 'rgba(250, 112, 154, 0.1)');
+
+    </script>
+</body>
+</html>

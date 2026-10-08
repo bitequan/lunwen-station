@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>论文订单 - 管理后台</title>
+  <link rel="stylesheet" href="/static/admin/css/admin.css">
+  <link rel="stylesheet" href="/static/admin/css/order_manage.css">
+</head>
+<body>
+  <div class="order-page">
+    <div class="order-page-title">论文订单</div>
+    <div class="om-subtitle">支持搜索订单号/标题/文件名。</div>
+
+    <div class="om-toolbar">
+      <input id="omSearchKeyword" class="om-search-input" type="text" placeholder="搜索：订单号/标题/文件名" />
+      <button id="omSearchBtn" class="om-btn om-btn-primary" type="button">搜索</button>
+    </div>
+
+    <div class="table-responsive" style="position: relative;">
+      <div id="omLoadingOverlay" class="om-loading-overlay">
+        <div class="om-loading-row">
+          <div class="om-spinner"></div>
+          <div>加载中...</div>
+        </div>
+      </div>
+
+      <table class="om-table">
+        <thead>
+          <tr id="omTableHead"></tr>
+        </thead>
+        <tbody id="omOrdersList"></tbody>
+      </table>
+    </div>
+
+    <div id="omPagination" class="om-pagination"></div>
+  </div>
+
+  <script>
+    window.ADMIN_ORDER_TYPE = 'paper';
+    window.ADMIN_ORDER_PAGE_TITLE = '论文订单';
+  </script>
+  <script src="/static/admin/js/order_manage_list.js"></script>
+</body>
+</html>
+

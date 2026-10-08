@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员管理1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 40px;
+            color: #262626;
+        }
+        
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #1890ff;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+        
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title">管理员管理</h1>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>昵称</th>
+                    <th>邮箱</th>
+                    <th>手机号</th>
+                    <th>角色</th>
+                    <th>状态</th>
+                    <th>最后登录</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (isset($list) && is_array($list)): ?>
+                <?php foreach ($list as $item): ?>
+                <tr>
+                    <td><?php echo $item['id']; ?></td>
+                    <td><?php echo htmlspecialchars($item['username']); ?></td>
+                    <td><?php echo htmlspecialchars($item['nickname']); ?></td>
+                    <td><?php echo htmlspecialchars($item['email']); ?></td>
+                    <td><?php echo htmlspecialchars($item['phone']); ?></td>
+                    <td><?php echo htmlspecialchars($item['role']); ?></td>
+                    <td><?php echo $item['status'] == 1 ? '正常' : '禁用'; ?></td>
+                    <td><?php echo $item['last_login_time'] ? $item['last_login_time'] : '未登录'; ?></td>
+                    <td>
+                        <button class="btn btn-primary" onclick="changePassword(<?php echo $item['id']; ?>, '<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>')">修改密码</button>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 修改密码模态框 -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <h2>修改管理员密码</h2>
+            <form id="passwordForm">
+                <input type="hidden" name="id" id="adminId">
+                <div class="form-group">
+                    <label class="form-label">用户名</label>
+                    <input type="text" id="adminName" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">原密码</label>
+                    <input type="password" name="old_password" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">新密码</label>
+                    <input type="password" name="new_password" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">确认新密码</label>
+                    <input type="password" name="confirm_password" class="form-input" required>
+                </div>
+                <div style="text-align: right; margin-top: 24px;">
+                    <button type="button" class="btn" onclick="closePasswordModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function changePassword(id, username) {
+            document.getElementById('adminId').value = id;
+            document.getElementById('adminName').value = username;
+            document.getElementById('passwordForm').reset();
+            document.getElementById('passwordModal').classList.add('show');
+        }
+        
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('show');
+        }
+        
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            if (data.new_password !== data.confirm_password) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+            
+            delete data.confirm_password;
+            
+            fetch('/admin/changeAdminPassword', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code == 1) {
+                    alert('密码修改成功');
+                    closePasswordModal();
+                } else {
+                    alert(data.msg);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

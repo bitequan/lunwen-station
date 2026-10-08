@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>充值赠送规则管理 - 管理员后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #262626;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .config-panel {
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 32px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 28px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title::before {
+            content: '|';
+            color: #1890ff;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .btn {
+            padding: 7px 18px;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            border-color: transparent;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-link {
+            color: #1890ff;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.2s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .btn-link:hover {
+            color: #40a9ff;
+        }
+        
+        .btn-danger {
+            color: #ff4d4f;
+        }
+        
+        .btn-danger:hover {
+            color: #ff7875;
+        }
+        
+        .alert-warning {
+            background: #fff7e6;
+            border: 1px solid #ffe58f;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-warning-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #faad14;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .alert-warning-text {
+            font-size: 14px;
+            color: #262626;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+        }
+        
+        .data-table thead {
+            background: #fafafa;
+        }
+        
+        .data-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .data-table td {
+            padding: 16px;
+            text-align: left;
+            font-size: 14px;
+            color: #595959;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #fafafa;
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            border: 1px solid transparent;
+        }
+        
+        .switch.active {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        
+        .switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .switch.active::after {
+            transform: translateX(20px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .badge-error {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+        
+        .badge-info {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(4px);
+            }
+        }
+        
+        .modal {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(85vh - 120px);
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #fafafa;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-label::after {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #ff4d4f;
+            border-radius: 50%;
+            margin-left: 2px;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #262626;
+            background: #fafafa;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .form-input:hover,
+        .form-select:hover {
+            border-color: #40a9ff;
+            background: #ffffff;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #1890ff;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            min-width: 320px;
+            max-width: 420px;
+            padding: 14px 16px;
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            animation: toastSlideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .toast.success {
+            border-left-color: #52c41a;
+        }
+        
+        .toast.error {
+            border-left-color: #ff4d4f;
+        }
+        
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #262626;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8c8c8c;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .action-buttons-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <div class="config-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">充值赠送规则管理</h2>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>+</span>
+                    <span>添加规则</span>
+                </button>
+            </div>
+            
+            <div class="alert-warning">
+                <div class="alert-warning-icon">!</div>
+                <div class="alert-warning-text">
+                    <strong>重要提示：</strong>
+                    <div style="margin-top: 5px;">
+                        1. 规则按排序和金额范围自动匹配，金额范围<strong style="color: #ff4d4f;">绝对不能重叠</strong>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        2. 建议设置连续的金额范围，例如：1-50元、50-100元、100-200元、200元以上
+                    </div>
+                    <div style="margin-top: 5px;">
+                        3. 保存时会<strong>自动检查重叠</strong>，如有重叠会提示确认
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>规则名称</th>
+                            <th>规则类型</th>
+                            <th>金额范围</th>
+                            <th>赠送金额</th>
+                            <th>排序</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rulesList">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <div>加载中...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加/编辑规则弹窗 -->
+    <div class="modal-overlay" id="ruleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">添加充值赠送规则</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="ruleForm">
+                    <input type="hidden" name="id" id="rule_id">
+                    
+                    <div class="form-group">
+                        <label class="form-label">规则名称</label>
+                        <input type="text" name="name" id="rule_name" class="form-input" placeholder="例如：大额充值赠送5%" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">规则类型</label>
+                        <select name="rule_type" id="rule_type" class="form-select" onchange="toggleRuleType()" required>
+                            <option value="1">按比例赠送</option>
+                            <option value="2">按固定金额赠送</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">最小充值金额（元）</label>
+                            <input type="number" name="min_amount" id="min_amount" class="form-input" placeholder="0.01" step="0.01" min="0.01" required>
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">不包含此金额（开区间）</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">最大充值金额（元）</label>
+                            <input type="number" name="max_amount" id="max_amount" class="form-input" placeholder="留空表示无上限" step="0.01" min="0.01">
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">包含此金额（闭区间，留空表示无上限）</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #1890ff; margin-bottom: 16px; padding: 8px; background: #f0f9ff; border-radius: 4px; border-left: 3px solid #1890ff;">
+                        💡 <strong>金额范围说明：</strong>范围格式为 (最小金额, 最大金额]，例如：最小10元，最大100元，表示10元 &lt; 充值金额 ≤ 100元
+                    </div>
+                    
+                    <div class="form-group" id="percentGroup">
+                        <label class="form-label">赠送比例（%）</label>
+                        <input type="number" name="bonus_percent" id="bonus_percent" class="form-input" placeholder="例如：5 表示赠送5%" step="0.01" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group" id="fixedGroup" style="display: none;">
+                        <label class="form-label">固定赠送金额（元）</label>
+                        <input type="number" name="bonus_fixed" id="bonus_fixed" class="form-input" placeholder="例如：10 表示固定赠送10元" step="0.01" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">规则描述</label>
+                        <input type="text" name="description" id="rule_description" class="form-input" placeholder="例如：充值100-200元赠送5%">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">排序（数字越小越靠前）</label>
+                        <input type="number" name="sort_order" id="sort_order" class="form-input" placeholder="0" min="0" value="0">
+                    </div>
+                    
+                    <!-- 重叠检查提示 -->
+                    <div class="form-group" id="overlapCheckResult" style="display: none;">
+                        <div class="alert-warning" style="margin-bottom: 0;">
+                            <div class="alert-warning-icon">!</div>
+                            <div class="alert-warning-text" id="overlapCheckText"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="closeModal()">取消</button>
+                <button type="button" class="btn" onclick="checkOverlap()">检查重叠</button>
+                <button type="button" class="btn btn-primary" onclick="saveRule()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRules();
+        });
+        
+        // 加载规则列表
+        async function loadRules() {
+            try {
+                const response = await fetch('/admin/getRechargeBonusRules');
+                const result = await response.json();
+                
+                const tbody = document.getElementById('rulesList');
+                
+                if (result.code === 1 && result.data && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(rule => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${escapeHtml(rule.name)}</td>
+                            <td><span class="badge badge-info">${rule.rule_type_text}</span></td>
+                            <td>${escapeHtml(rule.amount_range_text)}</td>
+                            <td><strong style="color: #52c41a;">${escapeHtml(rule.bonus_text)}</strong></td>
+                            <td>${rule.sort_order}</td>
+                            <td>
+                                <div class="switch ${rule.status == 1 ? 'active' : ''}" 
+                                     onclick="toggleRuleStatus(${rule.id}, ${rule.status}, event)">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons-group">
+                                    <button class="btn-link" onclick="openEditModal(${rule.id})">编辑</button>
+                                    <button class="btn-link btn-danger" onclick="deleteRule(${rule.id})">删除</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <div>暂无规则，点击"添加规则"创建第一条规则</div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载规则列表失败:', error);
+                showAlert('加载规则列表失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 切换规则类型显示
+        function toggleRuleType() {
+            const ruleType = document.getElementById('rule_type').value;
+            const percentGroup = document.getElementById('percentGroup');
+            const fixedGroup = document.getElementById('fixedGroup');
+            
+            if (ruleType == '1') {
+                percentGroup.style.display = 'block';
+                fixedGroup.style.display = 'none';
+                document.getElementById('bonus_percent').required = true;
+                document.getElementById('bonus_fixed').required = false;
+            } else {
+                percentGroup.style.display = 'none';
+                fixedGroup.style.display = 'block';
+                document.getElementById('bonus_percent').required = false;
+                document.getElementById('bonus_fixed').required = true;
+            }
+        }
+        
+        // 打开添加规则弹窗
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = '添加充值赠送规则';
+            document.getElementById('ruleForm').reset();
+            document.getElementById('rule_id').value = '';
+            toggleRuleType();
+            
+            // 重置重叠检查结果
+            document.getElementById('overlapCheckResult').style.display = 'none';
+            document.getElementById('overlapCheckText').textContent = '';
+            
+            document.getElementById('ruleModal').classList.add('show');
+        }
+        
+        // 打开编辑规则弹窗
+        async function openEditModal(id) {
+            try {
+                const response = await fetch(`/admin/getRechargeBonusRule?id=${id}`);
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    const rule = result.data;
+                    document.getElementById('modalTitle').textContent = '编辑充值赠送规则';
+                    document.getElementById('rule_id').value = rule.id;
+                    document.getElementById('rule_name').value = rule.name || '';
+                    document.getElementById('rule_type').value = rule.rule_type;
+                    document.getElementById('min_amount').value = rule.min_amount || '';
+                    document.getElementById('max_amount').value = rule.max_amount || '';
+                    document.getElementById('bonus_percent').value = rule.bonus_percent || '0';
+                    document.getElementById('bonus_fixed').value = rule.bonus_fixed || '0';
+                    document.getElementById('rule_description').value = rule.description || '';
+                    document.getElementById('sort_order').value = rule.sort_order || '0';
+                    
+                    toggleRuleType();
+                    
+                    // 重置重叠检查结果
+                    document.getElementById('overlapCheckResult').style.display = 'none';
+                    document.getElementById('overlapCheckText').textContent = '';
+                    
+                    document.getElementById('ruleModal').classList.add('show');
+                } else {
+                    showAlert(result.msg || '获取规则失败', 'error');
+                }
+            } catch (error) {
+                console.error('获取规则失败:', error);
+                showAlert('获取规则失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('ruleModal').classList.remove('show');
+        }
+        
+        // 静默检查重叠（不显示提示，用于保存前自动检查）
+        async function checkOverlapSilently(data) {
+            try {
+                const response = await fetch('/admin/checkAmountRangeOverlap', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    return {
+                        overlap: result.data.overlap,
+                        message: result.data.message || ''
+                    };
+                } else {
+                    return {
+                        overlap: false,
+                        message: result.msg || '检查失败'
+                    };
+                }
+            } catch (error) {
+                console.error('检查重叠失败:', error);
+                return {
+                    overlap: false,
+                    message: '检查失败，请稍后再试'
+                };
+            }
+        }
+        
+        // 检查金额范围是否重叠（显示提示）
+        async function checkOverlap() {
+            const form = document.getElementById('ruleForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key === 'max_amount' && value === '') {
+                    data[key] = null;
+                } else if (key === 'bonus_percent' || key === 'bonus_fixed' || key === 'min_amount' || key === 'max_amount' || key === 'sort_order') {
+                    data[key] = value ? parseFloat(value) : 0;
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // 验证必填字段
+            if (!data.name || !data.min_amount || data.min_amount <= 0) {
+                showAlert('请填写规则名称和最小充值金额', 'error');
+                return;
+            }
+            
+            if (data.rule_type == 1 && (!data.bonus_percent || data.bonus_percent < 0)) {
+                showAlert('请填写有效的赠送比例', 'error');
+                return;
+            }
+            
+            if (data.rule_type == 2 && (!data.bonus_fixed || data.bonus_fixed < 0)) {
+                showAlert('请填写有效的固定赠送金额', 'error');
+                return;
+            }
+            
+            if (data.max_amount && data.max_amount <= data.min_amount) {
+                showAlert('最大充值金额必须大于最小充值金额', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/checkAmountRangeOverlap', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                const overlapResult = document.getElementById('overlapCheckResult');
+                const overlapText = document.getElementById('overlapCheckText');
+                
+                if (result.code === 1) {
+                    if (result.data.overlap) {
+                        overlapText.textContent = '⚠️ 警告：金额范围与其他规则重叠！' + (result.data.message || '');
+                        overlapText.style.color = '#ff4d4f';
+                        overlapResult.style.display = 'block';
+                        showAlert('金额范围重叠，请调整', 'error');
+                    } else {
+                        overlapText.textContent = '✅ 金额范围无重叠，可以保存';
+                        overlapText.style.color = '#52c41a';
+                        overlapResult.style.display = 'block';
+                        showAlert('金额范围检查通过，无重叠', 'success');
+                    }
+                } else {
+                    showAlert(result.msg || '检查失败', 'error');
+                }
+            } catch (error) {
+                console.error('检查重叠失败:', error);
+                showAlert('检查失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 保存规则
+        async function saveRule() {
+            const form = document.getElementById('ruleForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key === 'max_amount' && value === '') {
+                    data[key] = null;
+                } else if (key === 'bonus_percent' || key === 'bonus_fixed' || key === 'min_amount' || key === 'max_amount' || key === 'sort_order') {
+                    data[key] = value ? parseFloat(value) : 0;
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // 验证必填字段
+            if (!data.name || !data.min_amount || data.min_amount <= 0) {
+                showAlert('请填写规则名称和最小充值金额', 'error');
+                return;
+            }
+            
+            if (data.rule_type == 1 && (!data.bonus_percent || data.bonus_percent < 0)) {
+                showAlert('请填写有效的赠送比例', 'error');
+                return;
+            }
+            
+            if (data.rule_type == 2 && (!data.bonus_fixed || data.bonus_fixed < 0)) {
+                showAlert('请填写有效的固定赠送金额', 'error');
+                return;
+            }
+            
+            if (data.max_amount && data.max_amount <= data.min_amount) {
+                showAlert('最大充值金额必须大于最小充值金额', 'error');
+                return;
+            }
+            
+            // 显示保存中状态
+            const saveBtn = document.querySelector('.modal-footer .btn-primary');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '检查重叠中...';
+            saveBtn.disabled = true;
+            
+            try {
+                // 自动检查重叠
+                const overlapCheckResult = await checkOverlapSilently(data);
+                
+                if (overlapCheckResult.overlap) {
+                    // 恢复按钮状态
+                    saveBtn.textContent = originalText;
+                    saveBtn.disabled = false;
+                    
+                    const confirmSave = confirm(`⚠️ 警告：金额范围与其他规则重叠！\n\n${overlapCheckResult.message}\n\n确定要强制保存吗？这可能导致充值金额匹配错误。\n\n建议点击"取消"返回修改金额范围。`);
+                    if (!confirmSave) {
+                        return;
+                    }
+                    
+                    // 重新禁用按钮
+                    saveBtn.textContent = '保存中...';
+                    saveBtn.disabled = true;
+                }
+                
+                // 保存数据
+                const response = await fetch('/admin/saveRechargeBonusRule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('保存成功', 'success');
+                    closeModal();
+                    loadRules();
+                } else {
+                    showAlert(result.msg || '保存失败', 'error');
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                showAlert('保存失败，请稍后再试', 'error');
+            } finally {
+                // 恢复按钮状态
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+        
+        // 切换规则状态
+        async function toggleRuleStatus(id, currentStatus, event) {
+            const switchEl = event.target.closest('.switch');
+            const newStatus = currentStatus == 1 ? 0 : 1;
+            
+            try {
+                const response = await fetch('/admin/updateRechargeBonusRuleStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        status: newStatus
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    if (newStatus == 1) {
+                        switchEl.classList.add('active');
+                    } else {
+                        switchEl.classList.remove('active');
+                    }
+                    showAlert('状态更新成功', 'success');
+                } else {
+                    showAlert(result.msg || '状态更新失败', 'error');
+                }
+            } catch (error) {
+                console.error('更新状态失败:', error);
+                showAlert('状态更新失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 删除规则
+        async function deleteRule(id) {
+            if (!confirm('确定要删除这条规则吗？删除后无法恢复。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/deleteRechargeBonusRule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('删除成功', 'success');
+                    loadRules();
+                } else {
+                    showAlert(result.msg || '删除失败', 'error');
+                }
+            } catch (error) {
+                console.error('删除失败:', error);
+                showAlert('删除失败，请稍后再试', 'error');
+            }
+        }
+        
+        // 显示提示信息
+        function showAlert(message, type) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            }
+            
+            toast.innerHTML = `
+                <div style="flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">
+                    ${iconSvg}
+                </div>
+                <div class="toast-content">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 点击遮罩关闭弹窗
+        document.getElementById('ruleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

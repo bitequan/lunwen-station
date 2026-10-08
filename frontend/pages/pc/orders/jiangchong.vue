@@ -1,0 +1,573 @@
+<template>
+  <div class="order-page">
+    <div class="page-container">
+      <!-- 状态筛选 -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <button
+            v-for="tab in statusTabs"
+            :key="tab.key"
+            class="filter-chip"
+            :class="{ active: filterStatus === tab.key }"
+            @click="setFilterStatus(tab.key)"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+        <div class="search-box">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input
+            v-model="searchInput"
+            type="text"
+            class="search-input"
+            placeholder="搜索订单号或文档标题"
+            @keyup.enter="handleSearch"
+          />
+          <button class="search-btn" @click="handleSearch">搜索</button>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <section class="panel">
+        <div v-if="loading" class="loading-state">
+          <div class="spinner"></div>
+          <p>加载中...</p>
+        </div>
+
+        <div v-else-if="orders.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v9h-9"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+          </div>
+          <p class="empty-title">暂无降重订单</p>
+          <p class="empty-desc">去提交你的第一篇文档降重吧</p>
+          <NuxtLink to="/pc/tools/aigcreduceweight" class="btn btn-primary">立即降重</NuxtLink>
+        </div>
+
+        <div v-else class="table-wrap">
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th class="col-sn">订单号</th>
+                <th class="col-title">文档标题</th>
+                <th class="col-type">降重类型</th>
+                <th class="col-platform">平台</th>
+                <th class="col-words">字数</th>
+                <th class="col-pay">支付类型</th>
+                <th class="col-status">处理状态</th>
+                <th class="col-time">创建时间</th>
+                <th class="col-action">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in orders" :key="order.id" class="order-row">
+                <td class="col-sn">
+                  <span class="order-sn-text" :title="order.order_sn" @click="copyOrderSn(order.order_sn)">
+                    {{ order.order_sn }}
+                  </span>
+                </td>
+                <td class="col-title">
+                  <span class="order-title" :title="order.title">{{ order.title || '-' }}</span>
+                </td>
+                <td class="col-type">
+                  <span class="type-text">{{ order.checktype_text || '-' }}</span>
+                </td>
+                <td class="col-platform">
+                  <span class="platform-text">{{ order.platform || '-' }}</span>
+                </td>
+                <td class="col-words">
+                  <span class="words-text">{{ Number(order.word_count || 0).toLocaleString() }}</span>
+                </td>
+                <td class="col-pay">
+                  <span class="pay-tag" :class="'pay-' + (order.pay_method || 'balance')">{{ order.pay_method_text || '余额' }}</span>
+                </td>
+                <td class="col-status">
+                  <span class="status-tag" :class="order.status_class">
+                    <span class="status-dot"></span>
+                    {{ order.status_text }}
+                  </span>
+                </td>
+                <td class="col-time">
+                  <span class="time-text">{{ order.create_time_text || '-' }}</span>
+                </td>
+                <td class="col-action">
+                  <div class="action-buttons">
+                    <button
+                      v-if="order.status === 2 && order.zipurl"
+                      class="action-btn download-btn"
+                      :disabled="downloading[order.order_sn]"
+                      @click="handleDownload(order)"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      <span>下载成品</span>
+                    </button>
+                    <span v-else class="action-na">-</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 分页 -->
+      <div v-if="total > 0" class="pagination">
+        <button class="page-btn" :disabled="currentPage <= 1" @click="goToPage(currentPage - 1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          上一页
+        </button>
+        <div class="page-numbers">
+          <template v-for="(p, i) in pageList" :key="i">
+            <span v-if="p === '...'" class="page-ellipsis">...</span>
+            <button v-else class="page-num" :class="{ active: p === currentPage }" @click="goToPage(p)">{{ p }}</button>
+          </template>
+        </div>
+        <button class="page-btn" :disabled="currentPage >= totalPages" @click="goToPage(currentPage + 1)">
+          下一页
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="page-info">共 <b>{{ total }}</b> 条 · 第 {{ currentPage }}/{{ totalPages }} 页</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, reactive, onMounted, onUnmounted } from 'vue'
+
+definePageMeta({ layout: 'console' })
+useHead({ title: '降重订单 - AI写作助手' })
+
+const api = useApi()
+const toast = useToast()
+
+const orders = ref([])
+const loading = ref(false)
+const currentPage = ref(1)
+const pageSize = 10
+const total = ref(0)
+const totalPages = ref(0)
+const downloading = reactive({})
+
+const filterStatus = ref('all')
+const searchKeyword = ref('')
+const searchInput = ref('')
+
+let pollTimer = null
+
+const statusTabs = [
+  { key: 'all', label: '全部' },
+  { key: 'pending', label: '待处理' },
+  { key: 'processing', label: '处理中' },
+  { key: 'completed', label: '已完成' },
+  { key: 'failed', label: '处理失败' },
+]
+
+const pageList = computed(() => {
+  const tp = totalPages.value
+  const cp = currentPage.value
+  if (tp <= 7) return Array.from({ length: tp }, (_, i) => i + 1)
+  const list = [1]
+  if (cp > 4) list.push('...')
+  const start = Math.max(2, cp - 1)
+  const end = Math.min(tp - 1, cp + 1)
+  for (let i = start; i <= end; i++) list.push(i)
+  if (cp < tp - 3) list.push('...')
+  list.push(tp)
+  return list
+})
+
+// 是否存在未完成且非失败的订单
+const hasPendingOrders = computed(() => {
+  return orders.value.some(o => o.status === 0 || o.status === 1)
+})
+
+// 后端 status -> 前端筛选 key
+function mapStatusClass(status) {
+  const m = { 0: 'pending', 1: 'processing', 2: 'completed', 3: 'failed' }
+  return m[status] || 'pending'
+}
+
+async function loadOrders(silent = false) {
+  if (!silent) loading.value = true
+  try {
+    const res = await api.get('/api/check/orderList', {
+      status: filterStatus.value,
+      keyword: searchKeyword.value,
+      page: currentPage.value,
+      page_size: pageSize,
+    })
+    if (res.ok) {
+      const list = res.data.list || []
+      orders.value = list.map(o => ({
+        ...o,
+        status_class: o.status_class || mapStatusClass(o.status),
+      }))
+      total.value = res.data.total || 0
+      totalPages.value = Math.ceil(total.value / pageSize) || 0
+    } else if (!silent) {
+      toast.error(res.msg || '加载失败')
+    }
+  } catch (e) {
+    if (!silent) toast.error('网络错误，请稍后重试')
+  } finally {
+    if (!silent) loading.value = false
+  }
+}
+
+function startPolling() {
+  stopPolling()
+  pollTimer = setInterval(() => {
+    if (hasPendingOrders.value) {
+      loadOrders(true)
+    }
+  }, 5000)
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+}
+
+function setFilterStatus(key) {
+  filterStatus.value = key
+  currentPage.value = 1
+  loadOrders()
+}
+
+function handleSearch() {
+  searchKeyword.value = searchInput.value.trim()
+  currentPage.value = 1
+  loadOrders()
+}
+
+function goToPage(page) {
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return
+  currentPage.value = page
+  loadOrders()
+  if (process.client) window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+async function copyOrderSn(sn) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(sn)
+    } else {
+      const ta = document.createElement('textarea')
+      ta.value = sn
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+    }
+    toast.success('订单号已复制')
+  } catch (e) {
+    toast.error('复制失败')
+  }
+}
+
+// 新窗口下载：先同步打开空白窗口保留用户手势，触发下载后自动关闭窗口回到订单页
+function openDownload(url) {
+  if (!url) return
+  const win = window.open('', '_blank')
+  if (!win) {
+    // 弹窗被拦截时降级：用 <a target="_blank"> 触发（保留用户手势，避免“无法安全下载”）
+    const a = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    return
+  }
+  win.location.href = url
+  // 文件在浏览器内直接触发下载，新窗口保持空白；下载完成后自动关闭窗口
+  closeDownloadWindow(win)
+}
+
+// 下载开始后自动关闭新窗口：下载期间 win.close() 可能被浏览器拦截，
+// 因此定时重试，直到下载完成、窗口成功关闭（最多约 12 秒兜底）
+function closeDownloadWindow(win) {
+  if (!win) return
+  let tries = 0
+  const timer = setInterval(() => {
+    tries++
+    try {
+      if (win.closed) { clearInterval(timer); return }
+      win.close()
+      if (win.closed) { clearInterval(timer); return }
+    } catch (e) {}
+    if (tries >= 24) clearInterval(timer)
+  }, 500)
+}
+
+function handleDownload(order) {
+  if (!order.zipurl) return
+  if (downloading[order.order_sn]) return
+  downloading[order.order_sn] = true
+  try {
+    openDownload(order.zipurl)
+    toast.success('正在下载成品')
+  } finally {
+    setTimeout(() => { downloading[order.order_sn] = false }, 1500)
+  }
+}
+
+onMounted(() => {
+  loadOrders()
+  startPolling()
+  window.addEventListener('console-refresh', handleRefreshEvent)
+})
+
+onUnmounted(() => {
+  stopPolling()
+  window.removeEventListener('console-refresh', handleRefreshEvent)
+})
+
+function handleRefreshEvent() {
+  loadOrders()
+}
+</script>
+
+<style scoped>
+.order-page { min-height: calc(100vh - 64px); }
+.page-container { max-width: 1400px; margin: 0 auto; }
+
+/* 按钮 */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  text-decoration: none; transition: all 0.18s ease;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: #fff; box-shadow: 0 4px 14px rgba(20, 184, 166, 0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(20, 184, 166, 0.4); }
+
+/* 筛选区 */
+.filter-bar {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px; flex-wrap: wrap;
+}
+.filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 7px 16px; border-radius: 999px;
+  border: 1px solid #e2e8f0; background: #fff;
+  font-size: 13px; font-weight: 500; color: #475569;
+  cursor: pointer; transition: all 0.18s ease;
+}
+.filter-chip:hover { border-color: #99f6e4; background: #f0fdfa; color: #0d9488; }
+.filter-chip.active {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 3px 10px rgba(20, 184, 166, 0.25);
+}
+.search-box {
+  margin-left: auto; display: flex; align-items: center;
+  border: 1px solid #e2e8f0; border-radius: 10px;
+  overflow: hidden; background: #fff; transition: all 0.18s ease;
+}
+.search-box:focus-within { border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1); }
+.search-icon { margin-left: 12px; color: #94a3b8; flex-shrink: 0; }
+.search-input {
+  border: none; outline: none; padding: 8px 10px;
+  font-size: 13px; width: 220px; background: transparent; color: #0f172a;
+}
+.search-input::placeholder { color: #94a3b8; }
+.search-btn {
+  border: none; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: #fff; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.search-btn:hover { filter: brightness(1.05); }
+
+/* 面板 */
+.panel {
+  background: #fff; border-radius: 16px; border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+  overflow: hidden; min-height: 400px;
+}
+
+/* 加载/空状态 */
+.loading-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 80px 20px; gap: 16px; color: #94a3b8;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #f1f5f9; border-top-color: #0d9488;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 70px 20px; gap: 8px; text-align: center;
+}
+.empty-icon {
+  width: 80px; height: 80px; display: grid; place-items: center;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(13, 148, 136, 0.04) 100%);
+  color: #0d9488; margin-bottom: 8px; border: 1px solid #ccfbf1;
+}
+.empty-title { font-size: 15px; font-weight: 600; color: #475569; margin: 0; }
+.empty-desc { font-size: 13px; color: #94a3b8; margin: 0 0 12px; }
+
+/* 表格 */
+.table-wrap { padding: 0 24px 8px; }
+.order-table {
+  width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;
+}
+.order-table thead th {
+  padding: 13px 12px; text-align: left;
+  font-size: 11.5px; font-weight: 700; color: #64748b;
+  background: #f8fafc; border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.order-table thead th:first-child { border-top-left-radius: 10px; }
+.order-table thead th:last-child { border-top-right-radius: 10px; }
+.order-row { transition: all 0.18s ease; }
+.order-table tbody td {
+  padding: 14px 12px; border-bottom: 1px solid #f1f5f9;
+  font-size: 13.5px; color: #334155; vertical-align: middle;
+}
+.order-row:hover { background: linear-gradient(90deg, rgba(20, 184, 166, 0.03) 0%, transparent 100%); }
+.order-row:hover td { border-bottom-color: #ccfbf1; }
+.order-row:last-child td { border-bottom: none; }
+
+.col-sn { width: 15%; }
+.col-title { width: 22%; }
+.col-type { width: 8%; }
+.col-platform { width: 9%; }
+.col-words { width: 7%; }
+.col-pay { width: 9%; }
+.col-status { width: 9%; }
+.col-time { width: 12%; }
+.col-action { width: 9%; }
+
+.order-sn-text {
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 12.5px; color: #475569; cursor: pointer;
+  display: inline-block; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  transition: color 0.18s ease;
+}
+.order-sn-text:hover { color: #0d9488; }
+.order-title {
+  display: block; font-weight: 500; color: #0f172a;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.type-text, .platform-text { font-size: 12.5px; color: #64748b; }
+.words-text { font-size: 13px; color: #334155; font-variant-numeric: tabular-nums; }
+
+/* 支付类型标签 */
+.pay-tag {
+  display: inline-flex; align-items: center;
+  padding: 3px 9px; border-radius: 6px;
+  font-size: 11.5px; font-weight: 600;
+  white-space: nowrap;
+}
+.pay-tag.pay-time { background: rgba(6, 182, 212, 0.1); color: #0e7490; }
+.pay-tag.pay-doc { background: rgba(20, 184, 166, 0.1); color: #0d9488; }
+.pay-tag.pay-balance { background: rgba(245, 158, 11, 0.1); color: #b45309; }
+.pay-tag.pay-char { background: rgba(139, 92, 246, 0.1); color: #6d28d9; }
+.pay-tag.pay-char\+balance { background: rgba(139, 92, 246, 0.1); color: #6d28d9; }
+.pay-tag.pay-doc\+balance { background: rgba(20, 184, 166, 0.1); color: #0d9488; }
+
+/* 状态标签 */
+.status-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.status-tag.pending { background: rgba(249, 115, 22, 0.1); color: #c2410c; }
+.status-tag.processing { background: rgba(6, 182, 212, 0.1); color: #0e7490; }
+.status-tag.processing .status-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+.status-tag.completed { background: rgba(34, 197, 94, 0.1); color: #15803d; }
+.status-tag.failed { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.time-text { font-size: 12.5px; color: #64748b; font-variant-numeric: tabular-nums; }
+
+/* 操作按钮 */
+.action-buttons { display: flex; gap: 6px; }
+.action-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 11px; border-radius: 7px;
+  border: 1px solid #e2e8f0; background: #fff;
+  font-size: 12px; font-weight: 500; color: #475569;
+  cursor: pointer; transition: all 0.18s ease;
+}
+.action-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.download-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent; color: #fff;
+}
+.action-na { color: #cbd5e1; font-size: 13px; }
+
+/* 分页 */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 20px 0 8px; flex-wrap: wrap;
+}
+.page-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid #e2e8f0; background: #fff;
+  font-size: 13px; font-weight: 500; color: #475569;
+  cursor: pointer; transition: all 0.18s ease;
+}
+.page-btn:hover:not(:disabled) { border-color: #0d9488; color: #0d9488; background: rgba(20, 184, 166, 0.04); }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-numbers { display: flex; align-items: center; gap: 4px; }
+.page-num {
+  min-width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: 8px; border: 1px solid #e2e8f0; background: #fff;
+  font-size: 13px; font-weight: 600; color: #475569;
+  cursor: pointer; transition: all 0.18s ease; padding: 0 6px;
+}
+.page-num:hover { border-color: #99f6e4; background: #f0fdfa; color: #0d9488; }
+.page-num.active {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 3px 10px rgba(20, 184, 166, 0.3);
+}
+.page-ellipsis { color: #94a3b8; padding: 0 4px; font-size: 13px; }
+.page-info { margin-left: 12px; font-size: 12.5px; color: #64748b; }
+.page-info b { color: #0f172a; font-weight: 700; }
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .search-box { margin-left: 0; width: 100%; }
+  .search-input { flex: 1; width: auto; }
+}
+@media (max-width: 768px) {
+  .page-container { padding: 0; }
+  .filter-bar, .table-wrap, .pagination { padding-left: 14px; padding-right: 14px; }
+  .order-table thead { display: none; }
+  .order-table, .order-table tbody, .order-table tr, .order-table td { display: block; width: 100%; }
+  .order-row {
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 12px; margin-bottom: 12px; padding: 8px 14px;
+  }
+  .order-row:hover { background: #fff; transform: none; }
+  .order-table tbody td {
+    border-bottom: 1px solid #f1f5f9; padding: 10px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    text-align: right; gap: 12px;
+  }
+  .page-info { width: 100%; text-align: center; margin: 8px 0 0; }
+}
+</style>

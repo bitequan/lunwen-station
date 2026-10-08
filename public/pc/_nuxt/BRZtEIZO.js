@@ -1,0 +1,1 @@
+import t from"./8SqHyW2A.js";import{_ as e,u as s,c as a,d as o,b as c}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const r={class:"m-wxlist-wrap"},_={__name:"wxlist",setup(i){return s({title:"参考文献获取"}),(p,l)=>(c(),a("div",r,[o(t)]))}},x=e(_,[["__scopeId","data-v-5959ead0"]]);export{x as default};

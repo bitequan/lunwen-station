@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #262626;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .config-panel {
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 32px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 28px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title::before {
+            content: '|';
+            color: #1890ff;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #262626;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .form-input:hover {
+            border-color: #40a9ff;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        .form-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px;
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+        
+        .form-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .form-checkbox-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .form-checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1890ff;
+        }
+        
+        .form-checkbox-item:has(input[type="checkbox"]:checked) {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        
+        .form-checkbox-item label {
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+        
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin: 32px 0 16px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            position: relative;
+        }
+        
+        h3:first-child {
+            margin-top: 0;
+        }
+        
+        h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 50px;
+            height: 2px;
+            background: #1890ff;
+            border-radius: 1px;
+        }
+        
+        .form-actions {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            min-width: 320px;
+            max-width: 420px;
+            padding: 14px 16px;
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            animation: toastSlideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        .toast.hiding {
+            animation: toastSlideOut 0.3s ease-out forwards;
+        }
+        
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #262626;
+        }
+        
+        .toast-close {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: #8c8c8c;
+            transition: color 0.2s ease;
+        }
+        
+        .toast-close:hover {
+            color: #262626;
+        }
+        
+        .toast-close svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .toast.success {
+            border-left-color: #52c41a;
+        }
+        
+        .toast.success .toast-icon {
+            color: #52c41a;
+        }
+        
+        .toast.error {
+            border-left-color: #ff4d4f;
+        }
+        
+        .toast.error .toast-icon {
+            color: #ff4d4f;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .config-panel {
+                padding: 24px;
+            }
+            
+            .panel-title {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                text-align: center;
+                margin-top: 24px;
+                padding-top: 20px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 0;
+            }
+            
+            h3 {
+                font-size: 15px;
+                margin: 24px 0 12px 0;
+            }
+            
+            .toast-container {
+                top: 16px;
+                right: 16px;
+                left: 16px;
+            }
+            
+            .toast {
+                min-width: auto;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <div class="config-panel">
+            <h2 class="panel-title">安全设置</h2>
+            <form id="securityForm">
+                <h3>密码策略</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">密码最小长度</label>
+                    <input type="number" name="password_min_length" value="<?php echo isset($config['password_min_length']) ? htmlspecialchars($config['password_min_length']) : '6'; ?>" class="form-input" min="6" max="32">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">密码复杂度要求</label>
+                    <div class="form-checkbox-group">
+                        <div class="form-checkbox-item">
+                        <?php 
+                        $reqUpper = isset($config['password_require_uppercase']) ? $config['password_require_uppercase'] : 0;
+                        $reqLower = isset($config['password_require_lowercase']) ? $config['password_require_lowercase'] : 0;
+                        $reqNumber = isset($config['password_require_number']) ? $config['password_require_number'] : 0;
+                        $reqSpecial = isset($config['password_require_special']) ? $config['password_require_special'] : 0;
+                        ?>
+                            <input type="checkbox" name="password_require_uppercase" id="req_upper" value="1" <?php echo $reqUpper == 1 ? 'checked' : ''; ?>>
+                            <label for="req_upper">要求大写字母</label>
+                        </div>
+                        <div class="form-checkbox-item">
+                            <input type="checkbox" name="password_require_lowercase" id="req_lower" value="1" <?php echo $reqLower == 1 ? 'checked' : ''; ?>>
+                            <label for="req_lower">要求小写字母</label>
+                        </div>
+                        <div class="form-checkbox-item">
+                            <input type="checkbox" name="password_require_number" id="req_number" value="1" <?php echo $reqNumber == 1 ? 'checked' : ''; ?>>
+                            <label for="req_number">要求数字</label>
+                        </div>
+                        <div class="form-checkbox-item">
+                            <input type="checkbox" name="password_require_special" id="req_special" value="1" <?php echo $reqSpecial == 1 ? 'checked' : ''; ?>>
+                            <label for="req_special">要求特殊字符</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>登录安全</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">最大登录尝试次数</label>
+                        <input type="number" name="login_max_attempts" value="<?php echo isset($config['login_max_attempts']) ? htmlspecialchars($config['login_max_attempts']) : '5'; ?>" class="form-input" min="1" max="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">登录锁定时间（分钟）</label>
+                        <input type="number" name="login_lockout_time" value="<?php echo isset($config['login_lockout_time']) ? htmlspecialchars($config['login_lockout_time']) : '30'; ?>" class="form-input" min="1">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">会话超时时间（分钟）</label>
+                    <input type="number" name="session_timeout" value="<?php echo isset($config['session_timeout']) ? htmlspecialchars($config['session_timeout']) : '1440'; ?>" class="form-input" min="1">
+                </div>
+                
+                <h3>邮箱验证码设置</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">启用邮箱验证码</label>
+                    <div class="form-checkbox-group">
+                        <div class="form-checkbox-item">
+                            <?php 
+                            $enableEmailVerify = isset($config['enable_email_verify']) ? $config['enable_email_verify'] : 0;
+                            ?>
+                            <input type="checkbox" name="enable_email_verify" id="enable_email_verify" value="1" <?php echo $enableEmailVerify == 1 ? 'checked' : ''; ?>>
+                            <label for="enable_email_verify">启用邮箱验证码（用户注册时需要邮箱验证）</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">邮箱验证码有效期（分钟）</label>
+                    <input type="number" name="email_verify_expire" value="<?php echo isset($config['email_verify_expire']) ? htmlspecialchars($config['email_verify_expire']) : '10'; ?>" class="form-input" min="1" max="60">
+                </div>
+                
+                <h3>用户端会话（User 应用）</h3>
+                <div class="form-group">
+                    <label class="form-label">单点登录限制</label>
+                    <div class="form-checkbox-group">
+                        <div class="form-checkbox-item">
+                            <?php $userSingleSession = isset($config['user_single_session']) ? (int)$config['user_single_session'] : 1; ?>
+                            <input type="checkbox" name="user_single_session" id="user_single_session" value="1" <?php echo $userSingleSession === 1 ? 'checked' : ''; ?>>
+                            <label for="user_single_session">同一账号仅保留最后一次登录有效（新登录会使其它设备/浏览器上的会话失效；默认开启）</label>
+                        </div>
+                    </div>
+                    <p class="form-hint" style="margin-top:8px;color:#8c8c8c;font-size:13px;">关闭后同一账号可在多端同时保持登录；开启后仅最后一次登录端有效。</p>
+                </div>
+
+                <h3>注册方式</h3>
+                <div class="form-group">
+                    <label class="form-label">自助注册</label>
+                    <div class="form-checkbox-group">
+                        <div class="form-checkbox-item">
+                            <?php $disableSelfReg = isset($config['disable_self_register']) ? (int)$config['disable_self_register'] : 0; ?>
+                            <input type="checkbox" name="disable_self_register" id="disable_self_register" value="1" <?php echo $disableSelfReg === 1 ? 'checked' : ''; ?>>
+                            <label for="disable_self_register">禁止自助注册（新用户仅可通过快捷登录/扫码；已绑定邮箱的账号仍可使用邮箱与密码登录）</label>
+                        </div>
+                    </div>
+                    <p class="form-hint" style="margin-top:8px;color:#8c8c8c;font-size:13px;">开启后用户端将隐藏「注册」入口；与手机号/邮箱自助注册相关的接口也会拒绝请求。</p>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="resetForm('securityForm')">重置</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 添加版本号防止缓存
+        const version = '<?php echo time(); ?>';
+        console.log('安全配置页面版本:', version);
+        
+        document.getElementById('securityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const btn = form.querySelector('button[type="submit"]');
+            submitForm('security', new FormData(form), btn);
+        });
+        
+        async function submitForm(type, formData, btn) {
+            const data = {};
+            
+            // 处理复选框（未选中的复选框不会在 FormData 中）
+            const checkboxFields = ['password_require_uppercase', 'password_require_lowercase', 
+                                    'password_require_number', 'password_require_special', 'enable_email_verify', 'disable_self_register', 'user_single_session'];
+            checkboxFields.forEach(field => {
+                data[field] = formData.has(field) ? '1' : '0';
+            });
+            
+            // 处理其他字段
+            for (let [key, value] of formData.entries()) {
+                if (!checkboxFields.includes(key)) {
+                    data[key] = value;
+                }
+            }
+            data.type = type;
+            
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '保存中...';
+            }
+            
+            try {
+                const response = await fetch('/admin/saveSiteConfig', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('保存成功', 'success');
+                } else {
+                    showAlert(result.msg || '保存失败', 'error');
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                showAlert('保存失败，请稍后再试', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '保存';
+                }
+            }
+        }
+        
+        function showAlert(message, type) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            }
+            
+            const closeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${iconSvg}</div>
+                <div class="toast-content">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">${closeSvg}</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        function resetForm(formId) {
+            document.getElementById(formId).reset();
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站配置</title>
+    <style>
+        /* ============================================
+           网站配置页面 - 全新现代设计（渐变、卡片、动画）
+           ============================================ */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #262626;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 配置面板 - 简洁设计，确保左右留白均衡 */
+        .config-panel {
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 24px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 20px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title::before {
+            content: '|';
+            color: #1890ff;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        /* 表单组 - 建立清晰的视觉层级 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.important {
+            margin-bottom: 24px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #262626;
+            letter-spacing: 0;
+        }
+        
+        .form-label.important {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-label .required {
+            color: #ff4d4f;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+        
+        .form-label .desc {
+            font-size: 13px;
+            font-weight: 400;
+            color: #9ca3af;
+            margin-left: 8px;
+        }
+        
+        /* 输入框 - 优化移动端体验 */
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #262626;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 42px; /* 适当缩小触摸区域 */
+            box-sizing: border-box;
+        }
+        
+        .form-input:hover,
+        .form-textarea:hover,
+        .form-select:hover {
+            border-color: #40a9ff;
+            background: #fafafa;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #1890ff;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+        }
+        
+        .form-input:active,
+        .form-textarea:active,
+        .form-select:active {
+            border-color: #1890ff;
+        }
+        
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+            line-height: 1.5;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+        
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%23595959' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+            padding-right: 40px;
+        }
+        
+        .form-select:focus {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%231890ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        }
+        
+        .form-select:hover {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%2340a9ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        }
+        
+        /* 移动端输入框优化 */
+        @media (max-width: 768px) {
+            .form-input,
+            .form-textarea,
+            .form-select {
+                padding: 12px 16px;
+                font-size: 15px;
+                border-radius: 8px;
+                min-height: 46px;
+                border-width: 1.5px;
+            }
+            
+            .form-textarea {
+                min-height: 100px;
+                padding-top: 14px;
+                padding-bottom: 14px;
+            }
+            
+            .form-select {
+                background-position: right 16px center;
+                padding-right: 48px;
+            }
+            
+            /* 防止iOS输入框缩放 */
+            input[type="text"],
+            input[type="email"],
+            input[type="url"],
+            input[type="password"],
+            input[type="number"],
+            textarea,
+            select {
+                font-size: 16px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-input,
+            .form-textarea,
+            .form-select {
+                padding: 10px 14px;
+                font-size: 14px;
+                min-height: 42px;
+            }
+            
+            .form-textarea {
+                min-height: 80px;
+            }
+        }
+        
+        /* 禁用文本选择，优化触摸体验 */
+        .btn,
+        .upload-preview,
+        .preview-remove {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        /* 优化长按行为 */
+        .btn:active,
+        .upload-preview:active,
+        .preview-remove:active {
+            -webkit-touch-callout: none;
+        }
+        
+        /* 防止双击缩放 */
+        @media (hover: none) and (pointer: coarse) {
+            .btn,
+            .upload-preview {
+                touch-action: manipulation;
+            }
+        }
+        
+        /* 表单行（两列布局） */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 主布局：左侧字段，右侧上传 */
+        .form-main-layout {
+            display: grid;
+            grid-template-columns: 1fr 180px; /* 缩小右侧宽度 */
+            gap: 20px; /* 缩小间距 */
+            align-items: start;
+        }
+        
+        .form-left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .form-right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* 增加间距，更自然 */
+            position: sticky;
+            top: 20px;
+        }
+        
+        /* 桌面端上传区域标签优化 */
+        .form-right-column .form-label {
+            text-align: left;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #595959;
+        }
+        
+        /* 移动端优化表单布局 */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .form-main-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .form-left-column {
+                gap: 0;
+            }
+            
+            .form-right-column {
+                gap: 20px;
+                position: static;
+                display: flex;
+                flex-direction: column; /* 移动端改为单列，更自然 */
+            }
+            
+            /* 移动端上传区域优化 */
+            .upload-wrapper.logo-wrapper {
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .upload-wrapper.icon-wrapper {
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            /* 移动端上传区域标签优化 */
+            .form-right-column .form-group {
+                margin-bottom: 0;
+            }
+            
+            .form-right-column .form-label {
+                text-align: left;
+                margin-bottom: 8px;
+                font-size: 13px;
+                width: 100%;
+            }
+            
+            /* 移动端上传区域自然布局 */
+            .form-right-column .upload-wrapper {
+                width: 100%;
+            }
+            
+            .form-right-column .upload-preview {
+                width: 100%;
+            }
+            
+            .form-right-column .upload-hint {
+                text-align: left;
+                font-size: 12px;
+                margin-top: 8px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .form-right-column {
+                gap: 16px;
+            }
+            
+            .form-right-column .form-label {
+                text-align: left;
+                margin-bottom: 6px;
+                font-size: 12px;
+            }
+            
+            .upload-wrapper.logo-wrapper,
+            .upload-wrapper.icon-wrapper {
+                max-width: 100%;
+            }
+            
+            .form-right-column .upload-hint {
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-main-layout {
+                gap: 16px;
+            }
+            
+            .form-right-column {
+                gap: 16px;
+            }
+            
+            /* 超小屏幕上传区域优化 */
+            .upload-wrapper.logo-wrapper,
+            .upload-wrapper.icon-wrapper {
+                max-width: 100%;
+            }
+            
+            .form-right-column .form-label {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .upload-hint {
+                font-size: 11px;
+                margin-top: 8px;
+            }
+        }
+        
+        @media (max-width: 1024px) and (min-width: 769px) {
+            /* 平板设备优化 */
+            .form-main-layout {
+                grid-template-columns: 1fr 160px; /* 平板设备右侧更窄 */
+                gap: 20px;
+            }
+            
+            .form-right-column {
+                gap: 18px;
+            }
+            
+            .form-right-column .form-label {
+                font-size: 12px;
+            }
+            
+            .upload-hint {
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-main-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .form-right-column {
+                position: static;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        /* 表单操作 - 优化移动端触摸体验 */
+        .form-actions {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+        
+        .btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(24, 144, 255, 0.12);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(24, 144, 255, 0.08);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 1px 4px rgba(24, 144, 255, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+            border-color: transparent;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(24, 144, 255, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* 输入框触摸优化 */
+        .form-input,
+        .form-textarea,
+        .form-select {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 44px; /* iOS推荐的最小触摸区域 */
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-width: 2px;
+        }
+        
+        /* 移动端按钮优化 */
+        @media (max-width: 768px) {
+            .form-actions {
+                gap: 12px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                border-radius: 8px;
+                min-height: 44px;
+                border-width: 1.5px;
+            }
+            
+            .btn:hover {
+                transform: none;
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
+            
+            .btn-primary:hover {
+                transform: none;
+            }
+            
+            .btn-primary:active {
+                transform: scale(0.98);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-actions {
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 13px;
+                min-height: 40px;
+            }
+        }
+        
+        /* Toast 提示框 - 统一设计 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            min-width: 320px;
+            max-width: 420px;
+            padding: 14px 16px;
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            animation: toastSlideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        .toast.hiding {
+            animation: toastSlideOut 0.3s ease-out forwards;
+        }
+        
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #262626;
+        }
+        
+        .toast-close {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: #8c8c8c;
+            transition: color 0.2s ease;
+        }
+        
+        .toast-close:hover {
+            color: #262626;
+        }
+        
+        .toast-close svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .toast.success {
+            border-left-color: #52c41a;
+        }
+        
+        .toast.success .toast-icon {
+            color: #52c41a;
+        }
+        
+        .toast.error {
+            border-left-color: #ff4d4f;
+        }
+        
+        .toast.error .toast-icon {
+            color: #ff4d4f;
+        }
+        
+        .toast.warning {
+            border-left-color: #faad14;
+        }
+        
+        .toast.warning .toast-icon {
+            color: #faad14;
+        }
+        
+        .toast.info {
+            border-left-color: #1890ff;
+        }
+        
+        .toast.info .toast-icon {
+            color: #1890ff;
+        }
+        
+        /* 兼容旧的 alert 样式 */
+        .alert {
+            display: none;
+        }
+        
+        /* 文件上传样式 - 统一正方形设计 */
+        .upload-wrapper {
+            position: relative;
+            margin-bottom: 0;
+        }
+        
+        /* 统一的上传预览框 - 优化移动端体验 */
+        .upload-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 1.5px dashed #d9d9d9;
+            border-radius: 6px;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            touch-action: manipulation; /* 优化触摸体验 */
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+        }
+        
+        .upload-preview:hover {
+            border-color: #1890ff;
+            border-style: solid;
+            background: #f0f9ff;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
+            transform: translateY(-1px);
+        }
+        
+        .upload-preview:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(24, 144, 255, 0.08);
+        }
+        
+        .upload-preview.has-image {
+            padding: 8px;
+            background: #ffffff;
+            border-style: solid;
+            border-color: #e5e7eb;
+            border-width: 1px;
+        }
+        
+        .upload-preview.has-image:hover {
+            border-color: #1890ff;
+            border-width: 1.5px;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
+        }
+        
+        .preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #8c8c8c;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+        }
+        
+        .preview-placeholder svg {
+            color: #bfbfbf;
+            width: 36px;
+            height: 36px;
+            stroke-width: 1.5;
+            transition: color 0.3s ease;
+        }
+        
+        .upload-preview:hover .preview-placeholder svg {
+            color: #1890ff;
+        }
+        
+        .preview-placeholder span {
+            font-size: 13px;
+            color: #595959;
+            line-height: 1.3;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .upload-preview.has-image:hover .preview-image {
+            transform: scale(1.05);
+        }
+        
+        .preview-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+            opacity: 0;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .upload-preview.has-image:hover .preview-remove {
+            opacity: 1;
+        }
+        
+        .preview-remove svg {
+            width: 12px;
+            height: 12px;
+            stroke-width: 2.5;
+        }
+        
+        .preview-remove:hover {
+            background: #ff4d4f;
+            transform: scale(1.05);
+        }
+        
+        .preview-remove:active {
+            transform: scale(0.9);
+        }
+        
+        .upload-input {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        
+        .upload-hint {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.6;
+            padding-left: 4px;
+        }
+        
+        .upload-hint span {
+            display: inline-block;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .upload-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e5e7eb;
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1890ff, #40a9ff);
+            transition: width 0.3s ease;
+        }
+        
+        /* Logo和Favicon尺寸优化 */
+        .upload-wrapper.logo-wrapper {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .upload-wrapper.icon-wrapper {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* 桌面端上传区域优化 */
+        @media (min-width: 769px) {
+            .upload-wrapper.logo-wrapper {
+                max-width: 100%;
+            }
+            
+            .upload-wrapper.icon-wrapper {
+                max-width: 100%;
+            }
+            
+            /* 桌面端上传预览框大小优化 */
+            .form-right-column .upload-preview {
+                max-width: 100%;
+            }
+            
+            /* 桌面端上传提示优化 */
+            .upload-hint {
+                text-align: left;
+                font-size: 12px;
+                color: #8c8c8c;
+                margin-top: 8px;
+                line-height: 1.5;
+            }
+            
+            .upload-hint span {
+                display: inline-block;
+                margin-right: 8px;
+            }
+        }
+        
+        /* 确保上传预览框是正方形 */
+        .upload-wrapper.logo-wrapper .upload-preview,
+        .upload-wrapper.icon-wrapper .upload-preview {
+            aspect-ratio: 1;
+        }
+        
+        /* Logo预览图片保持横向比例，但容器是正方形 */
+        .upload-wrapper.logo-wrapper .preview-image {
+            max-width: 85%;
+            max-height: 55%;
+            width: auto;
+            height: auto;
+            margin: auto;
+        }
+        
+        /* Favicon预览图片保持正方形 */
+        .upload-wrapper.icon-wrapper .preview-image {
+            max-width: 70%;
+            max-height: 70%;
+            width: auto;
+            height: auto;
+            margin: auto;
+        }
+        
+        /* 移动端上传区域优化 */
+        @media (max-width: 768px) {
+            .upload-preview {
+                border-radius: 8px;
+                padding: 20px;
+            }
+            
+            .upload-preview.has-image {
+                padding: 12px;
+            }
+            
+            .preview-placeholder {
+                gap: 12px;
+            }
+            
+            .preview-placeholder svg {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .preview-placeholder span {
+                font-size: 14px;
+            }
+            
+            .preview-remove {
+                width: 28px;
+                height: 28px;
+                top: 12px;
+                right: 12px;
+                opacity: 0.9; /* 移动端默认显示 */
+            }
+            
+            .preview-remove svg {
+                width: 14px;
+                height: 14px;
+            }
+            
+            .upload-hint {
+                font-size: 13px;
+                margin-top: 12px;
+            }
+            
+            .upload-hint span {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 6px;
+            }
+            
+            /* 移动端优化图片显示 */
+            .upload-wrapper.logo-wrapper .preview-image {
+                max-width: 80%;
+                max-height: 50%;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-image {
+                max-width: 65%;
+                max-height: 65%;
+            }
+            
+            /* 专门优化Favicon区域 */
+            .upload-wrapper.icon-wrapper .upload-preview {
+                padding: 16px; /* Favicon区域更小 */
+            }
+            
+            .upload-wrapper.icon-wrapper .upload-preview.has-image {
+                padding: 10px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-placeholder svg {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-placeholder span {
+                font-size: 13px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-remove {
+                width: 24px;
+                height: 24px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-remove svg {
+                width: 12px;
+                height: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .upload-preview {
+                padding: 16px;
+                border-radius: 6px;
+            }
+            
+            .upload-preview.has-image {
+                padding: 10px;
+            }
+            
+            .preview-placeholder svg {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .preview-placeholder span {
+                font-size: 13px;
+            }
+            
+            .preview-remove {
+                width: 24px;
+                height: 24px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            /* 超小屏幕优化Favicon区域 */
+            .upload-wrapper.logo-wrapper {
+                max-width: 180px;
+            }
+            
+            .upload-wrapper.icon-wrapper {
+                max-width: 140px;
+            }
+            
+            .upload-wrapper.icon-wrapper .upload-preview {
+                padding: 14px;
+            }
+            
+            .upload-wrapper.icon-wrapper .upload-preview.has-image {
+                padding: 8px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-placeholder svg {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-placeholder span {
+                font-size: 12px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-remove {
+                width: 20px;
+                height: 20px;
+                top: 8px;
+                right: 8px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-remove svg {
+                width: 10px;
+                height: 10px;
+            }
+        }
+        
+        /* 响应式设计 - 增强移动端体验 */
+        @media (max-width: 1024px) {
+            .form-main-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .form-right-column {
+                position: static;
+            }
+            
+            /* 平板设备优化 */
+            .config-panel {
+                padding: 28px;
+            }
+            
+            .panel-title {
+                font-size: 17px;
+            }
+            
+            .form-group {
+                margin-bottom: 22px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+                font-size: 15px; /* 移动端增加基础字体大小 */
+            }
+            
+            .config-panel {
+                padding: 24px;
+                border-radius: 8px; /* 移动端增加圆角 */
+            }
+            
+            .panel-title {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-group.important {
+                margin-bottom: 24px;
+            }
+            
+            .form-label {
+                font-size: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .form-label.important {
+                font-size: 16px;
+            }
+            
+            .form-input,
+            .form-textarea,
+            .form-select {
+                padding: 12px 14px;
+                font-size: 15px;
+                border-radius: 6px; /* 移动端增加圆角 */
+                min-height: 48px; /* 增加触摸区域 */
+            }
+            
+            .form-textarea {
+                min-height: 100px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                text-align: center;
+                margin-top: 28px;
+                padding-top: 20px;
+                gap: 12px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 0;
+                padding: 14px 20px;
+                font-size: 15px;
+                border-radius: 8px;
+                min-height: 48px; /* 增加触摸区域 */
+            }
+            
+            .toast-container {
+                top: 16px;
+                right: 16px;
+                left: 16px;
+            }
+            
+            .toast {
+                min-width: auto;
+                max-width: 100%;
+                padding: 16px;
+                border-radius: 8px;
+            }
+            
+            .toast-content {
+                font-size: 15px;
+            }
+            
+            /* 移动端优化上传区域 */
+            .upload-preview {
+                padding: 20px;
+                border-radius: 8px;
+                border-width: 2px;
+            }
+            
+            .upload-preview.has-image {
+                padding: 12px;
+            }
+            
+            .preview-placeholder svg {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .preview-placeholder span {
+                font-size: 14px;
+            }
+            
+            .upload-hint {
+                font-size: 13px;
+                margin-top: 12px;
+            }
+            
+            .upload-hint span {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 4px;
+            }
+            
+            .preview-remove {
+                width: 28px;
+                height: 28px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .preview-remove svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .config-panel {
+                padding: 20px;
+                border-radius: 10px;
+            }
+            
+            .panel-title {
+                font-size: 15px;
+                margin-bottom: 18px;
+            }
+            
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            .form-group.important {
+                margin-bottom: 22px;
+            }
+            
+            .form-label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .form-label.important {
+                font-size: 15px;
+            }
+            
+            .form-input,
+            .form-textarea,
+            .form-select {
+                padding: 14px 16px;
+                font-size: 14px;
+                border-radius: 8px;
+                min-height: 52px;
+            }
+            
+            .form-textarea {
+                min-height: 120px;
+            }
+            
+            .form-actions {
+                margin-top: 24px;
+                padding-top: 18px;
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 16px 20px;
+                font-size: 14px;
+                border-radius: 10px;
+                min-height: 52px;
+            }
+            
+            /* 超小屏幕优化 */
+            .upload-preview {
+                padding: 16px;
+            }
+            
+            .upload-preview.has-image {
+                padding: 10px;
+            }
+            
+            .preview-placeholder svg {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .preview-placeholder span {
+                font-size: 13px;
+            }
+            
+            .upload-hint {
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            body {
+                padding: 10px;
+            }
+            
+            .config-panel {
+                padding: 16px;
+            }
+            
+            .panel-title {
+                font-size: 14px;
+                margin-bottom: 16px;
+            }
+            
+            .form-input,
+            .form-textarea,
+            .form-select {
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+            
+            .btn {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+            
+            .upload-preview {
+                padding: 14px;
+            }
+            
+            /* 超小屏幕优化Favicon区域 */
+            .upload-wrapper.logo-wrapper {
+                max-width: 160px;
+            }
+            
+            .upload-wrapper.icon-wrapper {
+                max-width: 120px;
+            }
+            
+            .upload-wrapper.icon-wrapper .upload-preview {
+                padding: 12px;
+            }
+            
+            .upload-wrapper.icon-wrapper .upload-preview.has-image {
+                padding: 6px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-placeholder svg {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-placeholder span {
+                font-size: 11px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-remove {
+                width: 18px;
+                height: 18px;
+                top: 6px;
+                right: 6px;
+            }
+            
+            .upload-wrapper.icon-wrapper .preview-remove svg {
+                width: 9px;
+                height: 9px;
+            }
+        }
+        
+        /* 防止移动端输入框缩放 */
+        @media screen and (max-width: 768px) {
+            input[type="text"],
+            input[type="email"],
+            input[type="url"],
+            input[type="password"],
+            input[type="number"],
+            textarea {
+                font-size: 16px !important; /* 防止iOS自动缩放 */
+            }
+            
+            select {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover {
+                transform: none;
+            }
+            
+            .upload-preview:hover {
+                transform: none;
+                border-style: dashed;
+            }
+            
+            .upload-preview.has-image:hover {
+                border-width: 1px;
+            }
+            
+            .preview-remove {
+                opacity: 1; /* 触摸设备始终显示删除按钮 */
+                background: rgba(0, 0, 0, 0.6);
+            }
+            
+            .preview-remove:hover {
+                background: #ff4d4f;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <!-- 基本信息 -->
+        <div class="config-panel" id="panel-basic">
+            <h2 class="panel-title">基本信息</h2>
+            <form id="basicForm">
+                <div class="form-main-layout">
+                    <!-- 左侧：文本字段 -->
+                    <div class="form-left-column">
+                        <div class="form-group important">
+                            <label class="form-label important">网站名称<span class="required">*</span></label>
+                            <input type="text" name="site_name" value="<?php echo isset($config['site_name']) ? htmlspecialchars($config['site_name']) : ''; ?>" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">网站URL</label>
+                            <input type="url" name="site_url" value="<?php echo isset($config['site_url']) ? htmlspecialchars($config['site_url']) : ''; ?>" class="form-input" placeholder="https://example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">网站描述</label>
+                            <textarea name="site_description" class="form-textarea" placeholder="网站描述信息"><?php echo isset($siteInfo) && $siteInfo ? htmlspecialchars($siteInfo->site_description) : ''; ?></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">网站关键词</label>
+                            <input type="text" name="site_keywords" value="<?php echo isset($config['site_keywords']) ? htmlspecialchars($config['site_keywords']) : ''; ?>" class="form-input" placeholder="多个关键词用逗号分隔">
+                        </div>
+                        
+                        <!-- 备案与版权信息 -->
+                        <div class="form-group">
+                            <label class="form-label">网站版权信息</label>
+                            <input type="text" name="site_copyright"
+                                   value="<?php echo isset($config['site_copyright']) ? htmlspecialchars($config['site_copyright']) : ''; ?>"
+                                   class="form-input"
+                                   placeholder="例如：© 2026 XXX科技有限公司">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ICP备案号</label>
+                            <input type="text" name="site_icp"
+                                   value="<?php echo isset($config['site_icp']) ? htmlspecialchars($config['site_icp']) : ''; ?>"
+                                   class="form-input"
+                                   placeholder="例如：粤ICP备12345678号">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">联系邮箱</label>
+                                <input type="email" name="site_email" value="<?php echo isset($config['site_email']) ? htmlspecialchars($config['site_email']) : ''; ?>" class="form-input" placeholder="contact@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">联系电话</label>
+                                <input type="text" name="site_phone" value="<?php echo isset($config['site_phone']) ? htmlspecialchars($config['site_phone']) : ''; ?>" class="form-input" placeholder="联系电话">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧：上传区域 -->
+                    <div class="form-right-column">
+                        <div class="form-group">
+                            <label class="form-label">网站Logo</label>
+                            <div class="upload-wrapper logo-wrapper">
+                                <div class="upload-preview <?php echo (isset($siteInfo) && $siteInfo && $siteInfo->site_logo) ? 'has-image' : ''; ?>" id="logoPreview">
+                                    <?php if (isset($siteInfo) && $siteInfo && $siteInfo->site_logo): ?>
+                                        <img src="<?php echo htmlspecialchars($siteInfo->site_logo); ?>" alt="Logo预览" class="preview-image">
+                                        <button type="button" class="preview-remove" onclick="removeImage('logo')" title="删除">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    <?php else: ?>
+                                        <div class="preview-placeholder">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                            <span>点击或拖拽上传Logo</span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <input type="file" name="site_logo_file" id="site_logo_file" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" class="upload-input" onchange="handleImageUpload(this, 'logo')">
+                                <input type="hidden" name="site_logo" id="site_logo" value="<?php echo isset($config['site_logo']) ? htmlspecialchars($config['site_logo']) : ''; ?>">
+                                <div class="upload-hint">
+                                    <span>支持 JPG、PNG、GIF、WEBP 格式，不超过 5MB；建议尺寸 200×60px</span>
+                                    <span style="margin-left: 8px; color: #bfbfbf;">保存后自动同步全站静态资源，前台立即生效</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">网站图标 (Favicon)</label>
+                            <div class="upload-wrapper icon-wrapper">
+                                <div class="upload-preview <?php echo (isset($siteInfo) && $siteInfo && $siteInfo->site_icon) ? 'has-image' : ''; ?>" id="iconPreview">
+                                    <?php if (isset($siteInfo) && $siteInfo && $siteInfo->site_icon): ?>
+                                        <img src="<?php echo htmlspecialchars($siteInfo->site_icon); ?>" alt="Favicon预览" class="preview-image">
+                                        <button type="button" class="preview-remove" onclick="removeImage('icon')" title="删除">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    <?php else: ?>
+                                        <div class="preview-placeholder">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                            <span>点击或拖拽上传Favicon</span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <input type="file" name="site_icon_file" id="site_icon_file" accept=".ico,.png,image/x-icon,image/vnd.microsoft.icon,image/png" class="upload-input" onchange="handleImageUpload(this, 'icon')">
+                                <input type="hidden" name="site_icon" id="site_icon" value="<?php echo isset($config['site_icon']) ? htmlspecialchars($config['site_icon']) : ''; ?>">
+                                <div class="upload-hint">
+                                    <span>仅支持 ICO、PNG 格式，不超过 5MB；建议尺寸 32×32px 或 16×16px</span>
+                                    <span style="margin-left: 8px; color: #bfbfbf;">保存后自动替换全站 favicon（浏览器标签页图标）</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="resetForm('basicForm')">重置</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 安全处理URL路径，避免暴露服务器文件系统结构
+        function sanitizeUrlPath(url) {
+            if (!url || typeof url !== 'string') {
+                return '';
+            }
+            
+            // 如果已经是相对路径且格式正确，直接返回
+            if (url.startsWith('/uploads/') || url.startsWith('/public/uploads/')) {
+                return url.startsWith('/uploads/') ? url : url.replace('/public', '');
+            }
+            
+            // 处理Windows绝对路径格式 G:\... 或 G:/...
+            url = url.replace(/^[A-Z]:[\\\/]/i, '');
+            
+            // 统一使用正斜杠
+            url = url.replace(/\\/g, '/');
+            
+            // 移除常见的服务器路径前缀
+            const pathPatterns = [
+                /.*\/public\//i,           // 移除 .../public/ 之前的所有内容
+                /.*\/uploads\//i,          // 移除 .../uploads/ 之前的所有内容
+                /^\/var\/www\/html\//i,    // 移除 /var/www/html/
+                /^\/home\/.*\/public\//i,   // 移除 /home/xxx/public/
+                /^.*\/htdocs\//i,          // 移除 .../htdocs/
+            ];
+            
+            for (const pattern of pathPatterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    if (pattern.source.includes('public')) {
+                        url = url.substring(url.indexOf('/public/') + '/public'.length);
+                    } else if (pattern.source.includes('uploads')) {
+                        url = url.substring(url.indexOf('/uploads/'));
+                    } else {
+                        url = url.replace(pattern, '');
+                    }
+                    break;
+                }
+            }
+            
+            // 如果包含uploads目录，只保留uploads之后的部分
+            const uploadsIndex = url.indexOf('/uploads/');
+            if (uploadsIndex !== -1) {
+                url = url.substring(uploadsIndex);
+            }
+            
+            // 确保以 / 开头
+            if (!url.startsWith('/')) {
+                url = '/' + url;
+            }
+            
+            // 移除开头的多个斜杠
+            url = url.replace(/^\/+/, '/');
+            
+            // 移除可能的危险路径（包含 .. 或其他）
+            url = url.replace(/\.\./g, '');
+            
+            return url;
+        }
+        
+        // 页面加载时清理路径，确保安全
+        function initPathSanitization() {
+            // 清理Logo和Icon的隐藏输入框中的路径
+            const logoInput = document.getElementById('site_logo');
+            const iconInput = document.getElementById('site_icon');
+            
+            if (logoInput && logoInput.value) {
+                const safeUrl = sanitizeUrlPath(logoInput.value);
+                logoInput.value = safeUrl;
+                
+                // 更新图片src
+                const logoImg = document.querySelector('#logoPreview img');
+                if (logoImg) {
+                    logoImg.src = safeUrl;
+                }
+            }
+            
+            if (iconInput && iconInput.value) {
+                const safeUrl = sanitizeUrlPath(iconInput.value);
+                iconInput.value = safeUrl;
+                
+                // 更新图片src
+                const iconImg = document.querySelector('#iconPreview img');
+                if (iconImg) {
+                    iconImg.src = safeUrl;
+                }
+            }
+        }
+        
+        // 页面加载完成后执行路径清理
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPathSanitization);
+        } else {
+            initPathSanitization();
+        }
+        
+        // 图片上传处理
+        async function handleImageUpload(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // 验证文件类型（favicon 仅允许 ICO/PNG，logo 允许常见位图）
+            const isIcon = type === 'icon';
+            const extOk = isIcon
+                ? /\.(ico|png)$/i.test(file.name)
+                : /\.(jpe?g|png|gif|webp)$/i.test(file.name);
+            const mimeOk = isIcon
+                ? /^image\/(x-icon|vnd\.microsoft\.icon|png)$/i.test(file.type)
+                : /^image\/(jpeg|png|gif|webp)$/i.test(file.type);
+            if (!extOk || !mimeOk) {
+                showAlert(isIcon ? 'Favicon 仅支持 ICO、PNG 格式' : '请上传图片文件（JPG、PNG、GIF、WEBP）', 'error');
+                input.value = '';
+                return;
+            }
+            
+            // 验证文件大小（最大5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('图片大小不能超过5MB', 'error');
+                input.value = '';
+                return;
+            }
+            
+            const preview = document.getElementById((type === 'logo' ? 'logo' : 'icon') + 'Preview');
+            const hiddenInput = document.getElementById('site_' + (type === 'logo' ? 'logo' : 'icon'));
+            
+            // 显示预览
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.classList.add('has-image');
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="预览" class="preview-image">
+                    <button type="button" class="preview-remove" onclick="removeImage('${type}')" title="删除">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="upload-progress">
+                        <div class="upload-progress-bar" style="width: 0%"></div>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+            
+            // 上传文件
+            const uploadFormData = new FormData();
+            uploadFormData.append('file', file);
+            uploadFormData.append('type', type);
+            
+            try {
+                const progressBar = preview.querySelector('.upload-progress-bar');
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percent = (e.loaded / e.total) * 100;
+                        progressBar.style.width = percent + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', function() {
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+                        if (result.code === 1) {
+                            // 安全处理URL路径，避免暴露服务器文件系统结构
+                            const safeUrl = sanitizeUrlPath(result.data.url);
+                            hiddenInput.value = safeUrl;
+                            const progressDiv = preview.querySelector('.upload-progress');
+                            if (progressDiv) progressDiv.remove();
+                            showAlert('上传成功', 'success');
+                        } else {
+                            showAlert(result.msg || '上传失败', 'error');
+                            removeImage(type);
+                        }
+                    } else {
+                        showAlert('上传失败，请稍后再试', 'error');
+                        removeImage(type);
+                    }
+                });
+                
+                xhr.addEventListener('error', function() {
+                    showAlert('上传失败，请稍后再试', 'error');
+                    removeImage(type);
+                });
+                
+                xhr.open('POST', '/admin/uploadImage');
+                xhr.send(uploadFormData);
+            } catch (error) {
+                console.error('上传错误:', error);
+                showAlert('上传失败，请稍后再试', 'error');
+                removeImage(type);
+            }
+        }
+        
+        // 移除图片
+        function removeImage(type) {
+            const preview = document.getElementById((type === 'logo' ? 'logo' : 'icon') + 'Preview');
+            const hiddenInput = document.getElementById('site_' + (type === 'logo' ? 'logo' : 'icon'));
+            const fileInput = document.getElementById('site_' + (type === 'logo' ? 'logo' : 'icon') + '_file');
+            
+            preview.classList.remove('has-image');
+            preview.innerHTML = `
+                <div class="preview-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>点击或拖拽上传${type === 'logo' ? 'Logo' : 'Favicon'}</span>
+                </div>
+            `;
+            hiddenInput.value = '';
+            if (fileInput) fileInput.value = '';
+        }
+        
+        // 点击预览区域触发文件选择
+        document.getElementById('logoPreview').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('preview-remove')) {
+                document.getElementById('site_logo_file').click();
+            }
+        });
+        
+        document.getElementById('iconPreview').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('preview-remove')) {
+                document.getElementById('site_icon_file').click();
+            }
+        });
+        
+        // 表单提交
+        document.getElementById('basicForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitForm('basic', new FormData(this));
+        });
+        
+        // 提交表单
+        async function submitForm(type, formData) {
+            const data = {};
+            
+            // 处理表单数据（排除文件输入）
+            for (let [key, value] of formData.entries()) {
+                if (!key.endsWith('_file')) {
+                    data[key] = value;
+                }
+            }
+            data.type = type;
+            
+            const btn = document.querySelector(`#${type}Form button[type="submit"]`);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '保存中...';
+            }
+            
+            try {
+                const response = await fetch('/admin/saveSiteConfig', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('保存成功', 'success');
+                } else {
+                    showAlert(result.msg || '保存失败', 'error');
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                showAlert('保存失败，请稍后再试', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '保存';
+                }
+            }
+        }
+        
+        // 显示 Toast 提示消息
+        function showAlert(message, type) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            // 创建 toast 元素
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            
+            // 图标 SVG
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            } else if (type === 'warning') {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+            } else {
+                iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+            }
+            
+            // 关闭按钮 SVG
+            const closeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${iconSvg}</div>
+                <div class="toast-content">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">${closeSvg}</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // 自动移除
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // 重置表单
+        function resetForm(formId) {
+            document.getElementById(formId).reset();
+        }
+    </script>
+</body>
+</html>
+

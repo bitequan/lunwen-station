@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>站点信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 40px;
+            color: #262626;
+        }
+        
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #1890ff;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        
+        .form-actions {
+            text-align: right;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e8e8e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title">站点信息</h1>
+        </div>
+        
+        <form id="siteInfoForm">
+            <div class="form-group">
+                <label class="form-label">站点名称</label>
+                <input type="text" name="site_name" value="<?php echo isset($info['site_name']) ? htmlspecialchars($info['site_name']) : ''; ?>" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">站点Logo</label>
+                <input type="text" name="site_logo" value="<?php echo isset($info['site_logo']) ? htmlspecialchars($info['site_logo']) : ''; ?>" class="form-input" placeholder="Logo URL">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">站点图标</label>
+                <input type="text" name="site_icon" value="<?php echo isset($info['site_icon']) ? htmlspecialchars($info['site_icon']) : ''; ?>" class="form-input" placeholder="Favicon URL">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">站点关键词</label>
+                <input type="text" name="site_keywords" value="<?php echo isset($info['site_keywords']) ? htmlspecialchars($info['site_keywords']) : ''; ?>" class="form-input" placeholder="多个关键词用逗号分隔">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">站点描述</label>
+                <textarea name="site_description" class="form-input form-textarea"><?php echo isset($info['site_description']) ? htmlspecialchars($info['site_description']) : ''; ?></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">版权信息</label>
+                <input type="text" name="site_copyright" value="<?php echo isset($info['site_copyright']) ? htmlspecialchars($info['site_copyright']) : ''; ?>" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">ICP备案号</label>
+                <input type="text" name="site_icp" value="<?php echo isset($info['site_icp']) ? htmlspecialchars($info['site_icp']) : ''; ?>" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">站点地址</label>
+                <input type="text" name="site_address" value="<?php echo isset($info['site_address']) ? htmlspecialchars($info['site_address']) : ''; ?>" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">联系电话</label>
+                <input type="text" name="site_phone" value="<?php echo isset($info['site_phone']) ? htmlspecialchars($info['site_phone']) : ''; ?>" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">联系邮箱</label>
+                <input type="email" name="site_email" value="<?php echo isset($info['site_email']) ? htmlspecialchars($info['site_email']) : ''; ?>" class="form-input">
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('siteInfoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            fetch('/admin/saveSiteInfo', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code == 1) {
+                    alert('保存成功');
+                } else {
+                    alert(data.msg);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

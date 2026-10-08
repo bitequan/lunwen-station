@@ -1,0 +1,1 @@
+import o from"./DGDqWUjT.js";import{_ as t,u as e,c as a,d as c,b as s}from"./BkmVlzPN.js";const _={class:"m-autodoc-wrap"},r={__name:"autodoc",setup(d){return e({title:"格式重排"}),(p,u)=>(s(),a("div",_,[c(o)]))}},f=t(r,[["__scopeId","data-v-279192cf"]]);export{f as default};

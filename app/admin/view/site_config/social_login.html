@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快捷登录对接</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .config-panel { animation: none; }
+        }
+        :root {
+            --sl-bg: #f0f4f8;
+            --sl-card: #ffffff;
+            --sl-border: #e8ecf0;
+            --sl-text: #1f2937;
+            --sl-muted: #6b7280;
+            --sl-blue: #1890ff;
+            --sl-blue-soft: #e6f7ff;
+            --sl-wechat: #07c160;
+            --sl-radius: 12px;
+            --sl-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 28px rgba(15, 23, 42, 0.06);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(165deg, #e8eef5 0%, var(--sl-bg) 28%, #f5f7fa 100%);
+            min-height: 100vh;
+            padding: 24px 20px 40px;
+            color: var(--sl-text);
+            line-height: 1.65;
+        }
+        .page-container { max-width: 920px; margin: 0 auto; }
+        .page-hero {
+            margin-bottom: 22px;
+            padding: 22px 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid var(--sl-border);
+            border-radius: var(--sl-radius);
+            box-shadow: var(--sl-shadow);
+        }
+        .page-hero h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+        .page-hero p {
+            font-size: 14px;
+            color: var(--sl-muted);
+            max-width: 640px;
+        }
+        .site-banner {
+            margin-bottom: 18px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 13px;
+            color: #4b5563;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .site-banner::before {
+            content: '';
+            width: 4px;
+            flex-shrink: 0;
+            border-radius: 2px;
+            background: #9ca3af;
+            margin-top: 4px;
+            min-height: 1em;
+        }
+        .site-banner--warn {
+            background: linear-gradient(90deg, #fffbeb 0%, #fffdf8 100%);
+            border-color: #fde68a;
+        }
+        .site-banner--warn::before { background: #f59e0b; }
+        .config-panel {
+            background: var(--sl-card);
+            border-radius: var(--sl-radius);
+            padding: 28px 28px 32px;
+            border: 1px solid var(--sl-border);
+            box-shadow: var(--sl-shadow);
+            animation: fadeInUp 0.35s ease-out;
+        }
+        .config-panel + .config-panel { margin-top: 20px; }
+        #panel-wx-official, #panel-wx-mp, #panel-aggregate { scroll-margin-top: 28px; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .panel-head {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .panel-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #111827;
+        }
+        .panel-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--sl-blue) 0%, #096dd9 100%);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(24, 144, 255, 0.35);
+        }
+        .config-panel--wechat .panel-badge {
+            background: linear-gradient(135deg, var(--sl-wechat) 0%, #059669 100%);
+            box-shadow: 0 2px 6px rgba(7, 193, 96, 0.35);
+        }
+        .storage-line {
+            font-size: 12px;
+            color: var(--sl-muted);
+        }
+        .storage-line code {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        .alert-info {
+            background: linear-gradient(135deg, var(--sl-blue-soft) 0%, #f0f9ff 100%);
+            border: 1px solid #91d5ff;
+            border-left: 4px solid var(--sl-blue);
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 22px;
+            font-size: 14px;
+            color: #0c4a6e;
+        }
+        .alert-info ul {
+            margin: 0 0 10px 1.15em;
+            padding: 0;
+        }
+        .alert-info li { margin: 6px 0; }
+        .alert-info a {
+            color: #0369a1;
+            font-weight: 500;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(3, 105, 161, 0.35);
+        }
+        .alert-info a:hover { border-bottom-color: #0369a1; }
+        .alert-info code {
+            background: rgba(255,255,255,0.85);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            word-break: break-all;
+            border: 1px solid rgba(14, 116, 144, 0.15);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-hint { font-size: 12px; color: var(--sl-muted); margin-top: 6px; line-height: 1.5; }
+        input[type="text"], input[type="password"], input[type="url"], textarea {
+            width: 100%;
+            max-width: 520px;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:hover, textarea:hover { border-color: #9ca3af; }
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+            line-height: 1.55;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--sl-blue);
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.18);
+        }
+        .switch-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .inline-check {
+            padding: 12px 16px;
+            background: #fafafa;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .inline-check input { width: 16px; height: 16px; accent-color: var(--sl-blue); cursor: pointer; }
+        .inline-check label { font-size: 14px; color: #4b5563; cursor: pointer; }
+        /* 渠道启用：滑块开关 */
+        .toggle-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            background: linear-gradient(145deg, #fcfdfe 0%, #f4f6f9 100%);
+            border: 1px solid #e5e9ef;
+            border-radius: 10px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .toggle-field:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        }
+        .toggle-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+        .toggle-ui {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            user-select: none;
+            width: 100%;
+        }
+        .toggle-track {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            border-radius: 13px;
+            background: #d1d5db;
+            flex-shrink: 0;
+            transition: background 0.25s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toggle-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1f2937;
+            letter-spacing: 0.02em;
+        }
+        .toggle-hint {
+            display: block;
+            font-size: 12px;
+            font-weight: 400;
+            color: #8c8c8c;
+            margin-top: 4px;
+        }
+        .toggle-input:checked + .toggle-ui .toggle-track {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+        }
+        .toggle-input:checked + .toggle-ui .toggle-thumb {
+            transform: translateX(22px);
+        }
+        .toggle-input:focus-visible + .toggle-ui .toggle-track {
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.35);
+        }
+        /* 官方微信：开启态为微信绿 */
+        .toggle-field--official .toggle-input:checked + .toggle-ui .toggle-track {
+            background: linear-gradient(135deg, #07c160 0%, #06ae56 100%);
+        }
+        .toggle-field--official .toggle-input:focus-visible + .toggle-ui .toggle-track {
+            box-shadow: 0 0 0 3px rgba(7, 193, 96, 0.35);
+        }
+        /* 聚合：开启态保持蓝 */
+        .toggle-field--aggregate .toggle-input:checked + .toggle-ui .toggle-track {
+            background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+        }
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .type-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .type-item:hover {
+            border-color: #93c5fd;
+            background: #f8fafc;
+        }
+        .type-item:has(input:checked) {
+            border-color: var(--sl-blue);
+            background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+            box-shadow: 0 0 0 1px rgba(24, 144, 255, 0.2);
+        }
+        .type-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--sl-blue);
+            cursor: pointer;
+        }
+        .type-item span { font-size: 14px; font-weight: 500; color: #374151; }
+        .form-actions {
+            margin-top: 8px;
+            padding-top: 22px;
+            border-top: 1px solid #f0f2f5;
+        }
+        .btn-primary {
+            margin-top: 0;
+            padding: 11px 28px;
+            background: linear-gradient(135deg, var(--sl-blue) 0%, #096dd9 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.35);
+            transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.05);
+            box-shadow: 0 4px 14px rgba(24, 144, 255, 0.4);
+        }
+        .btn-primary:active { transform: translateY(1px); }
+        .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; filter: none; box-shadow: none; }
+        .social-login-subnav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 22px;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            border: 1px solid var(--sl-border);
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+        .social-login-subnav .nav-label {
+            color: var(--sl-muted);
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        .social-login-subnav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #1d4ed8;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #eff6ff;
+            border: 1px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .social-login-subnav a:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+        .nav-step {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        @media (max-width: 640px) {
+            .page-hero { padding: 18px; }
+            .config-panel { padding: 20px 18px 24px; }
+            .social-login-subnav { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+<?php
+$cfg = $config ?? [];
+$types = $cfg['types'] ?? [];
+$hasAppkey = !empty($cfg['appkey']);
+$wxCfg = isset($wxOpenConfig) && is_array($wxOpenConfig) ? $wxOpenConfig : [];
+$hasWxSecret = !empty($wxCfg['appsecret']);
+$wxMpCfg = isset($wxMpConfig) && is_array($wxMpConfig) ? $wxMpConfig : [];
+$hasWxMpSecret = !empty($wxMpCfg['appsecret']);
+$hasWxMpAesKey = !empty($has_wx_mp_aes_key ?? null);
+$wxOpenStartUrl = isset($wx_open_oauth_start_url) ? (string) $wx_open_oauth_start_url : '';
+$siteUrlOk = !empty($site_url_configured);
+?>
+<div class="page-container">
+    <header class="page-hero">
+        <h1>快捷登录对接</h1>
+        <p>在此配置微信开放平台扫码、服务号关注登录与聚合 OAuth。回调与入口地址均依赖「网站基本信息」中的站点地址，请与实际上线域名保持一致。</p>
+    </header>
+
+    <div class="site-banner<?php echo !$siteUrlOk ? ' site-banner--warn' : ''; ?>">
+        <span>下方地址按「网站基本信息」里的站点地址生成。<?php if (!$siteUrlOk): ?><strong>当前未配置站点地址</strong>，请先到「网站基本信息」填写后再保存本页配置。<?php else: ?>请确认与实际上线域名一致。<?php endif; ?></span>
+    </div>
+
+    <nav class="social-login-subnav" aria-label="本页区块">
+        <span class="nav-label">跳转</span>
+        <a href="#panel-wx-official"><span class="nav-step">1</span> 微信开放平台扫码</a>
+        <a href="#panel-wx-mp"><span class="nav-step">2</span> 服务号关注登录</a>
+        <a href="#panel-aggregate"><span class="nav-step">3</span> 聚合快捷登录</a>
+    </nav>
+
+    <div id="panel-wx-official" class="config-panel config-panel--wechat">
+        <div class="panel-head">
+            <h2 class="panel-title"><span class="panel-badge" aria-hidden="true">1</span> 微信开放平台扫码登录</h2>
+            <p class="storage-line">配置存储：<code>ad_system_config.config_key = social_wx_open_config</code>（与聚合登录完全独立）</p>
+        </div>
+
+        <div class="alert-info">
+            <p style="margin-bottom:10px;">开放平台创建网站应用，回调域填站点域名；回调 URI：<code><?php echo htmlspecialchars($callback_example ?? '', ENT_QUOTES, 'UTF-8'); ?></code>。入口示例：<code><?php echo $wxOpenStartUrl !== '' ? htmlspecialchars($wxOpenStartUrl, ENT_QUOTES, 'UTF-8') : '（请先配置站点地址）'; ?></code></p>
+            <p class="form-hint" style="margin-top:8px;"><a href="https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html" target="_blank" rel="noopener">开放平台文档</a></p>
+        </div>
+
+        <form id="wxOpenSocialForm">
+            <div class="toggle-field toggle-field--official">
+                <input type="checkbox" id="wx_open_enabled" name="wx_open_enabled" value="1" class="toggle-input" <?php echo !empty($wxCfg['enabled']) ? 'checked' : ''; ?>>
+                <label class="toggle-ui" for="wx_open_enabled">
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    <span class="toggle-text">启用微信登录<span class="toggle-hint">开启后用户端展示微信扫码登录（开放平台网站应用）</span></span>
+                </label>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label class="form-label" for="wx_open_appid">开放平台 AppID</label>
+                <input type="text" id="wx_open_appid" name="wx_open_appid" value="<?php echo htmlspecialchars((string)($wxCfg['appid'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="网站应用 AppID" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="wx_open_appsecret">AppSecret</label>
+                <input type="password" id="wx_open_appsecret" name="wx_open_appsecret" value="" placeholder="<?php echo $hasWxSecret ? '已配置，留空则不修改' : '开放平台应用密钥'; ?>" autocomplete="new-password">
+                <div class="form-hint"><?php echo $hasWxSecret ? '当前已保存密钥；若不想修改请留空。' : '首次保存请务必填写。'; ?></div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary" id="saveWxOpenBtn">保存微信登录配置</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="panel-wx-mp" class="config-panel config-panel--wechat">
+        <div class="panel-head">
+            <h2 class="panel-title"><span class="panel-badge" aria-hidden="true">2</span> 微信服务号·关注公众号登录</h2>
+            <p class="storage-line">配置存储：<code>ad_system_config.config_key = social_wx_mp_config</code>（与开放平台、聚合登录独立）</p>
+        </div>
+
+        <div class="alert-info">
+            <p style="margin-bottom:10px;">用户扫码关注或已关注后扫码，公众号内会回复下方配置的欢迎词（默认「登录成功」类提示），电脑端自动登录。请在公众平台 <strong>开发 → 基本配置</strong> 中：</p>
+            <ul style="margin:0 0 10px 1.2em;padding:0;">
+                <li><strong>服务器 URL</strong>：<code><?php echo htmlspecialchars($wechat_mp_server_url ?? '', ENT_QUOTES, 'UTF-8'); ?></code>（与下方 Token 配套，HTTPS）</li>
+                <li><strong>Token</strong>：与下方输入框一致</li>
+                <li><strong>消息加解密</strong>：选<strong>明文模式</strong>时可不填 EncodingAESKey；选<strong>兼容模式 / 安全模式</strong>时须在下方填写与公众平台一致的 <strong>EncodingAESKey（43 位）</strong></li>
+                <li><strong>IP 白名单</strong>：填网站服务器访问微信接口的出口公网 IP；报 <code>invalid ip</code> 时把提示里的 IP 加进去</li>
+            </ul>
+            <p class="form-hint" style="margin-top:8px;">回调示例 <code><?php echo htmlspecialchars($callback_example ?? '', ENT_QUOTES, 'UTF-8'); ?></code>。多机请用 Redis。<a href="https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html" target="_blank" rel="noopener">消息说明</a></p>
+        </div>
+
+        <form id="wxMpSocialForm">
+            <div class="toggle-field toggle-field--official">
+                <input type="checkbox" id="wx_mp_enabled" name="wx_mp_enabled" value="1" class="toggle-input" <?php echo !empty($wxMpCfg['enabled']) ? 'checked' : ''; ?>>
+                <label class="toggle-ui" for="wx_mp_enabled">
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    <span class="toggle-text">启用微信服务号关注登录<span class="toggle-hint">开启后用户端展示公众号二维码（与开放平台可同时启用）</span></span>
+                </label>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label class="form-label" for="wx_mp_appid">服务号 AppID</label>
+                <input type="text" id="wx_mp_appid" name="wx_mp_appid" value="<?php echo htmlspecialchars((string)($wxMpCfg['appid'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="微信公众平台 AppID" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="wx_mp_appsecret">AppSecret</label>
+                <input type="password" id="wx_mp_appsecret" name="wx_mp_appsecret" value="" placeholder="<?php echo $hasWxMpSecret ? '已配置，留空则不修改' : '公众平台应用密钥'; ?>" autocomplete="new-password">
+                <div class="form-hint"><?php echo $hasWxMpSecret ? '当前已保存密钥；若不想修改请留空。' : '首次保存请务必填写。'; ?></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="wx_mp_token">消息服务器 Token</label>
+                <input type="text" id="wx_mp_token" name="wx_mp_token" value="<?php echo htmlspecialchars((string)($wxMpCfg['mp_token'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="与公众平台服务器配置中的 Token 一致" autocomplete="off">
+                <div class="form-hint">须与微信公众平台「服务器配置」里的 Token 相同；留空保存则保留原值。</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="wx_mp_encoding_aes_key">EncodingAESKey（兼容 / 安全模式）</label>
+                <input type="password" id="wx_mp_encoding_aes_key" name="wx_mp_encoding_aes_key" value="" maxlength="43" placeholder="<?php echo $hasWxMpAesKey ? '已配置，留空则不修改' : '43 位，与公众平台一致'; ?>" autocomplete="new-password">
+                <div class="form-hint">明文模式可不填。若公众平台选兼容模式或安全模式，须填写此处（与后台随机生成或自填的 43 位密钥一致）。<?php echo $hasWxMpAesKey ? '当前已保存密钥。' : ''; ?></div>
+            </div>
+            <div class="inline-check">
+                <div class="switch-row" style="margin-bottom:0;">
+                    <input type="checkbox" id="wx_mp_encoding_aes_key_clear" name="wx_mp_encoding_aes_key_clear" value="1">
+                    <label for="wx_mp_encoding_aes_key_clear" style="font-size:14px;">清除 EncodingAESKey（仅保留明文收发时勾选并保存）</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="wx_mp_login_success_reply">扫码登录成功后的公众号回复（欢迎词）</label>
+                <textarea id="wx_mp_login_success_reply" name="wx_mp_login_success_reply" maxlength="600" placeholder="留空则使用默认：登录成功，您已在网站完成账号登录。"><?php echo htmlspecialchars((string)($wxMpCfg['login_success_reply'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>
+                <div class="form-hint">用户在公众号内完成关注/扫码后收到的被动回复文本，最多 600 字；可与品牌话术、使用说明等结合。</div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary" id="saveWxMpBtn">保存服务号登录配置</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="panel-aggregate" class="config-panel">
+        <div class="panel-head">
+            <h2 class="panel-title"><span class="panel-badge" aria-hidden="true">3</span> 聚合快捷登录</h2>
+            <p class="storage-line">配置存储：<code>ad_system_config.config_key = social_login_config</code>（仅聚合平台参数，与上方官方微信配置无关）</p>
+        </div>
+
+        <div class="alert-info">
+            <p style="margin-bottom:10px;">与第三方 OAuth 流程一致：用户在 QQ / 微信 / 支付宝 / 微博 授权后回到本站。请先在聚合登录服务商处创建应用，将下方<strong>回调地址</strong>填入对方控制台。</p>
+            <p style="margin-bottom:6px;">回调地址（与站点地址一致即可）：</p>
+            <p><code><?php echo htmlspecialchars($callback_example ?? '', ENT_QUOTES, 'UTF-8'); ?></code></p>
+            <p class="form-hint" style="margin-top:10px;">接口说明见项目根目录文档 <code>聚合登录api.txt</code>（act=login / act=callback）。</p>
+        </div>
+
+        <form id="aggregateSocialForm">
+            <div class="toggle-field toggle-field--aggregate">
+                <input type="checkbox" id="enabled" name="enabled" value="1" class="toggle-input" <?php echo !empty($cfg['enabled']) ? 'checked' : ''; ?>>
+                <label class="toggle-ui" for="enabled">
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    <span class="toggle-text">启用聚合快捷登录<span class="toggle-hint">开启后走聚合平台 connect 接口（QQ/微信/支付宝/微博）</span></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="connect_url">聚合接口地址</label>
+                <input type="url" id="connect_url" name="connect_url" value="<?php echo htmlspecialchars((string)($cfg['connect_url'] ?? 'https://v.910627.xyz/connect.php')); ?>" placeholder="https://v.910627.xyz/connect.php">
+                <div class="form-hint">一般为 connect.php 完整 URL，保存时会自动拼接 act、appid、appkey 等参数。</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="appid">AppID（appid）</label>
+                <input type="text" id="appid" name="appid" value="<?php echo htmlspecialchars((string)($cfg['appid'] ?? '')); ?>" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="appkey">AppKey（appkey）</label>
+                <input type="password" id="appkey" name="appkey" value="" placeholder="<?php echo $hasAppkey ? '已配置，留空则不修改' : '请填写聚合平台提供的密钥'; ?>" autocomplete="new-password">
+                <div class="form-hint"><?php echo $hasAppkey ? '当前已保存密钥；若不想修改请留空。' : '首次保存请务必填写。'; ?></div>
+            </div>
+
+            <div class="form-group">
+                <span class="form-label">对用户展示的登录方式</span>
+                <div class="type-grid">
+                    <label class="type-item">
+                        <input type="checkbox" name="type_qq" value="1" <?php echo !empty($types['qq']) ? 'checked' : ''; ?>>
+                        <span>QQ</span>
+                    </label>
+                    <label class="type-item">
+                        <input type="checkbox" name="type_wx" value="1" <?php echo !empty($types['wx']) ? 'checked' : ''; ?>>
+                        <span>微信</span>
+                    </label>
+                    <label class="type-item">
+                        <input type="checkbox" name="type_alipay" value="1" <?php echo !empty($types['alipay']) ? 'checked' : ''; ?>>
+                        <span>支付宝</span>
+                    </label>
+                    <label class="type-item">
+                        <input type="checkbox" name="type_sina" value="1" <?php echo !empty($types['sina']) ? 'checked' : ''; ?>>
+                        <span>微博</span>
+                    </label>
+                </div>
+                <div class="form-hint">仅勾选的方式会在用户登录弹窗中显示；须与聚合平台侧开通的渠道一致。</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary" id="saveAggregateBtn">保存聚合登录</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showAlert(message, type) {
+        const el = document.createElement('div');
+        const ok = type === 'success';
+        el.style.cssText = [
+            'position:fixed', 'top:22px', 'right:22px', 'max-width:min(360px,calc(100vw - 40px))',
+            'padding:14px 18px', 'border-radius:10px', 'z-index:99999', 'font-size:14px', 'font-weight:500',
+            'line-height:1.45', 'box-shadow:0 8px 28px rgba(15,23,42,.12)',
+            'animation:slToastIn .28s ease-out'
+        ].join(';');
+        el.style.background = ok ? 'linear-gradient(135deg,#f6ffed 0%,#f0fdf4 100%)' : 'linear-gradient(135deg,#fff1f2 0%,#fff5f5 100%)';
+        el.style.border = '1px solid ' + (ok ? '#b7eb8f' : '#fecdd3');
+        el.style.color = ok ? '#15803d' : '#b91c1c';
+        el.textContent = message;
+        if (!document.getElementById('sl-toast-keyframes')) {
+            const s = document.createElement('style');
+            s.id = 'sl-toast-keyframes';
+            s.textContent = '@keyframes slToastIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}';
+            document.head.appendChild(s);
+        }
+        document.body.appendChild(el);
+        setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .25s ease'; }, 2880);
+        setTimeout(() => el.remove(), 3180);
+    }
+
+    async function postSave(payload, onSuccess) {
+        const res = await fetch('/admin/saveSiteConfig', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.code === 1) {
+            showAlert('保存成功', 'success');
+            if (typeof onSuccess === 'function') onSuccess();
+        } else {
+            showAlert(json.msg || '保存失败', 'error');
+        }
+    }
+
+    document.getElementById('aggregateSocialForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('saveAggregateBtn');
+        btn.disabled = true;
+        btn.textContent = '保存中...';
+        const form = e.target;
+        const data = { type: 'social_login' };
+        data.enabled = form.querySelector('#enabled').checked ? '1' : '0';
+        data.connect_url = form.querySelector('#connect_url').value.trim();
+        data.appid = form.querySelector('#appid').value.trim();
+        data.appkey = form.querySelector('#appkey').value;
+        ['qq', 'wx', 'alipay', 'sina'].forEach(code => {
+            const cb = form.querySelector('[name="type_' + code + '"]');
+            data['type_' + code] = cb && cb.checked ? '1' : '0';
+        });
+        try {
+            await postSave(data, function() {
+                form.querySelector('#appkey').value = '';
+            });
+        } catch (err) {
+            showAlert('网络错误', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '保存聚合登录';
+        }
+    });
+
+    document.getElementById('wxOpenSocialForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('saveWxOpenBtn');
+        btn.disabled = true;
+        btn.textContent = '保存中...';
+        const form = e.target;
+        const data = { type: 'social_wx_open' };
+        data.wx_open_enabled = form.querySelector('#wx_open_enabled').checked ? '1' : '0';
+        data.wx_open_appid = form.querySelector('#wx_open_appid').value.trim();
+        data.wx_open_appsecret = form.querySelector('#wx_open_appsecret').value;
+        try {
+            await postSave(data, function() {
+                form.querySelector('#wx_open_appsecret').value = '';
+            });
+        } catch (err) {
+            showAlert('网络错误', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '保存微信登录配置';
+        }
+    });
+
+    document.getElementById('wxMpSocialForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('saveWxMpBtn');
+        btn.disabled = true;
+        btn.textContent = '保存中...';
+        const form = e.target;
+        const data = { type: 'social_wx_mp' };
+        data.wx_mp_enabled = form.querySelector('#wx_mp_enabled').checked ? '1' : '0';
+        data.wx_mp_appid = form.querySelector('#wx_mp_appid').value.trim();
+        data.wx_mp_appsecret = form.querySelector('#wx_mp_appsecret').value;
+        data.wx_mp_token = form.querySelector('#wx_mp_token').value.trim();
+        data.wx_mp_encoding_aes_key = form.querySelector('#wx_mp_encoding_aes_key').value.trim();
+        data.wx_mp_encoding_aes_key_clear = form.querySelector('#wx_mp_encoding_aes_key_clear').checked ? '1' : '0';
+        data.wx_mp_login_success_reply = form.querySelector('#wx_mp_login_success_reply').value;
+        try {
+            await postSave(data, function() {
+                form.querySelector('#wx_mp_appsecret').value = '';
+                form.querySelector('#wx_mp_encoding_aes_key').value = '';
+                form.querySelector('#wx_mp_encoding_aes_key_clear').checked = false;
+            });
+        } catch (err) {
+            showAlert('网络错误', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '保存服务号登录配置';
+        }
+    });
+</script>
+</body>
+</html>

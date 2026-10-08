@@ -1,0 +1,1 @@
+import o from"./CLmBumoR.js";import{_ as e,u as t,c as a,d as r,b as s}from"./BkmVlzPN.js";import"./BGUsDQsT.js";import"./CnGO2uq1.js";import"./BlRpTDXp.js";import"./BzJVkfZx.js";const p={class:"m-proposal-wrap"},c={__name:"proposal",setup(_){return t({title:"开题报告"}),(m,i)=>(s(),a("div",p,[r(o)]))}},h=e(c,[["__scopeId","data-v-875709e4"]]);export{h as default};

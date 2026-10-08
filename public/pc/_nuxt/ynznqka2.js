@@ -1,0 +1,1 @@
+import e from"./BT92l_Ya.js";import{_ as t,u as a,c,d as r,b as o}from"./BkmVlzPN.js";import"./Cuncmrtt.js";import"./CnGO2uq1.js";const s={class:"m-arw-wrap"},_={__name:"aigcreduceweight",setup(i){return a({title:"AI降重"}),(p,d)=>(o(),c("div",s,[r(e)]))}},l=t(_,[["__scopeId","data-v-b3b62e06"]]);export{l as default};

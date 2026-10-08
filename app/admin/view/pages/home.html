@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 40px;
+            color: #262626;
+        }
+        
+        .home-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-desc {
+            font-size: 16px;
+            color: #8c8c8c;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .category-card {
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .category-card:hover {
+            border-color: #1890ff;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .category-desc {
+            font-size: 14px;
+            color: #8c8c8c;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <div class="page-header">
+            <h1 class="page-title">欢迎使用管理员后台系统</h1>
+            <p class="page-desc">请从左侧菜单选择功能模块进行管理</p>
+        </div>
+        
+        <div class="category-grid">
+            <div class="category-card">
+                <div class="category-icon">🔐</div>
+                <div class="category-title">接入配置</div>
+                <div class="category-desc">查看鉴权方式、响应格式、错误码说明等接入配置信息</div>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">📝</div>
+                <div class="category-title">基础写作</div>
+                <div class="category-desc">管理开题报告、任务书、实习报告、实习日志等基础写作功能</div>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">📚</div>
+                <div class="category-title">高级论文</div>
+                <div class="category-desc">管理论文表单、图表资源、文献资源、大纲生成等功能</div>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">📊</div>
+                <div class="category-title">PPT生成</div>
+                <div class="category-desc">管理PPT价格、大纲生成、模板管理、订单处理等功能</div>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">🛠️</div>
+                <div class="category-title">工具集合</div>
+                <div class="category-desc">管理参考文献、段落改写、图表生成、AIGC降重等工具</div>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">📋</div>
+                <div class="category-title">模板管理</div>
+                <div class="category-desc">管理大纲模板、论文模板的增删改查操作</div>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">💳</div>
+                <div class="category-title">支付管理</div>
+                <div class="category-desc">查询价格、余额支付等支付相关功能</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

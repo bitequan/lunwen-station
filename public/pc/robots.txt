@@ -1,0 +1,10 @@
+# AI写作助手 robots.txt
+# 站点地图
+Sitemap: https://YOUR_DOMAIN_HERE/pc/sitemap.xml
+
+User-agent: *
+Allow: /pc/
+Allow: /mobile/
+Disallow: /api/
+Disallow: /*?embed=
+Disallow: /*?preview=

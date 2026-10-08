@@ -1,0 +1,1 @@
+import{f as s,s as r,o as n,c as u,b as i}from"./BkmVlzPN.js";const _={__name:"index",setup(l){const t=s(),{fetchSite:a,defaultHomeRoute:o}=r();return n(async()=>{await a();try{await t.isReady()}catch{}const e=o.value;e&&e!==t.currentRoute.value.path&&t.replace(e)}),(e,c)=>(i(),u("div"))}};export{_ as default};

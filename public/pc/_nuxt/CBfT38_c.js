@@ -1,0 +1,1 @@
+import e from"./C7WgHngr.js";import{_ as t,u as a,c,d as r,b as s}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const o={class:"m-createtitle-wrap"},_={__name:"createtitle",setup(i){return a({title:"题目生成"}),(p,l)=>(s(),c("div",o,[r(e)]))}},f=t(_,[["__scopeId","data-v-c4afe915"]]);export{f as default};

@@ -1,0 +1,1 @@
+import e from"./DEP1DkgT.js";import{_ as t,u as a,c as o,d as r,b as c}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const s={class:"m-createoutline-wrap"},_={__name:"createoutline",setup(n){return a({title:"大纲生成"}),(i,p)=>(c(),o("div",s,[r(e)]))}},m=t(_,[["__scopeId","data-v-d367e737"]]);export{m as default};

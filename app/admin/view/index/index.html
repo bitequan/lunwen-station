@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo isset($site_name) ? htmlspecialchars($site_name) : '对接端管理系统'; ?></title>
+    <?php
+    $site_icon_h = isset($site_icon) ? trim((string) $site_icon) : '';
+    $site_logo_h = isset($site_logo) ? trim((string) $site_logo) : '';
+    $favicon_h = $site_icon_h !== '' ? $site_icon_h : $site_logo_h;
+    if ($favicon_h !== '') {
+        echo '<link rel="icon" href="' . htmlspecialchars($favicon_h) . '">' . "\n    ";
+    }
+    ?>
+    <link rel="stylesheet" href="/static/admin/css/admin.css">
+    <style>
+        /* 移动端适配基础样式 */
+        :root {
+            --mobile-breakpoint: 768px;
+            --tablet-breakpoint: 1024px;
+            --mobile-sidebar-width: 280px;
+            --mobile-header-height: 56px;
+        }
+        
+        /* 标签栏滚动按钮基础样式优化 */
+        .tabs-scroll-btn {
+            opacity: 1;
+            transition: opacity 0.2s, background 0.2s;
+        }
+        
+        .tabs-scroll-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        /* 标签栏容器优化 */
+        .tabs-scroll-wrapper {
+            position: relative;
+        }
+        
+        /* 标签栏滚动指示器（移动端） */
+        .tabs-scroll-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(24, 144, 255, 0.3) 50%, 
+                transparent 100%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tabs-scroll-wrapper.has-scroll .tabs-scroll-indicator {
+            opacity: 1;
+        }
+        
+        /* 移动端汉堡菜单按钮 */
+        .mobile-menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #595959;
+            margin-right: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: #e8e8e8;
+            color: #262626;
+        }
+        
+        /* 侧边栏折叠按钮 */
+        .sidebar-toggle-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #595959;
+            margin-left: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-toggle-btn:hover {
+            background: #e8e8e8;
+            color: #262626;
+        }
+        
+        /* 刷新按钮样式 */
+        .refresh-btn {
+            background: #f5f5f5 !important;
+            color: #595959 !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 6px !important;
+            font-size: 18px !important;
+            transition: all 0.2s ease !important;
+            margin-left: 12px !important;
+            border: none !important;
+        }
+        
+        .refresh-btn:hover {
+            background: #e8e8e8 !important;
+            color: #262626 !important;
+        }
+        
+        /* 刷新动画 */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .refresh-btn.refreshing {
+            animation: rotate 0.6s linear;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        img.logo-icon {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
+        
+        /* 侧边栏折叠状态 */
+        .admin-sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .admin-sidebar.collapsed .logo-text,
+        .admin-sidebar.collapsed .nav-text,
+        .admin-sidebar.collapsed .nav-section-title,
+        .admin-sidebar.collapsed .nav-subitem-text,
+        .admin-sidebar.collapsed .nav-arrow {
+            display: none;
+        }
+        
+        .admin-sidebar.collapsed .nav-item,
+        .admin-sidebar.collapsed .nav-item-parent {
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        .admin-sidebar.collapsed .nav-submenu {
+            display: none;
+        }
+        
+        .admin-layout.sidebar-collapsed {
+            padding-left: 64px;
+        }
+        
+        .admin-sidebar.collapsed {
+            width: 64px !important;
+        }
+        
+        /* 侧边栏折叠时，调整header位置 */
+        .admin-sidebar.collapsed ~ * .admin-header {
+            left: 64px !important;
+        }
+        
+        .admin-sidebar.collapsed ~ .admin-header,
+        body:has(.admin-sidebar.collapsed) .admin-header {
+            left: 64px;
+        }
+        
+        /* 移动端遮罩层 */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+        
+        .mobile-overlay.show {
+            display: block;
+        }
+        
+        /* 移动端侧边栏样式 */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar-toggle-btn {
+                display: none;
+            }
+            
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: var(--mobile-sidebar-width);
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .admin-sidebar.open {
+                left: 0;
+            }
+            
+            .admin-header {
+                left: 0 !important;
+                padding: 0 16px;
+                height: var(--mobile-header-height);
+                position: fixed;
+                top: 0;
+                right: 0;
+                z-index: 999;
+                background: #ffffff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .admin-layout {
+                padding-left: 0;
+                margin-top: var(--mobile-header-height);
+                height: calc(100vh - var(--mobile-header-height));
+                overflow: hidden;
+            }
+            
+            .header-actions {
+                gap: 8px;
+            }
+            
+            .header-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+                border-radius: 8px;
+                background: #f5f5f5;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .header-btn:hover {
+                background: #e8e8e8;
+            }
+            
+            .user-name {
+                display: none;
+            }
+            
+            .dropdown-icon {
+                display: none;
+            }
+            
+            .user-info {
+                padding: 4px 8px;
+                background: #f5f5f5;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            
+            .user-menu {
+                min-width: 160px;
+                right: 0;
+                top: 100%;
+                margin-top: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid #f0f0f0;
+            }
+            
+            .admin-tabs {
+                height: 44px;
+                display: flex;
+                align-items: center;
+                position: relative;
+                background: #ffffff;
+                border-bottom: 1px solid #e8e8e8;
+            }
+            
+            .tabs-scroll-wrapper {
+                flex: 1;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                height: 100%;
+            }
+            
+            .tabs-scroll-btn {
+                width: 36px;
+                height: 36px;
+                background: #f5f5f5;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #595959;
+                font-size: 18px;
+                transition: all 0.2s;
+                flex-shrink: 0;
+                z-index: 10;
+                margin: 0 4px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            .tabs-scroll-btn:hover:not(:disabled) {
+                background: #e8e8e8;
+                color: #1890ff;
+            }
+            
+            .tabs-scroll-btn:active:not(:disabled) {
+                transform: scale(0.95);
+                background: #e0e0e0;
+            }
+            
+            .tabs-scroll-btn:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+                background: #fafafa;
+            }
+            
+            .tabs-scroll-btn.left {
+                margin-right: 4px;
+            }
+            
+            .tabs-scroll-btn.right {
+                margin-left: 4px;
+            }
+            
+            .tabs-container {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding: 0 8px;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tabs-container::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .tab-item {
+                min-width: 90px;
+                max-width: 150px;
+                padding: 8px 12px;
+                font-size: 12px;
+                white-space: nowrap;
+                flex-shrink: 0;
+                border-radius: 6px;
+                background: #f5f5f5;
+                border: 1px solid #e8e8e8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .tab-item.active {
+                background: #1890ff;
+                color: white;
+                border-color: #1890ff;
+            }
+            
+            .tab-item:active {
+                transform: scale(0.98);
+            }
+            
+            .tab-close {
+                width: 18px;
+                height: 18px;
+                font-size: 14px;
+                margin-left: 4px;
+                background: rgba(0, 0, 0, 0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                transition: all 0.2s;
+            }
+            
+            .tab-item.active .tab-close {
+                background: rgba(255, 255, 255, 0.3);
+            }
+            
+            .tab-close:active {
+                background: rgba(0, 0, 0, 0.2);
+                transform: scale(0.9);
+            }
+            
+            .tabs-actions {
+                padding: 0 8px;
+                display: flex;
+                align-items: center;
+                flex-shrink: 0;
+            }
+            
+            .tab-action-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+                border-radius: 6px;
+                background: #f5f5f5;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .tab-action-btn:active {
+                transform: scale(0.95);
+                background: #e8e8e8;
+            }
+            
+            .placeholder-icon {
+                font-size: 48px;
+            }
+            
+            .placeholder-text {
+                font-size: 14px;
+                color: #8c8c8c;
+            }
+            
+            /* 移动端侧边栏导航项优化 */
+            .nav-item, .nav-item-parent {
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin: 4px 8px;
+            }
+            
+            .nav-subitem {
+                padding: 10px 16px 10px 32px;
+                border-radius: 6px;
+                margin: 2px 8px;
+            }
+            
+            .nav-section-title {
+                padding: 12px 16px 8px;
+                font-size: 12px;
+                color: #8c8c8c;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            /* 移动端滚动优化 */
+            .sidebar-nav {
+                padding-bottom: 20px;
+            }
+        }
+        
+        /* 平板设备适配 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .admin-sidebar {
+                width: 200px;
+            }
+            
+            .admin-header {
+                left: 200px;
+            }
+            
+            .admin-layout {
+                padding-left: 200px;
+            }
+            
+            .logo-text {
+                font-size: 14px;
+            }
+            
+            .nav-text {
+                font-size: 13px;
+            }
+            
+            .nav-subitem-text {
+                font-size: 12px;
+            }
+            
+            .tab-item {
+                min-width: 90px;
+                max-width: 160px;
+                font-size: 12px;
+            }
+        }
+        
+        /* 小屏幕桌面适配 */
+        @media (min-width: 1025px) and (max-width: 1280px) {
+            .admin-sidebar {
+                width: 220px;
+            }
+            
+            .admin-header {
+                left: 220px;
+            }
+            
+            .admin-layout {
+                padding-left: 220px;
+            }
+        }
+        
+        /* iframe自适应优化 */
+        .iframe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+            display: block;
+        }
+        
+        /* 移动端iframe优化 */
+        @media (max-width: 768px) {
+            .iframe-container {
+                position: relative;
+                min-height: calc(100vh - var(--mobile-header-height) - 44px);
+                padding: 0;
+                background: #ffffff;
+            }
+            
+            .iframe-container iframe {
+                min-height: 500px;
+                width: 100%;
+                height: 100%;
+                border: none;
+                display: block;
+                background: #ffffff;
+            }
+            
+            /* 优化iframe内部内容的移动端显示 */
+            .iframe-container iframe body {
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+                text-size-adjust: 100%;
+                padding: 16px !important;
+                font-size: 14px;
+            }
+            
+            /* 移动端iframe加载优化 */
+            .iframe-loading {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #8c8c8c;
+                font-size: 14px;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            
+            .iframe-loading::before {
+                content: '⏳';
+                display: block;
+                font-size: 32px;
+                margin-bottom: 12px;
+                animation: pulse 1.5s infinite;
+            }
+            
+            /* 移动端iframe错误状态 */
+            .iframe-error {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                padding: 24px;
+                background: #fff2f0;
+                border-radius: 12px;
+                border: 1px solid #ffccc7;
+                max-width: 90%;
+            }
+            
+            .iframe-error-icon {
+                font-size: 48px;
+                margin-bottom: 16px;
+                color: #ff4d4f;
+            }
+            
+            .iframe-error-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #ff4d4f;
+                margin-bottom: 8px;
+            }
+            
+            .iframe-error-desc {
+                font-size: 14px;
+                color: #8c8c8c;
+                margin-bottom: 20px;
+            }
+            
+            .iframe-error-btn {
+                padding: 10px 20px;
+                background: #1890ff;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 14px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .iframe-error-btn:hover {
+                background: #40a9ff;
+            }
+        }
+        
+        /* 平板设备iframe优化 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .iframe-container iframe {
+                min-height: 600px;
+            }
+        }
+        
+        /* 防止iframe内容溢出 */
+        .iframe-container iframe * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* 优化iframe加载状态 */
+        .iframe-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .iframe-loading::before {
+            content: '⏳';
+            display: block;
+            font-size: 32px;
+            margin-bottom: 12px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            border-bottom: 1px solid #f0f0f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-title::before {
+            content: '🔒';
+            font-size: 24px;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 20px;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 28px;
+        }
+
+        /* 退出确认弹窗样式 */
+        .logout-modal-content {
+            max-width: 360px;
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .logout-modal-header {
+            background: #f7f8fa;
+            border-bottom: 1px solid #ebeef3;
+        }
+
+        .logout-modal-title::before {
+            content: ' ';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #409eff;
+            display: inline-block;
+        }
+
+        .logout-modal-title {
+            color: #1f2937;
+            font-size: 16px;
+        }
+
+        .logout-modal-header .modal-close {
+            background: #eef1f5;
+            color: #5b6472;
+        }
+
+        .logout-modal-header .modal-close:hover {
+            background: #e3e8ef;
+            transform: none;
+        }
+
+        .logout-modal-desc {
+            margin: 0;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.55;
+        }
+
+        .logout-modal-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        #logoutModal .modal-header {
+            padding: 14px 16px;
+        }
+
+        #logoutModal .modal-body {
+            padding: 14px 16px 16px;
+        }
+
+        #logoutModal .btn {
+            min-width: 76px;
+            height: 34px;
+            padding: 0 12px;
+            font-size: 13px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-label::after {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #ff4d4f;
+            border-radius: 50%;
+            margin-left: 4px;
+        }
+        
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+        }
+
+        /* 使用文本框+掩码，尽量规避浏览器原生“更新密码”弹窗 */
+        .masked-password {
+            -webkit-text-security: disc;
+        }
+
+        .masked-password.revealed {
+            -webkit-text-security: none;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #8c8c8c;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        
+        .password-toggle:hover {
+            background: #f0f0f0;
+            color: #1890ff;
+        }
+        
+        .form-error {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #fff2f0;
+            border-left: 4px solid #ff4d4f;
+            border-radius: 6px;
+            color: #ff4d4f;
+            font-size: 14px;
+            display: none;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .form-error.show {
+            display: block;
+        }
+        
+        .password-strength {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .password-strength-bar {
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        
+        .password-strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+        
+        .password-strength-fill.weak {
+            width: 33%;
+            background: #ff4d4f;
+        }
+        
+        .password-strength-fill.medium {
+            width: 66%;
+            background: #faad14;
+        }
+        
+        .password-strength-fill.strong {
+            width: 100%;
+            background: #52c41a;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 24px 28px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+        
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #595959;
+        }
+        
+        .btn-cancel:hover {
+            background: #e8e8e8;
+            color: #262626;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:disabled {
+            background: #d9d9d9;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 侧边栏：可折叠分组 */
+        .nav-item.nav-item-parent {
+            user-select: none;
+        }
+        .nav-submenu .nav-subitem {
+            gap: 10px;
+        }
+        .nav-submenu .nav-subitem .nav-icon {
+            font-size: 15px;
+            width: 20px;
+            flex-shrink: 0;
+            text-align: center;
+            opacity: 0.92;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header 顶部导航栏 -->
+    <header class="admin-header">
+        <div class="header-left">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" title="打开菜单">
+                <span>☰</span>
+            </button>
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="折叠/展开菜单">
+                <span>☰</span>
+            </button>
+            <button class="header-btn refresh-btn" id="refreshBtn" title="刷新当前页面">
+                <span>↻</span>
+            </button>
+        </div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="header-btn" title="全屏">
+                    <span>⛶</span>
+                </button>
+                <button class="header-btn" title="消息">
+                    <span>🔔</span>
+                    <span class="badge">0</span>
+                </button>
+                <div class="user-info-wrapper">
+                    <div class="user-info" id="userInfoBtn">
+                        <div class="user-avatar"><?php echo isset($admin) && $admin ? mb_substr($admin->nickname, 0, 1, 'utf-8') : 'A'; ?></div>
+                        <span class="user-name" id="adminNickname"><?php echo isset($admin) && $admin ? htmlspecialchars($admin->nickname) : '管理员'; ?></span>
+                        <span class="dropdown-icon">▼</span>
+                    </div>
+                    <div class="user-menu" id="userMenu">
+                        <a href="javascript:void(0)" class="user-menu-item" onclick="showChangePasswordModal()">
+                            <span>🔒</span>
+                            <span>修改密码</span>
+                        </a>
+                        <a href="javascript:void(0)" class="user-menu-item logout" onclick="return confirmLogout(event)">
+                            <span>🚪</span>
+                            <span>退出登录</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 移动端遮罩层 -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- 主布局容器 -->
+    <div class="admin-layout">
+        <!-- 侧边菜单栏 -->
+        <aside class="admin-sidebar">
+            <div class="logo">
+                <?php
+                $logo_src = $site_logo_h !== '' ? $site_logo_h : $site_icon_h;
+                if ($logo_src !== '') {
+                    echo '<img class="logo-icon" src="' . htmlspecialchars($logo_src) . '" alt="">';
+                } else {
+                    echo '<span class="logo-icon">⚡</span>';
+                }
+                ?>
+                <span class="logo-text"><?php echo isset($site_name) ? htmlspecialchars($site_name) : '对接端管理系统'; ?></span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="#" class="nav-item" data-action="home" data-title="工作台">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">工作台</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <a href="#" class="nav-item" data-action="users" data-title="用户管理">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">用户管理</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <a href="#" class="nav-item nav-item-parent expanded" data-nav="site">
+                        <span class="nav-icon">🏢</span>
+                        <span class="nav-text">站点与系统</span>
+                        <span class="nav-arrow">▼</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="#" class="nav-subitem" data-action="siteConfigBasic" data-title="基础信息">
+                            <span class="nav-icon">📋</span>
+                            <span class="nav-subitem-text">基础信息</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="siteConfigSystem" data-title="运行设置">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-subitem-text">维护设置</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="siteConfigSecurity" data-title="安全设置" title="含密码策略、用户端单点登录限制、邮箱验证与「禁止自助注册」等">
+                            <span class="nav-icon">🔒</span>
+                            <span class="nav-subitem-text">安全设置</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="siteConfigEmail" data-title="邮件服务">
+                            <span class="nav-icon">📧</span>
+                            <span class="nav-subitem-text">邮件服务</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="siteConfigSocialLogin" data-title="快捷登录对接">
+                            <span class="nav-icon">🔗</span>
+                            <span class="nav-subitem-text">快捷登录对接</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="versionCenter" data-title="在线更新中心">
+                            <span class="nav-icon">🆙</span>
+                            <span class="nav-subitem-text">在线更新中心</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <a href="#" class="nav-item nav-item-parent" data-nav="portal">
+                        <span class="nav-icon">🌐</span>
+                        <span class="nav-text">门户与展示</span>
+                        <span class="nav-arrow">▼</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="#" class="nav-subitem" data-action="siteConfigCustomerService" data-title="客服与联络">
+                            <span class="nav-icon">💬</span>
+                            <span class="nav-subitem-text">客服与联络</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="userThemeConfig" data-title="用户端主题配色">
+                            <span class="nav-icon">🎨</span>
+                            <span class="nav-subitem-text">用户端主题配色</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="announcementConfig" data-title="站点公告">
+                            <span class="nav-icon">📢</span>
+                            <span class="nav-subitem-text">站点公告</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="faqConfig" data-title="常见问题">
+                            <span class="nav-icon">❓</span>
+                            <span class="nav-subitem-text">常见问题</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <a href="#" class="nav-item nav-item-parent" data-nav="pay">
+                        <span class="nav-icon">💰</span>
+                        <span class="nav-text">支付与营销</span>
+                        <span class="nav-arrow">▼</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="#" class="nav-subitem" data-action="siteConfigPayment" data-title="支付对接">
+                            <span class="nav-icon">💳</span>
+                            <span class="nav-subitem-text">支付对接</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="rechargeBonus" data-title="充值赠送">
+                            <span class="nav-icon">🎁</span>
+                            <span class="nav-subitem-text">充值赠送</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <a href="#" class="nav-item nav-item-parent" data-nav="orders">
+                        <span class="nav-icon">🧾</span>
+                        <span class="nav-text">订单中心</span>
+                        <span class="nav-arrow">▼</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="#" class="nav-subitem" data-action="ordersPaper" data-title="论文订单">
+                            <span class="nav-icon">📄</span>
+                            <span class="nav-subitem-text">论文订单</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="ordersPpt" data-title="PPT 订单">
+                            <span class="nav-icon">📽</span>
+                            <span class="nav-subitem-text">PPT 订单</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="ordersWrite" data-title="写作中心订单">
+                            <span class="nav-icon">✍️</span>
+                            <span class="nav-subitem-text">写作中心</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="ordersCheck" data-title="降重订单">
+                            <span class="nav-icon">🧮</span>
+                            <span class="nav-subitem-text">降重订单</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="ordersAutodoc" data-title="格式重排订单">
+                            <span class="nav-icon">📐</span>
+                            <span class="nav-subitem-text">格式重排订单</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <a href="#" class="nav-item nav-item-parent" data-nav="templates">
+                        <span class="nav-icon">📑</span>
+                        <span class="nav-text">文档模板</span>
+                        <span class="nav-arrow">▼</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="#" class="nav-subitem" data-action="outlineTemplates" data-title="大纲模板">
+                            <span class="nav-icon">🧩</span>
+                            <span class="nav-subitem-text">大纲模板</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="paperTemplates" data-title="论文正文模板">
+                            <span class="nav-icon">📚</span>
+                            <span class="nav-subitem-text">论文正文模板</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <a href="#" class="nav-item nav-item-parent" data-nav="integrate">
+                        <span class="nav-icon">🔌</span>
+                        <span class="nav-text">商品与对接</span>
+                        <span class="nav-arrow">▼</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="#" class="nav-subitem" data-action="products" data-title="商品管理">
+                            <span class="nav-icon">🛒</span>
+                            <span class="nav-subitem-text">商品管理</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-action="apiConfig" data-title="API 与参数">
+                            <span class="nav-icon">⚡</span>
+                            <span class="nav-subitem-text">API 与参数</span>
+                        </a>
+
+                    </div>
+                </div>
+
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="admin-main">
+            <!-- 标签栏 -->
+            <div class="admin-tabs">
+                <button class="tabs-scroll-btn left" id="scrollLeftBtn" title="向左滚动">
+                    <span>‹</span>
+                </button>
+                <div class="tabs-scroll-wrapper">
+                    <div class="tabs-container" id="tabsContainer">
+                        <!-- 标签将通过JavaScript动态添加 -->
+                    </div>
+                    <div class="tabs-scroll-indicator"></div>
+                </div>
+                <button class="tabs-scroll-btn right" id="scrollRightBtn" title="向右滚动">
+                    <span>›</span>
+                </button>
+                <div class="tabs-actions">
+                    <button class="tab-action-btn" id="closeAllTabs" title="关闭所有标签">×</button>
+                </div>
+            </div>
+
+            <!-- iframe 内容区 -->
+            <div class="admin-content">
+                <div class="content-placeholder" id="contentPlaceholder">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">📋</div>
+                        <div class="placeholder-text">请从左侧菜单选择功能</div>
+                    </div>
+                </div>
+                <div class="iframe-container" id="iframeContainer" style="display: none;">
+                    <!-- iframe 将通过JavaScript动态添加 -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 修改密码模态框 -->
+    <div class="modal" id="passwordModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">修改密码</h2>
+                <button class="modal-close" onclick="closePasswordModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm" autocomplete="off" onsubmit="return false;">
+                    <input type="text" autocomplete="username" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+                    <input type="text" autocomplete="current-password" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+                    <div class="form-group">
+                        <label class="form-label">原密码</label>
+                        <div class="password-input-wrapper">
+                            <input type="text" id="oldPassword" class="form-input masked-password" placeholder="请输入原密码" autocomplete="off" data-lpignore="true" data-1p-ignore="true" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('oldPassword', this)" title="显示/隐藏密码">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">新密码</label>
+                        <div class="password-input-wrapper">
+                            <input type="text" id="newPassword" class="form-input masked-password" placeholder="请输入新密码（至少6位）" autocomplete="off" data-lpignore="true" data-1p-ignore="true" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('newPassword', this)" title="显示/隐藏密码">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                            <span id="strengthText">密码强度：</span>
+                            <div class="password-strength-bar">
+                                <div class="password-strength-fill" id="strengthBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">确认新密码</label>
+                        <div class="password-input-wrapper">
+                            <input type="text" id="confirmPassword" class="form-input masked-password" placeholder="请再次输入新密码" autocomplete="off" data-lpignore="true" data-1p-ignore="true" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)" title="显示/隐藏密码">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-error" id="passwordError"></div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" onclick="closePasswordModal()">取消</button>
+                        <button type="button" class="btn btn-primary" id="submitBtn">确定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 退出确认弹窗 -->
+    <div class="modal" id="logoutModal" style="display: none;">
+        <div class="modal-content logout-modal-content">
+            <div class="modal-header logout-modal-header">
+                <h2 class="modal-title logout-modal-title">确认退出</h2>
+                <button class="modal-close" type="button" onclick="closeLogoutModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="logout-modal-desc">确定要退出当前管理员账号吗？退出后需要重新登录才能继续操作。</p>
+                <div class="logout-modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeLogoutModal()">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="doLogout()">确认退出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/admin/js/admin.js"></script>
+    <script>
+        // 移动端菜单状态
+        let isMobileMenuOpen = false;
+        
+        // 显示/隐藏用户菜单
+        function showUserMenu(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const menu = document.getElementById('userMenu');
+            const userInfo = document.getElementById('userInfoBtn');
+            
+            if (!menu || !userInfo) {
+                console.error('菜单元素未找到');
+                return;
+            }
+            
+            // 检查当前显示状态
+            const currentDisplay = window.getComputedStyle(menu).display;
+            const isVisible = currentDisplay === 'block';
+            
+            // 切换显示状态
+            if (isVisible) {
+                menu.style.display = 'none';
+                menu.classList.remove('show');
+                userInfo.classList.remove('active');
+            } else {
+                menu.style.display = 'block';
+                menu.classList.add('show');
+                userInfo.classList.add('active');
+            }
+        }
+        
+        // 切换移动端菜单
+        function toggleMobileMenu() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            if (!sidebar || !overlay) return;
+            
+            isMobileMenuOpen = !isMobileMenuOpen;
+            
+            if (isMobileMenuOpen) {
+                sidebar.classList.add('open');
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // 关闭移动端菜单
+        function closeMobileMenu() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            if (!sidebar || !overlay) return;
+            
+            isMobileMenuOpen = false;
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        // 页面加载完成后绑定事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInfoBtn = document.getElementById('userInfoBtn');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            if (userInfoBtn) {
+                userInfoBtn.addEventListener('click', showUserMenu);
+            }
+            
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            }
+            
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', closeMobileMenu);
+            }
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768 && isMobileMenuOpen) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // 点击侧边栏菜单项时，在移动端自动关闭菜单
+            // 排除一级菜单项（.nav-item-parent），只对真正的导航项和子菜单项关闭菜单
+            const navItems = document.querySelectorAll('.nav-item:not(.nav-item-parent), .nav-subitem');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        setTimeout(closeMobileMenu, 300);
+                    }
+                });
+            });
+            
+            // 移动端手势支持 - 滑动关闭侧边栏
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (!isMobileMenuOpen) return;
+                
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const deltaX = touchX - touchStartX;
+                const deltaY = Math.abs(touchY - touchStartY);
+                
+                // 水平滑动距离大于垂直滑动距离，且向左滑动
+                if (Math.abs(deltaX) > deltaY && deltaX < -50) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // 移动端双击刷新
+            let lastTap = 0;
+            document.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < 300 && tapLength > 0) {
+                    // 双击事件
+                    const iframe = document.querySelector('#iframeContainer iframe');
+                    if (iframe && iframe.src && e.target.closest('.admin-content')) {
+                        refreshBtn.click();
+                    }
+                }
+                lastTap = currentTime;
+            });
+        });
+        
+        // 确认退出登录
+        function confirmLogout(event) {
+            event.preventDefault();
+            showLogoutModal();
+            return false;
+        }
+
+        function showLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (!modal) return;
+            modal.style.display = 'none';
+        }
+
+        function getAdminAppPrefix() {
+            const path = window.location.pathname || '';
+            const appPrefixMatch = path.match(/^(.*?\/admin)(?:\/|$)/i);
+            return appPrefixMatch ? appPrefixMatch[1] : '/admin';
+        }
+
+        function doLogout() {
+            const appPrefix = getAdminAppPrefix();
+            const logoutUrl = appPrefix + '/login/logout?_t=' + Date.now();
+            // 使用 top，确保在 iframe 场景也由顶层页面执行跳转
+            window.top.location.href = logoutUrl;
+        }
+        
+        // 关闭用户菜单的函数（admin专用，避免与user应用冲突）
+        function closeAdminUserMenu() {
+            console.log('closeAdminUserMenu被调用（admin应用）');
+            const menu = document.getElementById('userMenu');
+            const userInfo = document.getElementById('userInfoBtn');
+            
+            console.log('找到的元素:', {
+                menu: !!menu,
+                userInfo: !!userInfo,
+                menuDisplay: menu ? window.getComputedStyle(menu).display : 'null',
+                menuHasShowClass: menu ? menu.classList.contains('show') : 'null',
+                userInfoHasActiveClass: userInfo ? userInfo.classList.contains('active') : 'null'
+            });
+            
+            if (menu && userInfo) {
+                menu.style.display = 'none';
+                menu.classList.remove('show');
+                userInfo.classList.remove('active');
+                console.log('admin用户菜单已关闭');
+            } else {
+                console.log('无法找到admin菜单元素');
+            }
+        }
+        
+        // 保持closeUserMenu别名以兼容现有代码
+        const closeUserMenu = closeAdminUserMenu;
+        
+        // 为iframe添加透明点击覆盖层（用于跨域iframe）
+        function addClickOverlayToIframe(iframe) {
+            try {
+                // 获取iframe的容器
+                const iframeContainer = iframe.parentElement;
+                if (!iframeContainer) {
+                    console.log('无法找到iframe的父容器');
+                    return;
+                }
+                
+                console.log('找到iframe容器:', iframeContainer.className, iframeContainer.id);
+                console.log('iframe容器当前position:', iframeContainer.style.position);
+                
+                // 创建透明覆盖层
+                const overlay = document.createElement('div');
+                overlay.className = 'iframe-click-overlay';
+                overlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: transparent;
+                    z-index: 9999;
+                    cursor: default;
+                    border: 2px solid red !important; /* 调试用，显示覆盖层位置 */
+                `;
+                
+                // 点击覆盖层时关闭用户菜单
+                overlay.addEventListener('click', function(e) {
+                    console.log('iframe覆盖层被点击，关闭admin用户菜单');
+                    closeAdminUserMenu();
+                    // 阻止事件继续传播到iframe
+                    e.stopPropagation();
+                });
+                
+                // 将覆盖层添加到iframe容器中
+                // 注意：不要修改iframe容器的position，它已经是absolute了
+                // iframeContainer.style.position = 'relative';
+                iframeContainer.appendChild(overlay);
+                
+                console.log('已为iframe添加透明点击覆盖层，覆盖层数量:', iframeContainer.querySelectorAll('.iframe-click-overlay').length);
+            } catch (e) {
+                console.log('无法为iframe添加透明点击覆盖层:', e.message);
+            }
+        }
+        
+        // 点击其他地方关闭菜单
+        document.addEventListener('click', function(e) {
+            const userInfoWrapper = document.querySelector('.user-info-wrapper');
+            const menu = document.getElementById('userMenu');
+            
+            if (menu && userInfoWrapper) {
+                // 如果点击的不是用户信息区域和菜单区域，则关闭菜单
+                if (!userInfoWrapper.contains(e.target) && !menu.contains(e.target)) {
+                    closeAdminUserMenu();
+                }
+            }
+        });
+        
+        // 切换密码显示/隐藏
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            const svg = button.querySelector('svg');
+            if (!svg) return;
+            
+            if (!input.classList.contains('revealed')) {
+                input.classList.add('revealed');
+                // 显示隐藏图标（眼睛带斜线）
+                svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+                button.title = '隐藏密码';
+            } else {
+                input.classList.remove('revealed');
+                // 显示可见图标（眼睛）
+                svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                button.title = '显示密码';
+            }
+        }
+        
+        // 显示修改密码模态框
+        function showChangePasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            const form = document.getElementById('passwordForm');
+            const errorDiv = document.getElementById('passwordError');
+            const strengthDiv = document.getElementById('passwordStrength');
+            
+            // 重置表单
+            form.reset();
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+            strengthDiv.style.display = 'none';
+            
+            // 重置所有密码输入框显示状态
+            ['oldPassword', 'newPassword', 'confirmPassword'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    const toggle = input.nextElementSibling;
+                    if (toggle && toggle.classList.contains('password-toggle')) {
+                        input.classList.remove('revealed');
+                        const svg = toggle.querySelector('svg');
+                        if (svg) {
+                            svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                        }
+                        toggle.title = '显示密码';
+                    }
+                }
+            });
+            
+            // 显示模态框
+            modal.style.display = 'flex';
+            
+            // 关闭用户菜单
+            const userMenu = document.getElementById('userMenu');
+            const userInfo = document.getElementById('userInfoBtn');
+            if (userMenu) {
+                userMenu.style.display = 'none';
+                userMenu.classList.remove('show');
+            }
+            if (userInfo) userInfo.classList.remove('active');
+        }
+        
+        // 关闭修改密码模态框
+        function closePasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            const form = document.getElementById('passwordForm');
+            const errorDiv = document.getElementById('passwordError');
+            const strengthDiv = document.getElementById('passwordStrength');
+            
+            modal.style.display = 'none';
+            form.reset();
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+            strengthDiv.style.display = 'none';
+            
+            // 重置所有密码输入框显示状态
+            ['oldPassword', 'newPassword', 'confirmPassword'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    const toggle = input.nextElementSibling;
+                    if (toggle && toggle.classList.contains('password-toggle')) {
+                        input.classList.remove('revealed');
+                        const svg = toggle.querySelector('svg');
+                        if (svg) {
+                            svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                        }
+                        toggle.title = '显示密码';
+                    }
+                }
+            });
+        }
+        
+        // 监听新密码输入，显示密码强度
+        document.addEventListener('DOMContentLoaded', function() {
+            const newPasswordInput = document.getElementById('newPassword');
+            const strengthDiv = document.getElementById('passwordStrength');
+            const strengthText = document.getElementById('strengthText');
+            const strengthBar = document.getElementById('strengthBar');
+            
+            if (newPasswordInput) {
+                newPasswordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    if (password.length > 0) {
+                        strengthDiv.style.display = 'block';
+                        const { strengthText: text, strengthClass } = checkPasswordStrength(password);
+                        strengthText.textContent = '密码强度：' + text;
+                        strengthBar.className = 'password-strength-fill ' + strengthClass;
+                    } else {
+                        strengthDiv.style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        // 提交密码修改表单
+        async function submitPasswordChange() {
+            const data = {
+                old_password: (document.getElementById('oldPassword')?.value || '').trim(),
+                new_password: (document.getElementById('newPassword')?.value || '').trim(),
+                confirm_password: (document.getElementById('confirmPassword')?.value || '').trim()
+            };
+            const errorDiv = document.getElementById('passwordError');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // 验证新密码和确认密码是否一致
+            if (data.new_password !== data.confirm_password) {
+                errorDiv.textContent = '两次输入的新密码不一致';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            // 验证密码长度
+            if (data.new_password.length < 6) {
+                errorDiv.textContent = '新密码长度不能少于6位';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            // 禁用提交按钮
+            submitBtn.disabled = true;
+            submitBtn.textContent = '修改中...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/admin/changeMyPassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                const success = result && (
+                    Number(result.code) === 1 ||
+                    Number(result.code) === 200 ||
+                    result.success === true
+                );
+
+                if (success) {
+                    alert('密码修改成功，请重新登录');
+                    doLogout();
+                } else {
+                    errorDiv.textContent = result.msg || '密码修改失败';
+                    errorDiv.classList.add('show');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '确定';
+                }
+            } catch (error) {
+                errorDiv.textContent = '网络错误，请稍后重试';
+                errorDiv.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '确定';
+            }
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', submitPasswordChange);
+        document.getElementById('passwordForm').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitPasswordChange();
+            }
+        });
+        
+        // 点击模态框背景关闭
+        document.getElementById('passwordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePasswordModal();
+            }
+        });
+
+        document.getElementById('logoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogoutModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePasswordModal();
+                closeLogoutModal();
+            }
+        });
+        
+        // iframe加载优化
+        function createIframeLoader() {
+            const loader = document.createElement('div');
+            loader.className = 'iframe-loading';
+            loader.innerHTML = '加载中...';
+            return loader;
+        }
+        
+        function showIframeLoading(iframeContainer) {
+            const loader = createIframeLoader();
+            iframeContainer.appendChild(loader);
+            return loader;
+        }
+        
+        function hideIframeLoading(loader) {
+            if (loader && loader.parentNode) {
+                loader.parentNode.removeChild(loader);
+            }
+        }
+        
+        // 优化iframe加载
+        function loadIframeContent(url, title) {
+            const iframeContainer = document.getElementById('iframeContainer');
+            const contentPlaceholder = document.getElementById('contentPlaceholder');
+            
+            if (!iframeContainer || !contentPlaceholder) return;
+            
+            // 显示iframe容器，隐藏占位符
+            iframeContainer.style.display = 'block';
+            contentPlaceholder.style.display = 'none';
+            
+            // 清除现有iframe和错误状态
+            // 首先移除可能存在的透明覆盖层
+            const existingOverlays = iframeContainer.querySelectorAll('.iframe-click-overlay');
+            existingOverlays.forEach(overlay => overlay.remove());
+            
+            // 然后清空容器
+            iframeContainer.innerHTML = '';
+            
+            // 显示加载状态
+            const loader = showIframeLoading(iframeContainer);
+            
+            // 创建新的iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.title = title;
+            iframe.allow = 'fullscreen';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.style.display = 'block';
+            
+            // 保存原始的onload处理函数
+            const originalOnloadHandler = function() {
+                hideIframeLoading(loader);
+                
+                // 调整iframe内部内容的移动端适配
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc) {
+                        // 添加移动端viewport meta标签（如果不存在）
+                        let metaViewport = iframeDoc.querySelector('meta[name="viewport"]');
+                        if (!metaViewport) {
+                            metaViewport = iframeDoc.createElement('meta');
+                            metaViewport.name = 'viewport';
+                            metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                            iframeDoc.head.appendChild(metaViewport);
+                        }
+                        
+                        // 添加响应式样式
+                        const style = iframeDoc.createElement('style');
+                        style.textContent = `
+                            @media (max-width: 768px) {
+                                body {
+                                    padding: 16px !important;
+                                    font-size: 14px !important;
+                                }
+                                table {
+                                    display: block;
+                                    overflow-x: auto;
+                                    -webkit-overflow-scrolling: touch;
+                                }
+                                .form-row {
+                                    grid-template-columns: 1fr !important;
+                                    gap: 12px !important;
+                                }
+                                .modal-content {
+                                    width: 95% !important;
+                                    margin: 10px !important;
+                                    max-width: none !important;
+                                }
+                                .btn {
+                                    padding: 10px 16px !important;
+                                    font-size: 14px !important;
+                                }
+                                .form-input {
+                                    padding: 10px 12px !important;
+                                    font-size: 14px !important;
+                                }
+                                .table-container {
+                                    overflow-x: auto;
+                                    -webkit-overflow-scrolling: touch;
+                                }
+                                /* 卡片信息：移动端2列布局 */
+                                .stats-grid {
+                                    display: grid !important;
+                                    grid-template-columns: repeat(2, 1fr) !important;
+                                    grid-auto-flow: row !important;
+                                    gap: 12px !important;
+                                    width: 100% !important;
+                                }
+                                .stats-grid .stat-card {
+                                    width: 100% !important;
+                                    max-width: 100% !important;
+                                    min-width: 0 !important;
+                                }
+                            }
+                            
+                            @media (max-width: 480px) {
+                                /* 小屏幕：卡片1列布局 */
+                                .stats-grid {
+                                    grid-template-columns: 1fr !important;
+                                }
+                            }
+                            
+                            /* 移动端触摸优化 */
+                            @media (hover: none) and (pointer: coarse) {
+                                button, .btn, a {
+                                    min-height: 44px;
+                                    min-width: 44px;
+                                }
+                                input, select, textarea {
+                                    font-size: 16px; /* 防止iOS缩放 */
+                                }
+                            }
+                        `;
+                        iframeDoc.head.appendChild(style);
+                        
+                        // 尝试监听iframe内部的点击事件，用于关闭用户菜单
+                        // 注意：如果iframe是跨域的，这将失败
+                        try {
+                            // 移除之前可能添加的事件监听器（避免重复绑定）
+                            if (iframe._iframeClickHandler) {
+                                iframeDoc.removeEventListener('click', iframe._iframeClickHandler);
+                            }
+                            
+                            // 添加新的点击事件监听器
+                            iframe._iframeClickHandler = function() {
+                                // 当点击iframe内部时，关闭用户菜单
+                                closeAdminUserMenu();
+                            };
+                            
+                            iframeDoc.addEventListener('click', iframe._iframeClickHandler);
+                            console.log('已成功添加iframe内部点击事件监听器');
+                        } catch (e) {
+                            console.log('无法添加iframe内部点击事件监听器（可能是跨域限制）:', e.message);
+                            // 对于跨域iframe，我们需要使用其他方法
+                            // 方法1：在iframe上添加透明覆盖层
+                            addClickOverlayToIframe(iframe);
+                        }
+                        
+                        // 强制重绘以确保样式生效
+                        iframeDoc.body.style.display = 'none';
+                        iframeDoc.body.offsetHeight; // 触发重绘
+                        iframeDoc.body.style.display = '';
+                    }
+                } catch (e) {
+                    console.log('无法访问iframe内容:', e);
+                }
+            };
+            
+            // iframe加载错误处理
+            iframe.onerror = function() {
+                console.error('iframe加载失败:', url);
+                hideIframeLoading(loader);
+                iframeContainer.innerHTML = `
+                    <div class="iframe-error">
+                        <div class="iframe-error-icon">❌</div>
+                        <div class="iframe-error-title">页面加载失败</div>
+                        <div class="iframe-error-desc">请检查网络连接或刷新页面</div>
+                        <button class="iframe-error-btn" onclick="location.reload()">刷新页面</button>
+                    </div>
+                `;
+            };
+            
+            // 设置超时处理
+            const timeout = setTimeout(() => {
+                if (iframe.contentWindow && iframe.contentWindow.location.href === 'about:blank') {
+                    hideIframeLoading(loader);
+                    iframeContainer.innerHTML = `
+                        <div class="iframe-error">
+                            <div class="iframe-error-icon">⏰</div>
+                            <div class="iframe-error-title">加载超时</div>
+                            <div class="iframe-error-desc">页面加载时间过长，请检查网络或重试</div>
+                            <button class="iframe-error-btn" onclick="loadIframeContent('${url}', '${title}')">重新加载</button>
+                        </div>
+                    `;
+                }
+            }, 30000); // 30秒超时
+            
+            // 设置onload事件处理
+            iframe.onload = function() {
+                console.log('iframe加载完成:', url);
+                clearTimeout(timeout);
+                // 调用原始的onload处理函数
+                originalOnloadHandler.call(this);
+            };
+            
+            iframeContainer.appendChild(iframe);
+        }
+        
+        // 初始化iframe相关事件
+        document.addEventListener('DOMContentLoaded', function() {
+            // admin.js 已实现标签与 iframe 管理时，禁用这套旧逻辑，避免切换标签时清空容器导致白屏。
+            if (window.adminSystem) {
+                return;
+            }
+
+            // 监听菜单点击事件
+            const navItems = document.querySelectorAll('.nav-item, .nav-subitem');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.getAttribute('data-action');
+                    const title = this.getAttribute('data-title') || '页面';
+                    
+                    if (action) {
+                        // 首页单独映射到 /admin/home，其它保持原有规则
+                        const url = action === 'home' ? '/admin/home' : `/admin/${action}`;
+                        loadIframeContent(url, title);
+                    }
+                });
+            });
+            
+            // 监听标签页切换（假设admin.js中有标签页功能）
+            document.addEventListener('tabChange', function(e) {
+                if (e.detail && e.detail.url) {
+                    loadIframeContent(e.detail.url, e.detail.title);
+                }
+            });
+            
+            // 检查是否已经有iframe加载完成，如果是，则添加点击事件监听器
+            setTimeout(() => {
+                const iframe = document.querySelector('#iframeContainer iframe');
+                if (iframe && iframe.src && iframe.src !== 'about:blank') {
+                    try {
+                        // 手动触发load事件处理逻辑
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        if (iframeDoc && iframeDoc.readyState === 'complete') {
+                            // 模拟load事件
+                            const event = new Event('load');
+                            iframe.dispatchEvent(event);
+                        }
+                    } catch (e) {
+                        console.log('无法检查iframe状态:', e.message);
+                    }
+                }
+            }, 100);
+            
+            // 页面首次加载时默认打开首页
+            loadIframeContent('/admin/home', '工作台');
+            
+            // 监听页面刷新按钮
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    const iframe = document.querySelector('#iframeContainer iframe');
+                    const iframeContainer = document.getElementById('iframeContainer');
+                    const contentPlaceholder = document.getElementById('contentPlaceholder');
+                    
+                    // 添加刷新动画
+                    this.classList.add('refreshing');
+                    
+                    // 检查当前是否在首页（显示占位符）
+                    if (contentPlaceholder && contentPlaceholder.style.display !== 'none') {
+                        // 在首页，重新加载整个页面
+                        window.location.reload();
+                    } else if (iframe && iframe.src) {
+                        // 在iframe页面，重新加载iframe
+                        // 显示加载状态
+                        const loader = showIframeLoading(iframeContainer);
+                        
+                        // 重新加载iframe
+                        iframe.onload = function() {
+                            hideIframeLoading(loader);
+                            refreshBtn.classList.remove('refreshing');
+                        };
+                        
+                        iframe.contentWindow.location.reload();
+                    } else {
+                        // 其他情况，重新加载整个页面
+                        window.location.reload();
+                    }
+                    
+                    // 移除动画类（如果加载很快）
+                    setTimeout(() => {
+                        refreshBtn.classList.remove('refreshing');
+                    }, 600);
+                });
+                
+                // 移动端长按刷新提示
+                let pressTimer;
+                refreshBtn.addEventListener('touchstart', function(e) {
+                    pressTimer = setTimeout(() => {
+                        // 显示长按提示
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'mobile-tooltip';
+                        tooltip.textContent = '长按强制刷新';
+                        tooltip.style.cssText = `
+                            position: fixed;
+                            bottom: 80px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: rgba(0, 0, 0, 0.8);
+                            color: white;
+                            padding: 8px 16px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            z-index: 10000;
+                            white-space: nowrap;
+                        `;
+                        document.body.appendChild(tooltip);
+                        setTimeout(() => tooltip.remove(), 2000);
+                    }, 1000);
+                });
+                
+                refreshBtn.addEventListener('touchend', function(e) {
+                    clearTimeout(pressTimer);
+                });
+                
+                refreshBtn.addEventListener('touchmove', function(e) {
+                    clearTimeout(pressTimer);
+                });
+            }
+        });
+        
+        // 检查密码强度函数（补充缺失的函数）
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            let text = '弱';
+            let className = 'weak';
+            
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            if (strength >= 4) {
+                text = '强';
+                className = 'strong';
+            } else if (strength >= 3) {
+                text = '中';
+                className = 'medium';
+            }
+            
+            return { strengthText: text, strengthClass: className };
+        }
+    </script>
+</body>
+</html>

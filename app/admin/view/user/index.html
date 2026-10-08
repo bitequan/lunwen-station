@@ -1,0 +1,2984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #262626;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .config-panel {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            animation: fadeInUp 0.3s ease-out;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 28px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title::before {
+            content: '|';
+            color: #1890ff;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .panel-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .panel-title::before {
+                font-size: 18px;
+            }
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            color: #262626;
+        }
+        
+        .btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+            color: #ffffff;
+        }
+        
+        .btn-warning {
+            background: #faad14;
+            border-color: #faad14;
+            color: #ffffff;
+        }
+        
+        .btn-warning:hover {
+            background: #ffc53d;
+            border-color: #ffc53d;
+            color: #ffffff;
+        }
+        
+        .btn-danger {
+            background: #ff4d4f;
+            border-color: #ff4d4f;
+            color: #ffffff;
+        }
+        
+        .btn-danger:hover {
+            background: #ff7875;
+            border-color: #ff7875;
+            color: #ffffff;
+        }
+
+        .btn-success {
+            background: #52c41a;
+            border-color: #52c41a;
+            color: #ffffff;
+        }
+
+        .btn-success:hover {
+            background: #73d13d;
+            border-color: #73d13d;
+            color: #ffffff;
+        }
+
+        .btn-outline-danger {
+            background: #ffffff;
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+
+        .btn-outline-danger:hover {
+            background: #fff1f0;
+            border-color: #ff7875;
+            color: #ff7875;
+        }
+        
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        
+        .table-container {
+            border: 1px solid #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table thead {
+            background: #fafafa;
+        }
+        
+        table th {
+            padding: 12px 16px;
+            text-align: left;
+            color: #262626;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        table tbody tr:hover {
+            background: #fafafa;
+        }
+        
+        table tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        table td {
+            padding: 12px 16px;
+            color: #595959;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 2px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* 移动端状态徽章 */
+        @media (max-width: 768px) {
+            .status-badge {
+                padding: 1px 4px;
+                font-size: 10px;
+            }
+        }
+        
+        .status-active {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #52c41a;
+        }
+        
+        .status-inactive {
+            background: #fff2e8;
+            border: 1px solid #ffd8bf;
+            color: #fa8c16;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .modal {
+                align-items: center;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0.45);
+                padding: 20px 10px;
+            }
+            
+            .modal.show {
+                display: flex;
+                animation: modalFadeIn 0.3s ease;
+            }
+            
+            .modal-content {
+                animation: contentScaleIn 0.3s ease;
+                max-width: 92%;
+                width: 100%;
+                border-radius: 10px;
+                margin: 0 auto;
+                max-height: 80vh;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+                border: 1px solid #e5e7eb;
+            }
+            
+            #editUserModal .modal-content,
+            #addUserModal .modal-content {
+                border-radius: 10px;
+                margin: 0 auto;
+            }
+            
+            @keyframes modalFadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes contentScaleIn {
+                from {
+                    transform: scale(0.95) translateY(20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1) translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            /* 优化小屏幕设备 */
+            @media (max-width: 480px) {
+                .modal {
+                    padding: 15px 8px;
+                }
+                
+                .modal-content {
+                    max-width: 94%;
+                    max-height: 82vh;
+                }
+            }
+            
+            /* 优化横屏模式 */
+            @media (max-height: 500px) {
+                .modal-content {
+                    max-height: 90vh;
+                }
+                
+                #editUserModal #editUserForm,
+                #addUserModal #addUserForm {
+                    max-height: 70vh;
+                }
+            }
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            /* 默认模态框仍然保持整体滚动 */
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #8c8c8c;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            color: #262626;
+        }
+
+        /* 编辑用户模态框美化样式 */
+        #editUserModal .modal-content {
+            max-width: 600px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            /* 移除整个模态框的滚动，改为表单区域滚动 */
+            max-height: none;
+            overflow-y: visible;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #editUserModal #editUserForm {
+            /* 表单区域可以滚动 */
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 8px; /* 为滚动条留出空间 */
+        }
+
+        /* 自定义滚动条样式 */
+        #editUserModal #editUserForm::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #editUserModal #editUserForm::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        #editUserModal #editUserForm::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        #editUserModal #editUserForm::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        #editUserModal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            margin: -24px -24px 24px -24px;
+            padding: 20px 24px;
+            border-bottom: none;
+        }
+
+        #editUserModal .modal-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #editUserModal .modal-title::before {
+            content: '';
+            display: none;
+        }
+
+        #editUserModal .modal-close {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #editUserModal .modal-close:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        #editUserModal .form-group {
+            margin-bottom: 16px;
+        }
+
+        #editUserModal .form-label {
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #editUserModal .form-label::before {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        #editUserModal .form-input {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            background: white;
+            height: 38px;
+        }
+
+        #editUserModal .form-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        #editUserModal .form-input:read-only {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        #editUserModal select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        #editUserModal .form-actions {
+            margin-top: 22px;
+            padding: 18px 2px 2px;
+            border-top: 1px solid #e8eaef;
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.95) 0%, rgba(255, 255, 255, 0) 100%);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #editUserModal .form-actions .btn {
+            padding: 0 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            min-width: 92px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, filter 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+        }
+
+        #editUserModal .form-actions .btn:not(.btn-primary) {
+            background: #ffffff;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        #editUserModal .form-actions .btn:not(.btn-primary):hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #475569;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+        }
+
+        #editUserModal .form-actions .btn:not(.btn-primary):active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+
+        #editUserModal .form-actions .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        #editUserModal .form-actions .btn-primary:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #editUserModal .form-actions .btn-primary:active {
+            transform: translateY(0);
+            filter: brightness(0.98);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        #editUserModal .form-actions .btn:not(.btn-primary):focus-visible {
+            outline: 2px solid #94a3b8;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        #editUserModal .form-actions .btn-primary:focus-visible {
+            outline: 2px solid #7c3aed;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            #editUserModal .modal-content {
+                width: 100%;
+                margin: 0 auto;
+                padding: 16px;
+                max-height: 80vh;
+                border-radius: 10px;
+            }
+            
+            #editUserModal .modal-header {
+                margin: -16px -16px 16px -16px;
+                padding: 14px 16px;
+                border-radius: 10px 10px 0 0;
+            }
+            
+            #editUserModal .modal-title {
+                font-size: 16px;
+            }
+            
+            #editUserModal .modal-close {
+                width: 28px;
+                height: 28px;
+                font-size: 18px;
+            }
+            
+            #editUserModal #editUserForm {
+                max-height: 60vh;
+                padding-right: 4px;
+            }
+            
+            #editUserModal .form-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            #editUserModal .form-group {
+                margin-bottom: 12px;
+            }
+            
+            #editUserModal .form-label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            
+            #editUserModal .form-input {
+                font-size: 13px;
+                height: 36px;
+                padding: 8px 12px;
+                border-radius: 4px;
+            }
+            
+            #editUserModal .form-actions {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 10px;
+                padding: 14px 0 0 0;
+                margin: 14px 0 0 0;
+                border-top: 1px solid #e8eaef;
+                background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, transparent 100%);
+            }
+            
+            #editUserModal .form-actions .btn {
+                flex: 1;
+                width: auto;
+                min-width: 0;
+                padding: 0 12px;
+                height: 36px;
+                min-height: 36px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            #editUserModal .form-actions .btn-primary {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        /* 新增用户模态框美化样式 */
+        #addUserModal .modal-content {
+            max-width: 600px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            /* 移除整个模态框的滚动，改为表单区域滚动 */
+            max-height: none;
+            overflow-y: visible;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #addUserModal #addUserForm {
+            /* 表单区域可以滚动 */
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 8px; /* 为滚动条留出空间 */
+        }
+
+        /* 自定义滚动条样式 */
+        #addUserModal #addUserForm::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #addUserModal #addUserForm::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        #addUserModal #addUserForm::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        #addUserModal #addUserForm::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        #addUserModal .modal-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            margin: -24px -24px 24px -24px;
+            padding: 20px 24px;
+            border-bottom: none;
+        }
+
+        #addUserModal .modal-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #addUserModal .modal-title::before {
+            content: '';
+            display: none;
+        }
+
+        #addUserModal .modal-close {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #addUserModal .modal-close:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        #addUserModal .form-group {
+            margin-bottom: 16px;
+        }
+
+        #addUserModal .form-label {
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #addUserModal .form-label span {
+            color: #ef4444;
+        }
+
+        #addUserModal .form-input {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            background: white;
+            height: 38px;
+        }
+
+        #addUserModal .form-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+
+        #addUserModal select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        #addUserModal .form-actions {
+            margin-top: 22px;
+            padding: 18px 2px 2px;
+            border-top: 1px solid #d1fae5;
+            background: linear-gradient(180deg, rgba(236, 253, 245, 0.65) 0%, rgba(255, 255, 255, 0) 100%);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #addUserModal .form-actions .btn {
+            padding: 0 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            min-width: 92px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, filter 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+        }
+
+        #addUserModal .form-actions .btn:not(.btn-primary) {
+            background: #ffffff;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        #addUserModal .form-actions .btn:not(.btn-primary):hover {
+            background: #f0fdf4;
+            border-color: #a7f3d0;
+            color: #047857;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        #addUserModal .form-actions .btn:not(.btn-primary):active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+
+        #addUserModal .form-actions .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        #addUserModal .form-actions .btn-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #addUserModal .form-actions .btn-primary:active {
+            transform: translateY(0);
+            filter: brightness(0.98);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        #addUserModal .form-actions .btn:not(.btn-primary):focus-visible {
+            outline: 2px solid #94a3b8;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        #addUserModal .form-actions .btn-primary:focus-visible {
+            outline: 2px solid #059669;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            #addUserModal .modal-content {
+                width: 100%;
+                margin: 0 auto;
+                padding: 16px;
+                max-height: 80vh;
+                border-radius: 10px;
+            }
+            
+            #addUserModal .modal-header {
+                margin: -16px -16px 16px -16px;
+                padding: 14px 16px;
+                border-radius: 10px 10px 0 0;
+            }
+            
+            #addUserModal .modal-title {
+                font-size: 16px;
+            }
+            
+            #addUserModal .modal-close {
+                width: 28px;
+                height: 28px;
+                font-size: 18px;
+            }
+            
+            #addUserModal #addUserForm {
+                max-height: 60vh;
+                padding-right: 4px;
+            }
+            
+            #addUserModal .form-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            #addUserModal .form-group {
+                margin-bottom: 12px;
+            }
+            
+            #addUserModal .form-label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            
+            #addUserModal .form-label span {
+                font-size: 12px;
+            }
+            
+            #addUserModal .form-input {
+                font-size: 13px;
+                height: 36px;
+                padding: 8px 12px;
+                border-radius: 4px;
+            }
+            
+            #addUserModal .form-actions {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 10px;
+                padding: 14px 0 0 0;
+                margin: 14px 0 0 0;
+                border-top: 1px solid #d1fae5;
+                background: linear-gradient(180deg, rgba(236, 253, 245, 0.55) 0%, transparent 100%);
+            }
+            
+            #addUserModal .form-actions .btn {
+                flex: 1;
+                width: auto;
+                min-width: 0;
+                padding: 0 12px;
+                height: 36px;
+                min-height: 36px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            #addUserModal .form-actions .btn-primary {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #262626;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .form-input:read-only {
+            background: #f5f5f5;
+            color: #8c8c8c;
+            cursor: not-allowed;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+        
+        .form-row.single-column {
+            grid-template-columns: 1fr;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8c8c8c;
+        }
+        
+        .empty-state-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 14px;
+            color: #8c8c8c;
+        }
+        
+        @media (max-width: 768px) {
+            .empty-state {
+                padding: 30px 16px;
+            }
+            
+            .empty-state-icon {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+            
+            .empty-state-text {
+                font-size: 13px;
+            }
+            
+            .empty-state .btn-primary {
+                margin-top: 12px;
+                padding: 10px;
+                font-size: 14px;
+                height: 40px;
+            }
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        
+        .pagination-btn {
+            padding: 4px 12px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+        
+        .pagination-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .pagination-btn.active {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+                background: #f5f7fa;
+            }
+            
+            .page-container {
+                padding: 0;
+                max-width: 100%;
+            }
+            
+            .config-panel {
+                padding: 16px;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+                margin-bottom: 16px;
+            }
+            
+            .page-header .btn-primary {
+                width: 100%;
+                justify-content: center;
+                padding: 10px;
+                font-size: 14px;
+                height: 40px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .action-buttons .btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                height: 30px;
+            }
+            
+            /* 表格在移动端的优化 */
+            .table-container {
+                margin-top: 16px;
+                border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                overflow: hidden;
+            }
+            
+            table th,
+            table td {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            table th {
+                font-size: 12px;
+                white-space: nowrap;
+            }
+        }
+
+        /* 卡片布局样式 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #262626;
+            font-size: 16px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-id {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+
+        .card-body {
+            display: grid;
+            gap: 12px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            flex-wrap: wrap;
+        }
+
+        .info-label {
+            color: #8c8c8c;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #262626;
+            flex: 1;
+            word-break: break-word;
+            min-width: 0;
+        }
+
+        /* 紧凑布局样式 */
+        .compact-row {
+            gap: 4px;
+            font-size: 13px;
+        }
+
+        .compact-label {
+            min-width: 35px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .compact-value {
+            font-size: 13px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-footer {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 响应式断点 */
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 16px;
+            }
+
+            .user-card {
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            .card-header {
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+                gap: 6px;
+            }
+
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .user-name {
+                font-size: 12px;
+                margin-bottom: 1px;
+            }
+
+            .user-id {
+                font-size: 9px;
+            }
+
+            .card-body {
+                gap: 6px;
+            }
+
+            .info-row {
+                font-size: 12px;
+                gap: 4px;
+            }
+
+            .info-label {
+                min-width: 40px;
+                font-size: 11px;
+            }
+
+            .info-value {
+                font-size: 12px;
+            }
+
+            /* 移动端紧凑布局优化 */
+            .compact-row {
+                font-size: 11px;
+                gap: 3px;
+            }
+
+            .compact-label {
+                min-width: 30px;
+                font-size: 10px;
+                margin-left: 6px;
+            }
+
+            .compact-value {
+                font-size: 11px;
+                max-width: 90px;
+            }
+
+            .card-footer {
+                margin-top: 8px;
+                padding-top: 8px;
+                gap: 4px;
+            }
+
+            .card-footer .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 4px 6px;
+                font-size: 10px;
+                height: 24px;
+                min-height: 24px;
+            }
+
+            .card-footer .btn-sm {
+                padding: 2px 4px;
+                font-size: 9px;
+                height: 22px;
+            }
+        }
+
+        /* 隐藏/显示控制 */
+        .desktop-only {
+            display: block;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-only {
+                display: none !important;
+            }
+
+            .mobile-only {
+                display: block !important;
+            }
+
+            .table-container {
+                display: none;
+            }
+
+            .cards-container {
+                display: grid;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .cards-container {
+                display: none;
+            }
+
+            .table-container {
+                display: block;
+            }
+        }
+
+        /* 筛选表单响应式样式 */
+        @media (max-width: 768px) {
+            .filter-panel {
+                padding: 10px !important;
+                margin-bottom: 12px !important;
+                border-radius: 4px !important;
+            }
+            
+            .desktop-filter {
+                display: none !important;
+            }
+            
+            .mobile-filter {
+                display: block !important;
+            }
+            
+            .mobile-filter .form-input {
+                font-size: 13px;
+                height: 36px;
+                padding: 8px 12px;
+                border-radius: 4px;
+                width: 100%;
+            }
+            
+            .mobile-filter .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 8px;
+                height: 36px;
+                font-size: 13px;
+                border-radius: 4px;
+            }
+            
+            #filterStatus {
+                font-size: 10px;
+                margin-top: 6px;
+                padding-top: 6px;
+                border-top: 1px solid #e0e0e0;
+                line-height: 1.3;
+            }
+            
+            #filterStatus > div {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            #filterStatus button {
+                font-size: 9px;
+                padding: 1px 4px;
+                align-self: flex-end;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .desktop-filter {
+                display: flex !important;
+            }
+            
+            .mobile-filter {
+                display: none !important;
+            }
+        }
+
+        /* 无结果提示样式 */
+        .no-results-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 30px 20px;
+            color: #8c8c8c;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px dashed #e0e0e0;
+            margin-top: 10px;
+        }
+        
+        .no-results-message .btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            .no-results-message {
+                padding: 20px 16px;
+                margin-top: 8px;
+            }
+            
+            .no-results-message .btn {
+                padding: 10px;
+                font-size: 14px;
+                height: 40px;
+                width: 100%;
+            }
+        }
+
+        /* 余额管理模态框美化 */
+        #balanceUserModal .modal-content {
+            max-width: 520px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: none; /* 不要任何光圈/发光阴影 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        #balanceUserModal .modal-header {
+            background: linear-gradient(120deg, #f97316 0%, #fb923c 40%, #ea580c 100%);
+            margin: -24px -24px 24px -24px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: none;
+            padding: 18px 24px;
+        }
+
+        #balanceUserModal .modal-title {
+            color: #fff4e6;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #balanceUserModal .modal-title::before {
+            content: '￥';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff7ed;
+            font-size: 14px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+        }
+
+        #balanceUserModal .modal-title small {
+            color: #ffedd5 !important;
+            font-size: 12px !important;
+            opacity: 0.9;
+        }
+
+        #balanceUserModal .modal-close {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        #balanceUserModal .modal-close:hover {
+            background: rgba(255, 255, 255, 0.26);
+            transform: rotate(90deg) scale(1.02);
+        }
+
+        #balanceUserModal .form-grid {
+            margin-top: 4px;
+            gap: 8px;
+        }
+
+        #balanceUserModal .form-group {
+            margin-bottom: 10px;
+        }
+
+        #balanceUserModal .form-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        #balanceUserModal .form-label span.helper {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        #balanceUserModal #balanceUserCurrent {
+            font-weight: 600;
+            color: #f97316;
+            background: #fff7ed;
+            border-color: #fed7aa;
+        }
+
+        #balanceUserModal #balanceUserType {
+            background-image: linear-gradient(to right, #fff7ed, #ffffff);
+        }
+
+        #balanceUserModal #balanceUserAmount {
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        #balanceUserModal .form-actions {
+            margin-top: 18px;
+            padding: 16px 2px 2px;
+            border-top: 1px dashed #fdba74;
+            background: linear-gradient(180deg, rgba(255, 247, 237, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #balanceUserModal .form-actions .btn {
+            min-width: 100px;
+            height: 40px;
+            padding: 0 20px;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, filter 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        #balanceUserModal .form-actions .btn:not(.btn-primary) {
+            background: #ffffff;
+            color: #c2410c;
+            border: 1.5px solid #fed7aa;
+        }
+
+        #balanceUserModal .form-actions .btn:not(.btn-primary):hover {
+            background: #fff7ed;
+            border-color: #fb923c;
+            color: #9a3412;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        #balanceUserModal .form-actions .btn:not(.btn-primary):active {
+            transform: translateY(0);
+        }
+
+        #balanceUserModal .form-actions .btn-primary {
+            background: linear-gradient(120deg, #fb923c 0%, #f97316 45%, #ea580c 100%);
+            border: 1px solid rgba(251, 146, 60, 0.85);
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        #balanceUserModal .form-actions .btn-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #balanceUserModal .form-actions .btn-primary:active {
+            transform: translateY(0);
+            filter: brightness(0.98);
+        }
+
+        #balanceUserModal .form-actions .btn:focus-visible {
+            outline: none;
+        }
+
+        #balanceUserModal .form-actions .btn:not(.btn-primary):focus-visible {
+            outline: 2px solid #fb923c;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        #balanceUserModal .form-actions .btn-primary:focus-visible {
+            outline: 2px solid #ea580c;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            #balanceUserModal .modal-content {
+                max-width: 92%;
+                padding: 18px 16px;
+                border-radius: 12px;
+            }
+
+            #balanceUserModal .modal-header {
+                margin: -18px -16px 18px -16px;
+                padding: 14px 16px;
+                border-radius: 12px 12px 0 0;
+            }
+
+            #balanceUserModal .modal-title {
+                font-size: 16px;
+            }
+
+            #balanceUserModal .form-actions {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 10px;
+                padding-top: 14px;
+            }
+
+            #balanceUserModal .form-actions .btn {
+                flex: 1;
+                width: auto;
+                min-width: 0;
+                padding: 0 14px;
+                height: 36px;
+                min-height: 36px;
+                font-size: 12px;
+                border-radius: 999px;
+            }
+
+            #balanceUserModal .form-actions .btn-primary {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        /* 删除用户确认弹窗 */
+        #deleteUserModal .modal-content {
+            max-width: 420px;
+            border-radius: 14px;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid #fecaca;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #deleteUserModal .delete-user-modal-header {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 45%, #dc2626 100%);
+            color: #fff;
+            margin: 0;
+            padding: 18px 20px;
+            border-bottom: none;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        #deleteUserModal .delete-user-modal-header .modal-title {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.3;
+        }
+
+        #deleteUserModal .delete-user-modal-header .modal-title::before {
+            content: '⚠';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 18px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        #deleteUserModal .delete-user-modal-header .modal-close {
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            width: 34px;
+            height: 34px;
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        #deleteUserModal .delete-user-modal-header .modal-close:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        #deleteUserModal .delete-user-modal-body {
+            padding: 22px 22px 8px;
+            background: linear-gradient(180deg, #fffafa 0%, #ffffff 55%);
+        }
+
+        #deleteUserModal .delete-user-modal-lead {
+            font-size: 15px;
+            color: #1f2937;
+            line-height: 1.55;
+            margin: 0 0 10px;
+        }
+
+        #deleteUserModal .delete-user-modal-lead strong {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+
+        #deleteUserModal .delete-user-modal-hint {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin: 0;
+            padding: 10px 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+        }
+
+        #deleteUserModal .delete-user-modal-actions {
+            margin: 0;
+            padding: 16px 20px 20px;
+            border-top: none;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #fff;
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn {
+            padding: 0 20px;
+            min-width: 96px;
+            height: 40px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn:not(.btn-danger) {
+            background: #ffffff;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn:not(.btn-danger):hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn-danger {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
+            border: 1px solid rgba(239, 68, 68, 0.9);
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn-danger:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn-danger:active {
+            transform: translateY(0);
+            filter: brightness(0.98);
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn:not(.btn-danger):focus-visible {
+            outline: 2px solid #94a3b8;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        #deleteUserModal .delete-user-modal-actions .btn-danger:focus-visible {
+            outline: 2px solid #dc2626;
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            #deleteUserModal .modal-content {
+                max-width: 100%;
+                border-radius: 12px;
+            }
+
+            #deleteUserModal .delete-user-modal-actions {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 10px;
+                padding: 14px 16px 18px;
+            }
+
+            #deleteUserModal .delete-user-modal-actions .btn {
+                flex: 1;
+                min-width: 0;
+                height: 36px;
+                font-size: 12px;
+                border-radius: 8px;
+                padding: 0 12px;
+            }
+
+            #deleteUserModal .delete-user-modal-body {
+                padding: 18px 16px 6px;
+            }
+
+            #deleteUserModal .delete-user-modal-header {
+                padding: 14px 16px;
+            }
+
+            #deleteUserModal .delete-user-modal-header .modal-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="config-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="panel-title">用户管理</h2>
+            </div>
+            
+            <!-- 筛选表单 -->
+            <div class="filter-panel" style="margin-bottom: 20px; padding: 16px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
+                <div class="desktop-filter" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="searchInput" class="form-input" placeholder="搜索用户名、昵称、邮箱或手机号..." style="width: 100%;">
+                    </div>
+                    <div style="min-width: 120px;">
+                        <select id="statusFilter" class="form-input" style="width: 100%;">
+                            <option value="">全部状态</option>
+                            <option value="1">正常</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary" onclick="applyFilters()" style="white-space: nowrap;">
+                            🔍 搜索
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddUserModal()" style="white-space: nowrap;">
+                            ➕ 新增用户
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 移动端紧凑布局 -->
+                <div class="mobile-filter" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" id="searchInputMobile" class="form-input" placeholder="搜索...">
+                        <select id="statusFilterMobile" class="form-input">
+                            <option value="">全部状态</option>
+                            <option value="1">正常</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="btn btn-primary" onclick="applyFiltersMobile()">
+                            🔍 搜索
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddUserModal()">
+                            ➕ 新增用户
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="filterStatus" style="margin-top: 8px; font-size: 13px; color: #6c757d; display: none;">
+                    <!-- 筛选状态提示将在这里显示 -->
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>昵称</th>
+                            <th>邮箱</th>
+                            <th>手机号</th>
+                            <th>余额</th>
+                            <th>状态</th>
+                            <th>最后登录</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (isset($list) && $list): ?>
+                        <?php foreach ($list as $item): ?>
+                        <tr>
+                            <td><strong>#<?php echo $item['id']; ?></strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #1890ff; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                        <?php echo strtoupper(substr($item['username'], 0, 1)); ?>
+                                    </div>
+                                    <?php echo htmlspecialchars($item['username']); ?>
+                                </div>
+                            </td>
+                            <td><?php echo htmlspecialchars($item['nickname']); ?></td>
+                            <td><?php echo htmlspecialchars($item['email']); ?></td>
+                            <td><?php echo htmlspecialchars($item['phone']); ?></td>
+                            <td>
+                                <span style="font-weight: 600; color: #fa8c16;">
+                                    <?php echo isset($item['balance']) ? number_format($item['balance'], 2) : '0.00'; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge <?php echo $item['status'] == 1 ? 'status-active' : 'status-inactive'; ?>">
+                                    <?php echo $item['status'] == 1 ? '正常' : '禁用'; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?php if ($item['last_login_time']): ?>
+                                <span style="color: #595959; font-size: 13px;">
+                                    <?php echo $item['last_login_time']; ?>
+                                </span>
+                                <?php else: ?>
+                                <span style="color: #bfbfbf; font-size: 13px;">未登录</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary btn-sm balance-user-btn"
+                                            data-id="<?php echo $item['id']; ?>"
+                                            data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                            data-balance="<?php echo isset($item['balance']) ? $item['balance'] : 0; ?>">
+                                        💰 余额管理
+                                    </button>
+                                    <button class="btn btn-warning btn-sm edit-user-btn" 
+                                            data-id="<?php echo $item['id']; ?>"
+                                            data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                            data-nickname="<?php echo htmlspecialchars($item['nickname'], ENT_QUOTES); ?>"
+                                            data-email="<?php echo htmlspecialchars($item['email'], ENT_QUOTES); ?>"
+                                            data-phone="<?php echo htmlspecialchars($item['phone'], ENT_QUOTES); ?>"
+                                            data-status="<?php echo $item['status']; ?>">
+                                        ✏️ 编辑
+                                    </button>
+                                    <?php if ((int)$item['status'] === 1): ?>
+                                    <button type="button" class="btn btn-outline-danger btn-sm toggle-user-status-btn"
+                                            data-id="<?php echo $item['id']; ?>"
+                                            data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                            data-next-status="0">
+                                        ⛔ 禁用
+                                    </button>
+                                    <?php else: ?>
+                                    <button type="button" class="btn btn-success btn-sm toggle-user-status-btn"
+                                            data-id="<?php echo $item['id']; ?>"
+                                            data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                            data-next-status="1">
+                                        ✓ 启用
+                                    </button>
+                                    <?php endif; ?>
+                                    <button class="btn btn-danger btn-sm delete-user-btn"
+                                            data-id="<?php echo $item['id']; ?>"
+                                            data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>">
+                                        🗑️ 删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php else: ?>
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📋</div>
+                                    <div class="empty-state-text">暂无用户数据</div>
+                                    <button class="btn btn-primary" onclick="openAddUserModal()" style="margin-top: 16px;">
+                                        ➕ 添加第一个用户
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 卡片布局容器 -->
+            <div class="cards-container">
+                <?php if (isset($list) && $list): ?>
+                <?php foreach ($list as $item): ?>
+                <div class="user-card">
+                    <div class="card-header">
+                        <div class="user-avatar">
+                            <?php echo strtoupper(substr($item['username'], 0, 1)); ?>
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name"><?php echo htmlspecialchars($item['username']); ?></div>
+                            <div class="user-id">ID: #<?php echo $item['id']; ?></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="info-row compact-row">
+                            <span class="info-label">昵称:</span>
+                            <span class="info-value compact-value"><?php echo htmlspecialchars($item['nickname']); ?></span>
+                            <span class="info-label compact-label">余额:</span>
+                            <span class="info-value compact-value" style="color:#fa8c16;font-weight:600;">
+                                <?php echo isset($item['balance']) ? number_format($item['balance'], 2) : '0.00'; ?>
+                            </span>
+                            <span class="info-label compact-label">状态:</span>
+                            <span class="info-value compact-value">
+                                <span class="status-badge <?php echo $item['status'] == 1 ? 'status-active' : 'status-inactive'; ?>">
+                                    <?php echo $item['status'] == 1 ? '正常' : '禁用'; ?>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-row compact-row">
+                            <span class="info-label">邮箱:</span>
+                            <span class="info-value compact-value"><?php echo htmlspecialchars($item['email']); ?></span>
+                            <span class="info-label compact-label">手机:</span>
+                            <span class="info-value compact-value"><?php echo htmlspecialchars($item['phone']); ?></span>
+                            <span class="info-label compact-label">登录:</span>
+                            <span class="info-value compact-value">
+                                <?php if ($item['last_login_time']): ?>
+                                <span style="color: #595959; font-size: 11px;">
+                                    <?php echo date('m-d H:i', strtotime($item['last_login_time'])); ?>
+                                </span>
+                                <?php else: ?>
+                                <span style="color: #bfbfbf; font-size: 11px;">未登录</span>
+                                <?php endif; ?>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <button class="btn btn-primary btn-sm balance-user-btn"
+                                data-id="<?php echo $item['id']; ?>"
+                                data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                data-balance="<?php echo isset($item['balance']) ? $item['balance'] : 0; ?>">
+                            💰 余额管理
+                        </button>
+                        <button class="btn btn-warning btn-sm edit-user-btn" 
+                                data-id="<?php echo $item['id']; ?>"
+                                data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                data-nickname="<?php echo htmlspecialchars($item['nickname'], ENT_QUOTES); ?>"
+                                data-email="<?php echo htmlspecialchars($item['email'], ENT_QUOTES); ?>"
+                                data-phone="<?php echo htmlspecialchars($item['phone'], ENT_QUOTES); ?>"
+                                data-status="<?php echo $item['status']; ?>">
+                            ✏️ 编辑
+                        </button>
+                        <?php if ((int)$item['status'] === 1): ?>
+                        <button type="button" class="btn btn-outline-danger btn-sm toggle-user-status-btn"
+                                data-id="<?php echo $item['id']; ?>"
+                                data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                data-next-status="0">
+                            ⛔ 禁用
+                        </button>
+                        <?php else: ?>
+                        <button type="button" class="btn btn-success btn-sm toggle-user-status-btn"
+                                data-id="<?php echo $item['id']; ?>"
+                                data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>"
+                                data-next-status="1">
+                            ✓ 启用
+                        </button>
+                        <?php endif; ?>
+                        <button class="btn btn-danger btn-sm delete-user-btn"
+                                data-id="<?php echo $item['id']; ?>"
+                                data-username="<?php echo htmlspecialchars($item['username'], ENT_QUOTES); ?>">
+                            🗑️ 删除
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+                <?php else: ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-text">暂无用户数据</div>
+                    <button class="btn btn-primary" onclick="openAddUserModal()" style="margin-top: 16px;">
+                        ➕ 添加第一个用户
+                    </button>
+                </div>
+                <?php endif; ?>
+            </div>
+            
+            <?php if (isset($list) && method_exists($list, 'render')): ?>
+            <div class="pagination">
+                <?php echo $list->render(); ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    
+    <!-- 编辑用户信息模态框 -->
+    <div class="modal" id="editUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">编辑用户信息</h2>
+                <button class="modal-close" onclick="closeEditUserModal()">×</button>
+            </div>
+            <form id="editUserForm">
+                <input type="hidden" name="id" id="editUserId">
+                <div class="form-grid">
+                    <div class="form-row single-column">
+                        <div class="form-group">
+                            <label class="form-label">用户名</label>
+                            <input type="text" id="editUserName" class="form-input" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">昵称</label>
+                            <input type="text" name="nickname" id="editUserNickname" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">状态</label>
+                            <select name="status" id="editUserStatus" class="form-input">
+                                <option value="1">正常</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" name="email" id="editUserEmail" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">手机号</label>
+                            <input type="text" name="phone" id="editUserPhone" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">新密码</label>
+                            <input type="password" name="new_password" class="form-input" placeholder="留空表示不修改密码">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">确认新密码</label>
+                            <input type="password" name="confirm_password" class="form-input" placeholder="留空表示不修改密码">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeEditUserModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 新增用户模态框 -->
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">新增用户</h2>
+                <button class="modal-close" onclick="closeAddUserModal()">×</button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-grid">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">用户名 <span style="color: #ef4444;">*</span></label>
+                            <input type="text" name="username" class="form-input" required placeholder="请输入用户名">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">状态</label>
+                            <select name="status" class="form-input">
+                                <option value="1" selected>正常</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">密码 <span style="color: #ef4444;">*</span></label>
+                            <input type="password" name="password" class="form-input" required placeholder="请输入密码">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">确认密码 <span style="color: #ef4444;">*</span></label>
+                            <input type="password" name="confirm_password" class="form-input" required placeholder="请再次输入密码">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">昵称</label>
+                            <input type="text" name="nickname" class="form-input" placeholder="请输入昵称">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" name="email" class="form-input" placeholder="请输入邮箱">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">手机号</label>
+                            <input type="text" name="phone" class="form-input" placeholder="请输入手机号">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeAddUserModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">创建用户</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 用户余额管理模态框 -->
+    <div class="modal" id="balanceUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span>余额管理</span>
+                    <small id="balanceUserName"></small>
+                </h2>
+                <button class="modal-close" onclick="closeBalanceUserModal()">×</button>
+            </div>
+            <form id="balanceUserForm">
+                <input type="hidden" name="id" id="balanceUserId">
+                <div class="form-grid">
+                    <div class="form-row single-column">
+                        <div class="form-group">
+                            <label class="form-label">当前余额 <span class="helper">仅展示，不参与编辑</span></label>
+                            <input type="text" id="balanceUserCurrent" class="form-input" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row single-column">
+                        <div class="form-group">
+                            <label class="form-label">操作类型</label>
+                            <select name="type" id="balanceUserType" class="form-input">
+                                <option value="inc">增加余额</option>
+                                <option value="dec">减少余额</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row single-column">
+                        <div class="form-group">
+                            <label class="form-label">变动金额 <span class="helper">必填，正数</span></label>
+                            <input type="number" step="0.01" min="0.01" name="amount" id="balanceUserAmount" class="form-input" placeholder="请输入正数金额">
+                        </div>
+                    </div>
+                    <div class="form-row single-column">
+                        <div class="form-group">
+                            <label class="form-label">备注</label>
+                            <input type="text" name="remark" id="balanceUserRemark" class="form-input" placeholder="如：人工补偿、活动扣减等">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeBalanceUserModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">确认调整</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 删除用户确认 -->
+    <div class="modal" id="deleteUserModal">
+        <div class="modal-content">
+            <div class="modal-header delete-user-modal-header">
+                <h2 class="modal-title">删除用户</h2>
+                <button type="button" class="modal-close" onclick="closeDeleteUserModal()" aria-label="关闭">×</button>
+            </div>
+            <div class="delete-user-modal-body">
+                <p class="delete-user-modal-lead">确定要删除用户 <strong id="deleteUserTargetName">—</strong> 吗？</p>
+                <p class="delete-user-modal-hint">此操作不可撤销，该账号及相关数据可能被永久移除，请谨慎操作。</p>
+            </div>
+            <div class="form-actions delete-user-modal-actions">
+                <button type="button" class="btn" onclick="closeDeleteUserModal()">取消</button>
+                <button type="button" class="btn btn-danger" id="deleteUserConfirmBtn" onclick="confirmDeleteUser()">确认删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let pendingDeleteUserId = null;
+
+        function editUser(id, username, nickname, email, phone, status) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editUserName').value = username;
+            document.getElementById('editUserNickname').value = nickname || '';
+            document.getElementById('editUserEmail').value = email || '';
+            document.getElementById('editUserPhone').value = phone || '';
+            
+            // 设置状态值（现在状态值已经是字符串类型）
+            document.getElementById('editUserStatus').value = status;
+            
+            // 清空密码字段，确保每次编辑时密码字段都是空的
+            document.querySelector('#editUserForm input[name="new_password"]').value = '';
+            document.querySelector('#editUserForm input[name="confirm_password"]').value = '';
+            
+            document.getElementById('editUserModal').classList.add('show');
+        }
+        
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.remove('show');
+            // 关闭时重置表单，确保下次打开时是干净的
+            document.getElementById('editUserForm').reset();
+        }
+        
+        function openAddUserModal() {
+            document.getElementById('addUserForm').reset();
+            document.getElementById('addUserModal').classList.add('show');
+        }
+        
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('show');
+        }
+
+        function openBalanceUserModal(id, username, balance) {
+            document.getElementById('balanceUserId').value = id;
+            document.getElementById('balanceUserName').textContent = `（${username}）`;
+            document.getElementById('balanceUserCurrent').value = (parseFloat(balance) || 0).toFixed(2);
+            document.getElementById('balanceUserAmount').value = '';
+            document.getElementById('balanceUserRemark').value = '';
+            document.getElementById('balanceUserType').value = 'inc';
+            document.getElementById('balanceUserModal').classList.add('show');
+        }
+
+        function closeBalanceUserModal() {
+            document.getElementById('balanceUserModal').classList.remove('show');
+        }
+        
+        function setUserStatus(id, nextStatus, username) {
+            const enable = nextStatus === 1 || nextStatus === '1';
+            const tip = enable
+                ? `确定要启用用户「${username}」吗？`
+                : `确定要禁用用户「${username}」吗？禁用后将无法登录前台。`;
+            if (!confirm(tip)) {
+                return;
+            }
+            fetch('/admin/setUserStatus', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: id, status: parseInt(nextStatus, 10) })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code == 1) {
+                    showNotification(data.msg || '操作成功', 'success');
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showNotification(data.msg, 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('网络错误，请重试', 'error');
+            });
+        }
+
+        function openDeleteUserModal(id, username) {
+            pendingDeleteUserId = id;
+            const nameEl = document.getElementById('deleteUserTargetName');
+            const u = username && String(username).trim();
+            nameEl.textContent = u ? u : ('ID #' + id);
+            document.getElementById('deleteUserModal').classList.add('show');
+        }
+
+        function closeDeleteUserModal() {
+            pendingDeleteUserId = null;
+            document.getElementById('deleteUserModal').classList.remove('show');
+        }
+
+        function confirmDeleteUser() {
+            if (pendingDeleteUserId == null) return;
+            const id = pendingDeleteUserId;
+            const btn = document.getElementById('deleteUserConfirmBtn');
+            if (btn.disabled) return;
+            btn.disabled = true;
+            closeDeleteUserModal();
+            fetch('/admin/deleteUser', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: id })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code == 1) {
+                        showNotification('删除成功', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showNotification(data.msg, 'error');
+                    }
+                })
+                .catch(() => {
+                    showNotification('网络错误，请重试', 'error');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                });
+        }
+        
+        function showNotification(message, type = 'info') {
+            // 移除现有的通知
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${type === "success" ? "<path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/><polyline points='22 4 12 14.01 9 11.01'/>" : 
+                          type === "error" ? "<path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/><line x1='12' y1='9' x2='12' y2='13'/><line x1='12' y1='17' x2='12.01' y2='17'/>" :
+                          "<circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='12'/><line x1='12' y1='16' x2='12.01' y2='16'/>"}
+                    </svg>
+                    ${message}
+                </div>
+            `;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                border-radius: 8px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                color: white;
+                font-weight: 500;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            // 添加动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // 如果填写了新密码，验证两次输入是否一致
+            if (data.new_password && data.confirm_password && data.new_password !== data.confirm_password) {
+                showNotification('两次输入的密码不一致', 'error');
+                return;
+            }
+            
+            // 如果密码为空，移除密码字段
+            if (!data.new_password) {
+                delete data.new_password;
+            }
+            delete data.confirm_password;
+            
+            fetch('/admin/updateUser', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code == 1) {
+                    showNotification('用户信息更新成功', 'success');
+                    closeEditUserModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.msg, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('网络错误，请重试', 'error');
+            });
+        });
+        
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // 验证密码
+            if (data.password !== data.confirm_password) {
+                showNotification('两次输入的密码不一致', 'error');
+                return;
+            }
+            
+            // 移除确认密码字段
+            delete data.confirm_password;
+            
+            // 显示加载状态
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '创建中...';
+            submitBtn.disabled = true;
+            
+            fetch('/admin/saveUser', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code == 1) {
+                    showNotification('用户创建成功', 'success');
+                    closeAddUserModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.msg, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('网络错误，请重试', 'error');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+        
+        // 点击模态框外部关闭
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    if (this.id === 'deleteUserModal') {
+                        closeDeleteUserModal();
+                    } else {
+                        this.classList.remove('show');
+                    }
+                }
+            });
+        });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    if (modal.id === 'deleteUserModal') {
+                        closeDeleteUserModal();
+                    } else {
+                        modal.classList.remove('show');
+                    }
+                });
+            }
+        });
+
+        // 响应式布局切换
+        function updateLayout() {
+            const isMobile = window.innerWidth <= 768;
+            const tableContainer = document.querySelector('.table-container');
+            const cardsContainer = document.querySelector('.cards-container');
+            
+            if (isMobile) {
+                // 移动端显示卡片，隐藏表格
+                if (tableContainer) tableContainer.style.display = 'none';
+                if (cardsContainer) cardsContainer.style.display = 'grid';
+            } else {
+                // PC端显示表格，隐藏卡片
+                if (tableContainer) tableContainer.style.display = 'block';
+                if (cardsContainer) cardsContainer.style.display = 'none';
+            }
+        }
+
+        // 页面加载时和窗口大小变化时更新布局
+        window.addEventListener('load', updateLayout);
+        window.addEventListener('resize', updateLayout);
+
+        // 初始调用
+        updateLayout();
+
+        // 为编辑按钮添加事件监听器
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('edit-user-btn')) {
+                const btn = e.target;
+                const id = btn.getAttribute('data-id');
+                const username = btn.getAttribute('data-username');
+                const nickname = btn.getAttribute('data-nickname');
+                const email = btn.getAttribute('data-email');
+                const phone = btn.getAttribute('data-phone');
+                const status = btn.getAttribute('data-status');
+                
+                editUser(id, username, nickname, email, phone, status);
+            }
+            
+            // 为删除按钮添加事件监听器
+            if (e.target.classList.contains('delete-user-btn')) {
+                const btn = e.target;
+                const id = btn.getAttribute('data-id');
+                const username = btn.getAttribute('data-username') || '';
+                openDeleteUserModal(id, username);
+            }
+
+            if (e.target.classList.contains('toggle-user-status-btn')) {
+                const btn = e.target;
+                const id = btn.getAttribute('data-id');
+                const nextStatus = btn.getAttribute('data-next-status');
+                const username = btn.getAttribute('data-username') || '';
+                setUserStatus(id, nextStatus, username);
+            }
+
+            // 为余额管理按钮添加事件监听器
+            if (e.target.classList.contains('balance-user-btn')) {
+                const btn = e.target;
+                const id = btn.getAttribute('data-id');
+                const username = btn.getAttribute('data-username');
+                const balance = btn.getAttribute('data-balance') || 0;
+                openBalanceUserModal(id, username, balance);
+            }
+        });
+
+        // 余额管理表单提交
+        document.getElementById('balanceUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            const amount = parseFloat(data.amount);
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('请输入大于 0 的金额', 'error');
+                return;
+            }
+
+            if (!confirm(`确认对该用户${data.type === 'inc' ? '增加' : '减少'}余额 ${amount.toFixed(2)} 吗？`)) {
+                return;
+            }
+
+            // 使用表单方式提交，兼容现有后台逻辑
+            const urlParams = new URLSearchParams();
+            Object.keys(data).forEach(key => {
+                urlParams.append(key, data[key]);
+            });
+
+            fetch('/admin/userBalance', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body: urlParams.toString()
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.code == 1) {
+                    showNotification('余额调整成功', 'success');
+                    closeBalanceUserModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(res.msg || '操作失败', 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('网络错误，请重试', 'error');
+            });
+        });
+
+        // 筛选功能
+        function applyFilters() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            // 获取所有用户行（表格和卡片）
+            const tableRows = document.querySelectorAll('.table-container tbody tr');
+            const userCards = document.querySelectorAll('.cards-container .user-card');
+            
+            let visibleCount = 0;
+            let filterConditions = [];
+            
+            // 构建筛选条件提示
+            if (searchText) {
+                filterConditions.push(`搜索: "${searchText}"`);
+            }
+            if (statusFilter) {
+                filterConditions.push(`状态: ${statusFilter === '1' ? '正常' : '禁用'}`);
+            }
+            
+            // 筛选表格行
+            tableRows.forEach(row => {
+                if (row.querySelector('.empty-state')) {
+                    // 空状态行，根据是否有数据决定显示
+                    const hasUsers = document.querySelectorAll('.table-container tbody tr:not(:has(.empty-state))').length > 1;
+                    row.style.display = hasUsers ? 'none' : '';
+                    return;
+                }
+                
+                const username = row.cells[1].textContent.toLowerCase();
+                const nickname = row.cells[2].textContent.toLowerCase();
+                const email = row.cells[3].textContent.toLowerCase();
+                const phone = row.cells[4].textContent.toLowerCase();
+                // 表头顺序：ID、用户名、昵称、邮箱、手机、余额、状态、最后登录、操作 — 状态列为 cells[6]
+                const statusBadge = row.cells[6] && row.cells[6].querySelector('.status-badge');
+                const statusText = statusBadge ? statusBadge.textContent.trim() : '';
+                const statusValue = statusText === '正常' ? '1' : '0';
+                
+                let match = true;
+                
+                // 搜索条件
+                if (searchText) {
+                    match = username.includes(searchText) || 
+                            nickname.includes(searchText) || 
+                            email.includes(searchText) || 
+                            phone.includes(searchText);
+                }
+                
+                // 状态条件
+                if (statusFilter && match) {
+                    match = statusValue === statusFilter;
+                }
+                
+                if (match) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // 筛选卡片
+            userCards.forEach(card => {
+                const username = card.querySelector('.user-name').textContent.toLowerCase();
+                const nickname = card.querySelector('.info-row:nth-child(1) .compact-value:nth-child(2)').textContent.toLowerCase();
+                const email = card.querySelector('.info-row:nth-child(2) .compact-value:nth-child(2)').textContent.toLowerCase();
+                const phone = card.querySelector('.info-row:nth-child(2) .compact-value:nth-child(4)').textContent.toLowerCase();
+                const statusBadge = card.querySelector('.status-badge');
+                const status = statusBadge.textContent;
+                const statusValue = status === '正常' ? '1' : '0';
+                
+                let match = true;
+                
+                // 搜索条件
+                if (searchText) {
+                    match = username.includes(searchText) || 
+                            nickname.includes(searchText) || 
+                            email.includes(searchText) || 
+                            phone.includes(searchText);
+                }
+                
+                // 状态条件
+                if (statusFilter && match) {
+                    match = statusValue === statusFilter;
+                }
+                
+                if (match) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // 更新筛选状态提示
+            const filterStatus = document.getElementById('filterStatus');
+            if (filterConditions.length > 0) {
+                filterStatus.innerHTML = `
+                    <div style="font-size: 13px; color: #6c757d;">
+                        筛选: ${filterConditions.join('， ')} | 显示 ${visibleCount} 个用户
+                    </div>
+                `;
+                filterStatus.style.display = 'block';
+            } else {
+                filterStatus.style.display = 'none';
+            }
+            
+            // 如果没有匹配的用户，显示提示
+            if (visibleCount === 0) {
+                showNoResultsMessage(searchText, statusFilter);
+            } else {
+                removeNoResultsMessage();
+            }
+        }
+        
+        function showNoResultsMessage(searchText, statusFilter) {
+            // 先移除可能已存在的提示
+            removeNoResultsMessage();
+            
+            const message = document.createElement('div');
+            message.className = 'no-results-message';
+            message.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #8c8c8c;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔍</div>
+                    <div style="font-size: 14px; margin-bottom: 8px;">
+                        没有找到匹配的用户
+                        ${searchText ? `<br><small>搜索词: "${searchText}"</small>` : ''}
+                        ${statusFilter ? `<br><small>状态: ${statusFilter === '1' ? '正常' : '禁用'}</small>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // 添加到表格容器和卡片容器
+            const tableContainer = document.querySelector('.table-container tbody');
+            const cardsContainer = document.querySelector('.cards-container');
+            
+            if (tableContainer) {
+                const clone = message.cloneNode(true);
+                tableContainer.appendChild(clone);
+            }
+            
+            if (cardsContainer) {
+                const clone = message.cloneNode(true);
+                cardsContainer.appendChild(clone);
+            }
+        }
+        
+        function removeNoResultsMessage() {
+            document.querySelectorAll('.no-results-message').forEach(msg => msg.remove());
+        }
+        
+        // 支持按Enter键搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+        
+        // 移动端输入框同步
+        document.getElementById('searchInputMobile').addEventListener('input', function() {
+            document.getElementById('searchInput').value = this.value;
+        });
+        
+        document.getElementById('statusFilterMobile').addEventListener('change', function() {
+            document.getElementById('statusFilter').value = this.value;
+        });
+        
+        // PC端输入框同步到移动端
+        document.getElementById('searchInput').addEventListener('input', function() {
+            document.getElementById('searchInputMobile').value = this.value;
+        });
+        
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            document.getElementById('statusFilterMobile').value = this.value;
+        });
+        
+        // 移动端搜索函数
+        function applyFiltersMobile() {
+            // 同步值到PC端表单
+            const searchValue = document.getElementById('searchInputMobile').value;
+            const statusValue = document.getElementById('statusFilterMobile').value;
+            
+            document.getElementById('searchInput').value = searchValue;
+            document.getElementById('statusFilter').value = statusValue;
+            
+            // 调用主筛选函数
+            applyFilters();
+        }
+        
+        // 移动端按Enter键搜索
+        document.getElementById('searchInputMobile').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFiltersMobile();
+            }
+        });
+        
+        // 页面加载时应用URL中的筛选参数（如果有）
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const search = urlParams.get('search');
+            const status = urlParams.get('status');
+            
+            if (search) {
+                document.getElementById('searchInput').value = search;
+                document.getElementById('searchInputMobile').value = search;
+            }
+            if (status) {
+                document.getElementById('statusFilter').value = status;
+                document.getElementById('statusFilterMobile').value = status;
+            }
+            
+            if (search || status) {
+                // 延迟一点执行，确保DOM完全加载
+                setTimeout(applyFilters, 100);
+            }
+            
+            // 移除滑动关闭初始化，因为现在模态框是居中显示
+        });
+        
+        // 优化移动端输入框焦点时的视图
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                if (window.innerWidth <= 768) {
+                    // 在移动端，滚动到输入框可见
+                    setTimeout(() => {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

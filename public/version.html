@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统版本更新管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #6c757d;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .file-upload {
+            position: relative;
+            display: inline-block;
+        }
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-upload-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .history-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+        .history-time {
+            color: #6c757d;
+            font-size: 12px;
+        }
+        .history-message {
+            color: #495057;
+            margin-top: 5px;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 系统版本更新管理</h1>
+        
+        <div id="alert-container"></div>
+        
+        <!-- 当前版本信息 -->
+        <div class="section">
+            <h2>当前版本信息</h2>
+            <div id="version-info">
+                <div class="info-item">
+                    <span class="info-label">当前版本:</span>
+                    <span class="info-value" id="current-version">加载中...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">最后更新:</span>
+                    <span class="info-value" id="update-time">-</span>
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary" onclick="checkUpdate()">检查更新</button>
+                <button class="btn btn-primary" onclick="loadVersionInfo()">刷新信息</button>
+            </div>
+        </div>
+
+        <!-- 版本检查 -->
+        <div class="section">
+            <h2>版本检查</h2>
+            <div class="form-group">
+                <label>远程版本号 (可选，留空则从服务器获取):</label>
+                <input type="text" id="remote-version" placeholder="例如: 1.0.1" pattern="\d+\.\d+\.\d+">
+            </div>
+            <button class="btn btn-primary" onclick="checkUpdate()">检查更新</button>
+            <div id="update-check-result" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- 上传更新包 -->
+        <div class="section">
+            <h2>上传更新包</h2>
+            <div class="form-group">
+                <label>选择更新包文件 (ZIP格式):</label>
+                <div class="file-upload">
+                    <input type="file" id="update-file" accept=".zip">
+                    <label for="update-file" class="file-upload-label">选择文件</label>
+                </div>
+                <span id="file-name" style="margin-left: 10px; color: #6c757d;"></span>
+            </div>
+            <button class="btn btn-success" onclick="uploadUpdate()">上传更新包</button>
+        </div>
+
+        <!-- 应用更新 -->
+        <div class="section">
+            <h2>应用更新</h2>
+            <div class="form-group">
+                <label>更新包路径:</label>
+                <input type="text" id="update-path" placeholder="例如: runtime/update/update_20240101_xxx.zip">
+            </div>
+            <div class="form-group">
+                <label>新版本号 (可选):</label>
+                <input type="text" id="new-version" placeholder="例如: 1.0.1" pattern="\d+\.\d+\.\d+">
+            </div>
+            <div class="form-group">
+                <label>更新模式:</label>
+                <select id="update-mode" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+                    <option value="incremental">新增更新（推荐）</option>
+                    <option value="full">全包更新</option>
+                </select>
+                <div style="margin-top: 8px; padding: 10px; background: #e7f3ff; border-radius: 5px; font-size: 12px; color: #0066cc;">
+                    <strong>新增更新：</strong>只更新新增或修改的文件，保留现有文件，适合日常更新<br>
+                    <strong>全包更新：</strong>完整替换所有文件，可删除不需要的文件，适合大版本更新
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="applyUpdate()">应用更新</button>
+            <p style="margin-top: 10px; color: #6c757d; font-size: 12px;">
+                ⚠️ 注意: 应用更新前会自动备份系统，请确保有足够的磁盘空间
+            </p>
+        </div>
+
+        <!-- 设置版本号 -->
+        <div class="section">
+            <h2>设置版本号</h2>
+            <div class="form-group">
+                <label>新版本号:</label>
+                <input type="text" id="set-version" placeholder="例如: 1.0.1" pattern="\d+\.\d+\.\d+">
+            </div>
+            <button class="btn btn-primary" onclick="setVersion()">设置版本号</button>
+        </div>
+
+        <!-- 更新历史 -->
+        <div class="section">
+            <h2>更新历史</h2>
+            <button class="btn btn-primary" onclick="loadHistory()">刷新历史</button>
+            <div id="history-list" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/version';
+        
+        // 显示提示信息
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // 加载版本信息
+        async function loadVersionInfo() {
+            try {
+                const response = await fetch(API_BASE + '/current');
+                const result = await response.json();
+                if (result.code === 1) {
+                    document.getElementById('current-version').textContent = result.data.version;
+                    document.getElementById('update-time').textContent = result.data.update_time;
+                } else {
+                    showAlert(result.msg, 'danger');
+                }
+            } catch (error) {
+                showAlert('获取版本信息失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 检查更新
+        async function checkUpdate() {
+            const remoteVersion = document.getElementById('remote-version').value;
+            const resultDiv = document.getElementById('update-check-result');
+            resultDiv.innerHTML = '<div class="loading"></div> 检查中...';
+            
+            try {
+                const url = API_BASE + '/check' + (remoteVersion ? '?remote_version=' + encodeURIComponent(remoteVersion) : '');
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    const data = result.data;
+                    let html = '<div class="alert ';
+                    if (data.has_update) {
+                        html += 'alert-info">';
+                        html += `<strong>发现新版本!</strong><br>`;
+                        html += `当前版本: ${data.current_version}<br>`;
+                        html += `最新版本: ${data.latest_version}`;
+                    } else {
+                        html += 'alert-success">';
+                        html += `<strong>${data.message}</strong><br>`;
+                        html += `当前版本: ${data.current_version}`;
+                    }
+                    html += '</div>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    showAlert(result.msg, 'danger');
+                    resultDiv.innerHTML = '';
+                }
+            } catch (error) {
+                showAlert('检查更新失败: ' + error.message, 'danger');
+                resultDiv.innerHTML = '';
+            }
+        }
+
+        // 上传更新包
+        async function uploadUpdate() {
+            const fileInput = document.getElementById('update-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('请选择要上传的文件', 'danger');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('update_package', file);
+
+            try {
+                const response = await fetch(API_BASE + '/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('上传成功: ' + result.data.file_name, 'success');
+                    document.getElementById('update-path').value = result.data.file_path;
+                    fileInput.value = '';
+                    document.getElementById('file-name').textContent = '';
+                } else {
+                    showAlert(result.msg, 'danger');
+                }
+            } catch (error) {
+                showAlert('上传失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 应用更新
+        async function applyUpdate() {
+            const filePath = document.getElementById('update-path').value;
+            const newVersion = document.getElementById('new-version').value;
+            const updateMode = document.getElementById('update-mode').value;
+            
+            if (!filePath) {
+                showAlert('请提供更新包路径', 'danger');
+                return;
+            }
+
+            const modeText = updateMode === 'full' ? '全包更新' : '新增更新';
+            const confirmMsg = `确定要应用更新吗？\n\n更新模式: ${modeText}\n系统将自动备份当前版本。`;
+            
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('file_path', filePath);
+                formData.append('update_mode', updateMode);
+                if (newVersion) {
+                    formData.append('new_version', newVersion);
+                }
+
+                const response = await fetch(API_BASE + '/apply', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert(`更新成功! (${modeText})`, 'success');
+                    loadVersionInfo();
+                    loadHistory();
+                } else {
+                    showAlert(result.msg, 'danger');
+                }
+            } catch (error) {
+                showAlert('应用更新失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 设置版本号
+        async function setVersion() {
+            const version = document.getElementById('set-version').value;
+            
+            if (!version) {
+                showAlert('请提供版本号', 'danger');
+                return;
+            }
+
+            if (!/^\d+\.\d+\.\d+$/.test(version)) {
+                showAlert('版本号格式不正确，应为 x.x.x 格式', 'danger');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('version', version);
+
+                const response = await fetch(API_BASE + '/set', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    showAlert('版本号设置成功', 'success');
+                    loadVersionInfo();
+                    document.getElementById('set-version').value = '';
+                } else {
+                    showAlert(result.msg, 'danger');
+                }
+            } catch (error) {
+                showAlert('设置版本号失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 加载更新历史
+        async function loadHistory() {
+            const historyDiv = document.getElementById('history-list');
+            historyDiv.innerHTML = '<div class="loading"></div> 加载中...';
+            
+            try {
+                const response = await fetch(API_BASE + '/history?limit=20');
+                const result = await response.json();
+                
+                if (result.code === 1) {
+                    if (result.data.length === 0) {
+                        historyDiv.innerHTML = '<p style="color: #6c757d;">暂无更新历史</p>';
+                    } else {
+                        let html = '';
+                        result.data.forEach(item => {
+                            html += `<div class="history-item">`;
+                            html += `<div class="history-time">${item.time}</div>`;
+                            html += `<div class="history-message">${item.message}</div>`;
+                            html += `</div>`;
+                        });
+                        historyDiv.innerHTML = html;
+                    }
+                } else {
+                    showAlert(result.msg, 'danger');
+                }
+            } catch (error) {
+                showAlert('加载历史失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 文件选择事件
+        document.getElementById('update-file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || '';
+            document.getElementById('file-name').textContent = fileName;
+        });
+
+        // 页面加载时初始化
+        window.onload = function() {
+            loadVersionInfo();
+            loadHistory();
+        };
+    </script>
+</body>
+</html>
+

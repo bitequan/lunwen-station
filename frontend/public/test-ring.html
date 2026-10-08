@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading 预览</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      gap: 40px;
+    }
+    .preview-box {
+      width: 300px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .page-refresh-ring {
+      width: 56px;
+      height: 56px;
+      transform-origin: center;
+      filter: drop-shadow(0 2px 6px rgba(13, 148, 136, 0.28));
+    }
+    .page-refresh-ring-track {
+      stroke-dasharray: 110 40;
+      animation: page-refresh-ring-spin 1.2s linear infinite;
+      transform-origin: center;
+    }
+    .page-refresh-ring-inner {
+      stroke-dasharray: 55 30;
+      animation: page-refresh-ring-spin-reverse 1.8s linear infinite;
+      transform-origin: center;
+    }
+    @keyframes page-refresh-ring-spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes page-refresh-ring-spin-reverse {
+      to { transform: rotate(-360deg); }
+    }
+    .label {
+      color: #64748b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-box">
+    <svg class="page-refresh-ring" viewBox="0 0 60 60" aria-hidden="true">
+      <defs>
+        <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0d9488" stop-opacity="0.95"/>
+          <stop offset="55%" stop-color="#14b8a6" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.08"/>
+        </linearGradient>
+      </defs>
+      <circle cx="30" cy="30" r="24" fill="none" stroke="#14b8a6" stroke-width="1.2" stroke-opacity="0.12"/>
+      <circle class="page-refresh-ring-track" cx="30" cy="30" r="24" fill="none" stroke="url(#ring-gradient)" stroke-width="4.2" stroke-linecap="round"/>
+      <circle class="page-refresh-ring-inner" cx="30" cy="30" r="16" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.35" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <p class="label">新 loading 预览</p>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# 环境变量（含数据库与对接密钥）
+.env
+.env.*
+!.env.example
+
+# 运行时目录（日志/缓存），保留目录结构
+runtime/*
+!runtime/.gitkeep
+
+# 用户上传目录（部署后自动生成），保留目录结构
+public/uploads/*
+!public/uploads/site/
+public/uploads/site/*
+!public/uploads/site/.gitkeep
+
+# 前端构建缓存与依赖
+frontend/node_modules/
+frontend/.nuxt/
+frontend/.output/
+frontend/dist/
+
+# 日志与系统文件
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini

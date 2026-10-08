@@ -1,0 +1,1 @@
+import t from"./U3N1S8L1.js";import{_ as a,u as e,c as s,d as o,b as r}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const c={class:"m-illustration-wrap"},_={__name:"illustration",setup(i){return e({title:"段落配图"}),(l,n)=>(r(),s("div",c,[o(t)]))}},d=a(_,[["__scopeId","data-v-6e596a51"]]);export{d as default};

@@ -1,0 +1,1 @@
+import e from"./BF6_aee5.js";import{_ as t,u as a,c as r,d as p,b as s}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const o={class:"m-paperweight-wrap"},c={__name:"paperweight",setup(_){return a({title:"论文增重"}),(i,m)=>(s(),r("div",o,[p(e)]))}},l=t(c,[["__scopeId","data-v-11ac9414"]]);export{l as default};

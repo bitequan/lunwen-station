@@ -1,0 +1,1 @@
+import e from"./BpmTkdcR.js";import{_ as t,u as a,c,d as r,b as s}from"./BkmVlzPN.js";import"./CnGO2uq1.js";const o={class:"m-createchart-wrap"},_={__name:"createchart",setup(p){return a({title:"图表生成"}),(d,m)=>(s(),c("div",o,[r(e)]))}},l=t(_,[["__scopeId","data-v-aceed7d2"]]);export{l as default};
